@@ -2,9 +2,11 @@ package parser
 
 import (
 	"fmt"
+	"io/ioutil"
 	"reflect"
 
-	// "code.google.com/p/gogoprotobuf/proto"
+	"code.google.com/p/gogoprotobuf/proto"
+	"code.google.com/p/snappy-go/snappy"
 	"github.com/elobuff/d2rp/core/utils"
 	dota "github.com/elobuff/d2rp/dota"
 )
@@ -25,26 +27,50 @@ type ParserBaseEventMap struct {
 	Value     int
 }
 
+func SnappyUncompress(compressed []byte) []byte {
+	dst := make([]byte, 0, len(compressed))
+	out, err := snappy.Decode(dst, compressed)
+	if err != nil {
+		panic(err)
+	}
+	return out
+}
+
+func ProtoUnmarshal(data []byte, obj proto.Message) {
+	err := proto.Unmarshal(data, obj)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func readFile(path string) []byte {
+	raw, err := ioutil.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+	return raw
+}
+
 type ParserBase struct {
 	reader *utils.BytesReader
 }
 
-func NewParserBase(datas []byte) *ParserBase {
-	if len(datas) < headerLength {
+func NewParserBase(data []byte) *ParserBase {
+	if len(data) < headerLength {
 		panic("File too small.")
 	}
 
-	magic := ReadStringZ(datas, 0)
+	magic := ReadStringZ(data, 0)
 	if magic != headerMagic {
 		panic("demofilestamp doesn't match, was: " + magic)
 	}
 
-	totalLength := len(datas) - headerLength
+	totalLength := len(data) - headerLength
 	if totalLength < 1 {
 		panic("couldn't open file")
 	}
 
-	buffer := datas[headerLength:totalLength]
+	buffer := data[headerLength:totalLength]
 	return &ParserBase{
 		reader: &utils.BytesReader{Data: buffer},
 	}

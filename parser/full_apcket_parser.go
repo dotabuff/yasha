@@ -1,24 +1,10 @@
 package parser
 
 import (
-	"io/ioutil"
-
 	"github.com/elobuff/d2rp/core/utils"
 
-	"code.google.com/p/gogoprotobuf/proto"
-	//	"github.com/elobuff/d2rp/core/utils"
-	"code.google.com/p/snappy-go/snappy"
 	dota "github.com/elobuff/d2rp/dota"
 )
-
-func SnappyUncompress(compressed []byte) []byte {
-	dst := make([]byte, 0, len(compressed))
-	out, err := snappy.Decode(dst, compressed)
-	if err != nil {
-		panic(err)
-	}
-	return out
-}
 
 type FullPacketParser struct {
 	*ParserBase
@@ -26,18 +12,12 @@ type FullPacketParser struct {
 	Items    map[float64]*ParserItem
 }
 
-func LoadFromFile(path string) *FullPacketParser {
-	raw, err := ioutil.ReadFile(path)
-	if err != nil {
-		panic(err)
-	}
-
-	return NewFullPacketParser(raw)
+func FullPacketParserFromFile(path string) *FullPacketParser {
+	return NewFullPacketParser(readFile(path))
 }
 
 func NewFullPacketParser(data []byte) *FullPacketParser {
-	fppb := NewParserBase(data)
-	fpp := &FullPacketParser{ParserBase: fppb}
+	fpp := &FullPacketParser{ParserBase: NewParserBase(data)}
 	fpp.Analyze()
 	return fpp
 }
@@ -71,11 +51,8 @@ func (fpp *FullPacketParser) Analyze() {
 				item.Data = fpp.reader.Read(length)
 			}
 			if pbEvent.EventType == DEM_FullPacket {
-				full := dota.CDemoFullPacket{}
-				err := proto.Unmarshal(item.Data, &full)
-				if err != nil {
-					panic(err)
-				}
+				full := &dota.CDemoFullPacket{}
+				ProtoUnmarshal(item.Data, full)
 				item.From = DEM_FullPacket
 				item.EventType = DEM_StringTables
 				item.Data = nil
@@ -83,11 +60,8 @@ func (fpp *FullPacketParser) Analyze() {
 				fpp.Items[item.Sequence] = item
 				fpp.AnalyzePacket(DEM_FullPacket, tick, full.GetPacket().Data)
 			} else if pbEvent.EventType == DEM_SendTables && item.Tick == 0 {
-				full := dota.CDemoSendTables{}
-				err := proto.Unmarshal(item.Data, &full)
-				if err != nil {
-					panic(err)
-				}
+				full := &dota.CDemoSendTables{}
+				ProtoUnmarshal(item.Data, full)
 				fpp.AnalyzePacket(DEM_SendTables, tick, full.GetData())
 			} else {
 				fpp.Items[item.Sequence] = item
