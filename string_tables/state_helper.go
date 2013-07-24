@@ -28,9 +28,9 @@ func NewStateHelper(items parser.ParserBaseItems) *StateHelper {
 
 	for _, item := range items {
 		switch item.Value.(type) {
-		case dota.CSVCMsg_CreateStringTable, dota.CSVCMsg_UpdateStringTable:
+		case *dota.CSVCMsg_CreateStringTable, *dota.CSVCMsg_UpdateStringTable:
 			packets = append(packets, item)
-		case dota.CDemoStringTables, dota.CDemoFullPacket:
+		case *dota.CDemoStringTables, *dota.CDemoFullPacket:
 			fullPackets = append(fullPackets, item)
 		}
 	}
@@ -52,7 +52,7 @@ func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
 
 	for _, item := range packets {
 		switch t := item.Value.(type) {
-		case dota.CSVCMsg_CreateStringTable:
+		case *dota.CSVCMsg_CreateStringTable:
 			helper.lastIndexUsed += 1
 			st := &StringTable{
 				Index: helper.lastIndexUsed,
@@ -69,7 +69,7 @@ func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
 				st.Items[key] = value
 			}
 			result[helper.lastIndexUsed] = st
-		case dota.CSVCMsg_UpdateStringTable:
+		case *dota.CSVCMsg_UpdateStringTable:
 			stc := helper.cache[int(t.GetTableId())]
 			ustr := Parse(t.GetStringData(),
 				t.GetNumChangedEntries(),
@@ -103,10 +103,10 @@ func (helper *StateHelper) populateCache() {
 	}
 	sort.Sort(sortItems)
 
-	items := []dota.CSVCMsg_CreateStringTable{}
+	items := []*dota.CSVCMsg_CreateStringTable{}
 	for _, item := range sortItems {
 		switch cst := item.Value.(type) {
-		case dota.CSVCMsg_CreateStringTable:
+		case *dota.CSVCMsg_CreateStringTable:
 			items = append(items, cst)
 		}
 	}

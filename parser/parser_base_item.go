@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"code.google.com/p/gogoprotobuf/proto"
 	"reflect"
 )
 
@@ -9,7 +10,7 @@ type ParserBaseItem struct {
 	From     ParserBaseEvent
 	ItemType reflect.Type
 	Tick     int
-	Value    interface{}
+	Value    proto.Message
 }
 
 // ParserBaseItems attaches the methods of Interface to []*ParserBaseItem, sorting in increasing order by Sequence.

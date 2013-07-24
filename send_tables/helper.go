@@ -48,12 +48,12 @@ const (
 )
 
 type Helper struct {
-	sendTables       map[string]dota.CSVCMsg_SendTable
+	sendTables       map[string]*dota.CSVCMsg_SendTable
 	flatSendTable    []dota.CSVCMsg_SendTableSendpropT
 	excludedSendProp []dota.CSVCMsg_SendTableSendpropT
 }
 
-func NewHelper(sendTables map[string]dota.CSVCMsg_SendTable) *Helper {
+func NewHelper(sendTables map[string]*dota.CSVCMsg_SendTable) *Helper {
 	return &Helper{
 		sendTables:       sendTables,
 		flatSendTable:    []dota.CSVCMsg_SendTableSendpropT{},

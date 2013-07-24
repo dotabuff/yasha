@@ -8,72 +8,58 @@ import (
 )
 
 const (
-	BaseError ParserBaseEvent = iota
+	BaseError ParserBaseEvent = -1
+
+	DEM_Error ParserBaseEvent = iota
+	DEM_Stop
+	DEM_FileHeader
+	DEM_FileInfo
+	DEM_SyncTick
+	DEM_SendTables
 	DEM_ClassInfo
+	DEM_StringTables
+	DEM_Packet
+	DEM_SignonPacket
 	DEM_ConsoleCmd
 	DEM_CustomData
 	DEM_CustomDataCallbacks
-	DEM_FileHeader
-	DEM_FileInfo
-	DEM_FullPacket
-	DEM_IsCompressed
-	DEM_Max
-	DEM_Packet
-	DEM_SendTables
-	DEM_SignonPacket
-	DEM_Stop
-	DEM_StringTables
-	DEM_SyncTick
 	DEM_UserCmd
-	DOTA_UM_AIDebugLine
-	DOTA_UM_AddQuestLogEntry
-	DOTA_UM_AddUnitToSelection
-	DOTA_UM_BotChat
-	DOTA_UM_CharacterSpeakConcept
-	DOTA_UM_ChatEvent
-	DOTA_UM_ChatWheel
-	DOTA_UM_CombatHeroPositions
-	DOTA_UM_CombatLogData
-	DOTA_UM_CombatLogShowDeath
-	DOTA_UM_CreateLinearProjectile
-	DOTA_UM_DestroyLinearProjectile
-	DOTA_UM_DodgeTrackingProjectiles
-	DOTA_UM_GamerulesStateChanged
-	DOTA_UM_GlobalLightColor
-	DOTA_UM_GlobalLightDirection
-	DOTA_UM_HalloweenDrops
-	DOTA_UM_HudError
-	DOTA_UM_InvalidCommand
-	DOTA_UM_ItemAlert
-	DOTA_UM_ItemFound
-	DOTA_UM_ItemPurchased
-	DOTA_UM_LocationPing
-	DOTA_UM_MapLine
-	DOTA_UM_MiniKillCamInfo
-	DOTA_UM_MinimapDebugPoint
-	DOTA_UM_MinimapEvent
-	DOTA_UM_NevermoreRequiem
-	DOTA_UM_OverheadEvent
-	DOTA_UM_ParticleManager
-	DOTA_UM_Ping
-	DOTA_UM_ReceivedXmasGift
-	DOTA_UM_SendGenericToolTip
-	DOTA_UM_SendRoshanPopup
-	DOTA_UM_SendStatPopup
-	DOTA_UM_SetNextAutobuyItem
-	DOTA_UM_SharedCooldown
-	DOTA_UM_ShowSurvey
-	DOTA_UM_SpectatorPlayerClick
-	DOTA_UM_SwapVerify
-	DOTA_UM_TournamentDrop
-	DOTA_UM_TutorialFade
-	DOTA_UM_TutorialFinish
-	DOTA_UM_TutorialPingMinimap
-	DOTA_UM_TutorialRequestExp
-	DOTA_UM_TutorialTipInfo
-	DOTA_UM_UnitEvent
-	DOTA_UM_UpdateSharedContent
-	DOTA_UM_WorldLine
+	DEM_FullPacket
+	DEM_Max
+	DEM_IsCompressed
+	NET_NOP
+	NET_Disconnect
+	NET_File
+	NET_SplitScreenUser
+	NET_Tick
+	NET_StringCmd
+	NET_SetConVar
+	NET_SignonState
+	SVC_ServerInfo
+	SVC_SendTable
+	SVC_ClassInfo
+	SVC_SetPause
+	SVC_CreateStringTable
+	SVC_UpdateStringTable
+	SVC_VoiceInit
+	SVC_VoiceData
+	SVC_Print
+	SVC_Sounds
+	SVC_SetView
+	SVC_FixAngle
+	SVC_CrosshairAngle
+	SVC_BSPDecal
+	SVC_SplitScreen
+	SVC_UserMessage
+	SVC_EntityMessage
+	SVC_GameEvent
+	SVC_PacketEntities
+	SVC_TempEntities
+	SVC_Prefetch
+	SVC_Menu
+	SVC_GameEventList
+	SVC_GetCvarValue
+	SVC_PacketReliable
 	UM_AchievementEvent
 	UM_CloseCaption
 	UM_CloseCaptionDirect
@@ -86,7 +72,6 @@ const (
 	UM_HudMsg
 	UM_HudText
 	UM_KeyHintText
-	UM_MAX_BASE
 	UM_MessageText
 	UM_RequestState
 	UM_ResetHUD
@@ -94,7 +79,6 @@ const (
 	UM_SayText
 	UM_SayText2
 	UM_SayTextChannel
-	UM_SendAudio
 	UM_Shake
 	UM_ShakeDir
 	UM_StatsCrawlMsg
@@ -105,39 +89,57 @@ const (
 	UM_VGUIMenu
 	UM_VoiceMask
 	UM_VoiceSubtitle
-	NET_Disconnect
-	NET_File
-	NET_NOP
-	NET_SetConVar
-	NET_SignonState
-	NET_SplitScreenUser
-	NET_StringCmd
-	NET_Tick
-	SVC_BSPDecal
-	SVC_ClassInfo
-	SVC_CreateStringTable
-	SVC_CrosshairAngle
-	SVC_EntityMessage
-	SVC_FixAngle
-	SVC_GameEvent
-	SVC_GameEventList
-	SVC_GetCvarValue
-	SVC_Menu
-	SVC_PacketEntities
-	SVC_PacketReliable
-	SVC_Prefetch
-	SVC_Print
-	SVC_SendTable
-	SVC_ServerInfo
-	SVC_SetPause
-	SVC_SetView
-	SVC_Sounds
-	SVC_SplitScreen
-	SVC_TempEntities
-	SVC_UpdateStringTable
-	SVC_UserMessage
-	SVC_VoiceData
-	SVC_VoiceInit
+	UM_SendAudio
+	UM_MAX_BASE
+	DOTA_UM_AddUnitToSelection
+	DOTA_UM_AIDebugLine
+	DOTA_UM_ChatEvent
+	DOTA_UM_CombatHeroPositions
+	DOTA_UM_CombatLogData
+	DOTA_UM_CombatLogShowDeath
+	DOTA_UM_CreateLinearProjectile
+	DOTA_UM_DestroyLinearProjectile
+	DOTA_UM_DodgeTrackingProjectiles
+	DOTA_UM_GlobalLightColor
+	DOTA_UM_GlobalLightDirection
+	DOTA_UM_InvalidCommand
+	DOTA_UM_LocationPing
+	DOTA_UM_MapLine
+	DOTA_UM_MiniKillCamInfo
+	DOTA_UM_MinimapDebugPoint
+	DOTA_UM_MinimapEvent
+	DOTA_UM_NevermoreRequiem
+	DOTA_UM_OverheadEvent
+	DOTA_UM_SetNextAutobuyItem
+	DOTA_UM_SharedCooldown
+	DOTA_UM_SpectatorPlayerClick
+	DOTA_UM_TutorialTipInfo
+	DOTA_UM_UnitEvent
+	DOTA_UM_ParticleManager
+	DOTA_UM_BotChat
+	DOTA_UM_HudError
+	DOTA_UM_ItemPurchased
+	DOTA_UM_Ping
+	DOTA_UM_ItemFound
+	DOTA_UM_CharacterSpeakConcept
+	DOTA_UM_SwapVerify
+	DOTA_UM_WorldLine
+	DOTA_UM_TournamentDrop
+	DOTA_UM_ItemAlert
+	DOTA_UM_HalloweenDrops
+	DOTA_UM_ChatWheel
+	DOTA_UM_ReceivedXmasGift
+	DOTA_UM_UpdateSharedContent
+	DOTA_UM_TutorialRequestExp
+	DOTA_UM_TutorialPingMinimap
+	DOTA_UM_GamerulesStateChanged
+	DOTA_UM_ShowSurvey
+	DOTA_UM_TutorialFade
+	DOTA_UM_AddQuestLogEntry
+	DOTA_UM_SendStatPopup
+	DOTA_UM_TutorialFinish
+	DOTA_UM_SendRoshanPopup
+	DOTA_UM_SendGenericToolTip
 )
 
 var NetSvc []ParserBaseEventMap

@@ -35,13 +35,13 @@ func NewParser(items parser.ParserBaseItems) {
 		entities: make([]*PacketEntity, 0, 2048),
 	}
 
-	var serverInfo dota.CSVCMsg_ServerInfo
+	var serverInfo *dota.CSVCMsg_ServerInfo
 	packets := parser.ParserBaseItems{}
 	for _, item := range items {
 		switch value := item.Value.(type) {
-		case dota.CSVCMsg_ServerInfo:
+		case *dota.CSVCMsg_ServerInfo:
 			serverInfo = value
-		case dota.CSVCMsg_PacketEntities:
+		case *dota.CSVCMsg_PacketEntities:
 			if item.From == parser.DEM_Packet {
 				packets = append(packets, item)
 			}
@@ -54,17 +54,17 @@ func NewParser(items parser.ParserBaseItems) {
 
 	var classInfos *dota.CDemoClassInfo
 	var instanceBaseline *dota.CDemoStringTablesTableT
-	sendTables := map[string]dota.CSVCMsg_SendTable{}
+	sendTables := map[string]*dota.CSVCMsg_SendTable{}
 
 	for _, item := range items {
 		switch value := item.Value.(type) {
-		case dota.CDemoClassInfo:
+		case *dota.CDemoClassInfo:
 			if classInfos == nil {
-				classInfos = &value
+				classInfos = value
 			}
-		case dota.CSVCMsg_SendTable:
+		case *dota.CSVCMsg_SendTable:
 			sendTables[value.GetNetTableName()] = value
-		case dota.CDemoStringTables:
+		case *dota.CDemoStringTables:
 			for _, table := range value.GetTables() {
 				if table.GetTableName() == "instancebaseline" {
 					instanceBaseline = table
@@ -186,7 +186,7 @@ func (p *PacketEntitiesParser) EntityPreserve(br *utils.BitReader, currentIndex,
 }
 
 func (p *PacketEntitiesParser) ParsePacket(packet *parser.ParserBaseItem) {
-	pe := (packet.Value).(dota.CSVCMsg_PacketEntities)
+	pe := (packet.Value).(*dota.CSVCMsg_PacketEntities)
 	br := utils.NewBitReader(pe.GetEntityData())
 	currentIndex := -1
 	for i := 0; i < int(pe.GetUpdatedEntries()); i++ {

@@ -44,11 +44,8 @@ func SnappyUncompress(compressed []byte) []byte {
 	return out
 }
 
-func ProtoUnmarshal(data []byte, obj proto.Message) {
-	err := proto.Unmarshal(data, obj)
-	if err != nil {
-		panic(err)
-	}
+func ProtoUnmarshal(data []byte, obj proto.Message) error {
+	return proto.Unmarshal(data, obj)
 }
 
 func ReadFile(path string) []byte {

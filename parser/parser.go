@@ -122,76 +122,45 @@ func (p *Parser) AnalyzePacket(fromEvent ParserBaseEvent, tick int, data []byte)
 }
 
 func (p *Parser) Parse(events ...ParserBaseEvent) (items ParserBaseItems) {
-	if len(events) < 1 {
-		panic("we're missing something")
-	}
-	emap := map[ParserBaseEvent]bool{}
-	for _, event := range events {
-		emap[event] = true
-	}
+	found := false
+
 	for _, item := range p.Items {
-		if _, found := emap[item.EventType]; !found {
+		if item.Data == nil {
 			continue
 		}
-		if item.Data != nil {
-			instance := reflect.New(item.ItemType)
-			spew.Dump(instance)
-			spew.Dump(instance.Interface())
-			value := instance.Interface()
-			ProtoUnmarshal(item.Data, value.(proto.Message))
-			spew.Dump(value)
-			item.Value = value
-			item.Data = nil
+		found = false
+		for _, event := range events {
+			if found = event == item.EventType; found {
+				break
+			}
 		}
-		items = append(items, &ParserBaseItem{
-			Sequence: item.Sequence,
-			From:     item.From,
-			ItemType: item.ItemType,
-			Tick:     item.Tick,
-			Value:    item.Value,
-		})
+		if !found {
+			continue
+		}
+		items = append(items, parseOne(item))
 	}
 	sort.Sort(items)
 	return items
 }
 
-/*
-public IEnumerable<ParserBaseItem> Parse(params ParserBaseEvent[] events) {
-  Parallel.ForEach(this.Items,
-    o => {
-      if (o.Datas != null && events.Contains(o.EventType)) {
-        o.Value = o.Datas.Protobuf(o.ItemType);
-        o.Datas = null;
-      }
-      });
-  return this.Items.Where(o => events.Contains(o.EventType))
-    .OrderBy(o => o.Sequence)
-    .Select(o => new ParserBaseItem {
-        Sequence = o.Sequence,
-        From = o.From,
-        ItemType = o.ItemType,
-        Tick = o.Tick,
-        Value = o.Value
-        });
+func parseOne(item *ParserItem) *ParserBaseItem {
+	instance := reflect.New(item.ItemType)
+	message := instance.Interface().(proto.Message)
+	err := ProtoUnmarshal(item.Data, message)
+	if err != nil {
+		spew.Dump(item)
+		spew.Dump(message)
+		panic(err)
+		return &ParserBaseItem{}
+	}
+	item.Value = message
+	item.Data = nil
+	spew.Dump(item)
+	return &ParserBaseItem{
+		Sequence: item.Sequence,
+		From:     item.From,
+		ItemType: item.ItemType,
+		Tick:     item.Tick,
+		Value:    message,
+	}
 }
-public IEnumerable<ParserBaseItem> Parse() {
-  Parallel.ForEach(
-    this.Items, o => {
-      if (o.Datas != null) {
-      o.Value = o.Datas.Protobuf(o.ItemType);
-      o.Datas = null;
-    }
-  });
-  return this.Items.OrderBy(
-    o => o.Sequence
-  ).Select(
-    o => new ParserBaseItem {
-      Sequence = o.Sequence,
-      From = o.From,
-      ItemType = o.ItemType,
-      Tick = o.Tick,
-      Value = o.Value
-    }
-  );
-}
-*/
