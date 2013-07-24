@@ -99,6 +99,9 @@ func (p *ParserBase) AsParserBaseEventNETSVC(event int) ParserBaseEventMap {
 }
 
 func (p *ParserBase) AsParserBaseEventBUMDUM(event int) ParserBaseEventMap {
+	if event > len(BumDum) {
+		return ParserBaseEventMap{EventType: BaseError}
+	}
 	return BumDum[event]
 }
 

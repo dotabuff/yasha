@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"code.google.com/p/gogoprotobuf/proto"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/elobuff/d2rp/core/utils"
 	dota "github.com/elobuff/d2rp/dota"
 )
@@ -121,6 +122,9 @@ func (p *Parser) AnalyzePacket(fromEvent ParserBaseEvent, tick int, data []byte)
 }
 
 func (p *Parser) Parse(events ...ParserBaseEvent) (items ParserBaseItems) {
+	if len(events) < 1 {
+		panic("we're missing something")
+	}
 	emap := map[ParserBaseEvent]bool{}
 	for _, event := range events {
 		emap[event] = true
@@ -130,9 +134,13 @@ func (p *Parser) Parse(events ...ParserBaseEvent) (items ParserBaseItems) {
 			continue
 		}
 		if item.Data != nil {
-			v := reflect.New(item.ItemType)
-			ProtoUnmarshal(item.Data, v.Addr().Interface().(proto.Message))
-			item.Value = v.Interface()
+			instance := reflect.New(item.ItemType)
+			spew.Dump(instance)
+			spew.Dump(instance.Interface())
+			value := instance.Interface()
+			ProtoUnmarshal(item.Data, value.(proto.Message))
+			spew.Dump(value)
+			item.Value = value
 			item.Data = nil
 		}
 		items = append(items, &ParserBaseItem{
