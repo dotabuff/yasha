@@ -18,11 +18,3 @@ type ParserBaseItems []*ParserBaseItem
 func (p ParserBaseItems) Len() int           { return len(p) }
 func (p ParserBaseItems) Less(i, j int) bool { return p[i].Sequence < p[j].Sequence }
 func (p ParserBaseItems) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-
-const (
-	DEM ParserBaseEventMapType = iota
-	NET
-	SVC
-	BUM
-	DUM
-)

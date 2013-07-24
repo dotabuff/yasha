@@ -16,6 +16,14 @@ const (
 	headerMagic  = "PBUFDEM"
 )
 
+const (
+	DEM ParserBaseEventMapType = iota
+	NET
+	SVC
+	BUM
+	DUM
+)
+
 type ParserBaseEvent int
 type ParserBaseEventMapType int
 type ItemType int
@@ -43,7 +51,7 @@ func ProtoUnmarshal(data []byte, obj proto.Message) {
 	}
 }
 
-func readFile(path string) []byte {
+func ReadFile(path string) []byte {
 	raw, err := ioutil.ReadFile(path)
 	if err != nil {
 		panic(err)

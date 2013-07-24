@@ -13,7 +13,7 @@ type FullPacketParser struct {
 }
 
 func FullPacketParserFromFile(path string) *FullPacketParser {
-	return NewFullPacketParser(readFile(path))
+	return NewFullPacketParser(ReadFile(path))
 }
 
 func NewFullPacketParser(data []byte) *FullPacketParser {

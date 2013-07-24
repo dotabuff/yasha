@@ -1,8 +1,11 @@
 package parser
 
 import (
-	"github.com/elobuff/d2rp/core/utils"
+	"reflect"
+	"sort"
 
+	"code.google.com/p/gogoprotobuf/proto"
+	"github.com/elobuff/d2rp/core/utils"
 	dota "github.com/elobuff/d2rp/dota"
 )
 
@@ -13,7 +16,7 @@ type Parser struct {
 }
 
 func ParserFromFile(path string) *Parser {
-	return NewParser(readFile(path))
+	return NewParser(ReadFile(path))
 }
 
 func NewParser(data []byte) *Parser {
@@ -100,7 +103,7 @@ func (p *Parser) AnalyzePacket(fromEvent ParserBaseEvent, tick int, data []byte)
 				Data:      reader.Read(length),
 			}
 			p.Sequence++
-			if pbEvent.EventType == svc_UserMessage {
+			if pbEvent.EventType == SVC_UserMessage {
 				message := &dota.CSVCMsg_UserMessage{}
 				ProtoUnmarshal(item.Data, message)
 				umEvent := p.AsParserBaseEventBUMDUM(int(message.GetMsgType()))
@@ -116,3 +119,71 @@ func (p *Parser) AnalyzePacket(fromEvent ParserBaseEvent, tick int, data []byte)
 		}
 	}
 }
+
+func (p *Parser) Parse(events ...ParserBaseEvent) (items ParserBaseItems) {
+	emap := map[ParserBaseEvent]bool{}
+	for _, event := range events {
+		emap[event] = true
+	}
+	for _, item := range p.Items {
+		if _, found := emap[item.EventType]; !found {
+			continue
+		}
+		if item.Data != nil {
+			v := reflect.New(item.ItemType)
+			ProtoUnmarshal(item.Data, v.Addr().Interface().(proto.Message))
+			item.Value = v.Interface()
+			item.Data = nil
+		}
+		items = append(items, &ParserBaseItem{
+			Sequence: item.Sequence,
+			From:     item.From,
+			ItemType: item.ItemType,
+			Tick:     item.Tick,
+			Value:    item.Value,
+		})
+	}
+	sort.Sort(items)
+	return items
+}
+
+/*
+public IEnumerable<ParserBaseItem> Parse(params ParserBaseEvent[] events) {
+  Parallel.ForEach(this.Items,
+    o => {
+      if (o.Datas != null && events.Contains(o.EventType)) {
+        o.Value = o.Datas.Protobuf(o.ItemType);
+        o.Datas = null;
+      }
+      });
+  return this.Items.Where(o => events.Contains(o.EventType))
+    .OrderBy(o => o.Sequence)
+    .Select(o => new ParserBaseItem {
+        Sequence = o.Sequence,
+        From = o.From,
+        ItemType = o.ItemType,
+        Tick = o.Tick,
+        Value = o.Value
+        });
+}
+public IEnumerable<ParserBaseItem> Parse() {
+  Parallel.ForEach(
+    this.Items, o => {
+      if (o.Datas != null) {
+      o.Value = o.Datas.Protobuf(o.ItemType);
+      o.Datas = null;
+    }
+  });
+  return this.Items.OrderBy(
+    o => o.Sequence
+  ).Select(
+    o => new ParserBaseItem {
+      Sequence = o.Sequence,
+      From = o.From,
+      ItemType = o.ItemType,
+      Tick = o.Tick,
+      Value = o.Value
+    }
+  );
+}
+*/

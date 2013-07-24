@@ -17,15 +17,15 @@ const (
 )
 
 type BitReader struct {
-	buffer     []byte
+	Buffer     []byte
 	currentBit int
 }
 
-func (br *BitReader) Length() int      { return len(br.buffer) }
+func (br *BitReader) Length() int      { return len(br.Buffer) }
 func (br *BitReader) CurrentBit() int  { return br.currentBit }
 func (br *BitReader) CurrentByte() int { return br.currentBit / 8 }
-func (br *BitReader) BitsLeft() int    { return (len(br.buffer) * 8) - br.currentBit }
-func (br *BitReader) BytesLeft() int   { return len(br.buffer) - br.CurrentByte() }
+func (br *BitReader) BitsLeft() int    { return (len(br.Buffer) * 8) - br.currentBit }
+func (br *BitReader) BytesLeft() int   { return len(br.Buffer) - br.CurrentByte() }
 
 // origin -1: current
 // origin  0: begin
@@ -51,7 +51,7 @@ func (br *BitReader) ReadUBitsByteAligned(nBits int) uint {
 	}
 	var result uint
 	for i := 0; i < nBits/8; i++ {
-		result += uint(br.buffer[br.CurrentByte()] << (uint(i) * 8))
+		result += uint(br.Buffer[br.CurrentByte()] << (uint(i) * 8))
 		br.currentBit += 8
 	}
 	return result
@@ -66,7 +66,7 @@ func (br *BitReader) ReadUBitsNotByteAligned(nBits int) uint {
 
 	var currentValue uint64
 	for i := 0; i < nBytesToRead; i++ {
-		b := br.buffer[br.CurrentByte()+1]
+		b := br.Buffer[br.CurrentByte()+1]
 		currentValue += (uint64(b) << uint(i*8))
 	}
 	currentValue >>= uint(bitOffset)
@@ -118,7 +118,7 @@ func (br *BitReader) ReadBoolean() bool {
 	}
 	currentByte := br.CurrentBit() / 8
 	bitOffset := br.CurrentBit() % 8
-	result := br.buffer[currentByte]&(1<<uint(bitOffset)) != 0
+	result := br.Buffer[currentByte]&(1<<uint(bitOffset)) != 0
 	br.currentBit++
 	return result
 }

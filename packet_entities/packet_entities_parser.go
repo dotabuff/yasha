@@ -1,210 +1,213 @@
-namespace D2NET.Core.PacketEntities {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+package packet_entities
 
-    using D2NET.Core.Parser;
-    using D2NET.Core.Protobuf;
-    using D2NET.Core.SendTables;
-    using D2NET.Core.Utils;
+import (
+	"math"
+	"sort"
+	"strconv"
 
-    public class PacketEntitiesParser {
-        private Dictionary<int, Dictionary<string, object>> baseline = new Dictionary<int, Dictionary<string, object>>();
-        private int classIdNumBits = 0;
-        private Dictionary<string, int> classInfosIdMapping = new Dictionary<string, int>();
-        private Dictionary<int, string> classInfosNameMapping = new Dictionary<int, string>();
-        private Dictionary<string, Handler> createClassHandlers = new Dictionary<string, Handler>();
-        private Dictionary<string, Handler> deleteClassHandlers = new Dictionary<string, Handler>();
-        private Dictionary<int, SendProp[]> mapping = new Dictionary<int, SendProp[]>();
-        private Dictionary<int, Dictionary<string, int>> multiples = new Dictionary<int, Dictionary<string, int>>();
-        private List<ParserBaseItem> packets;
-        private Dictionary<string, HandlerPreserve> preserveClassHandlers = new Dictionary<string, HandlerPreserve>();
-        private SendTablesHelper sendTablesHelper;
+	"github.com/elobuff/d2rp/core/parser"
+	"github.com/elobuff/d2rp/core/send_tables"
+	"github.com/elobuff/d2rp/core/utils"
+	dota "github.com/elobuff/d2rp/dota"
+)
 
-        public PacketEntitiesParser(List<ParserBaseItem> items) {
-            this.Entities = new PacketEntity[2048];
-            this.packets = items.Where(o => o.ItemType == typeof(CSVCMsg_PacketEntities) && o.From == ParserBaseEvent.DEM_Packet)
-                                .OrderBy(o => o.Tick)
-                                .ToList();
-            CSVCMsg_ServerInfo server_info = (CSVCMsg_ServerInfo)items.First(o => o.ItemType == typeof(CSVCMsg_ServerInfo)).Value;
-            this.classIdNumBits = (int)(Math.Log(server_info.max_classes) / Math.Log(2)) + 1;
-            CDemoClassInfo class_infos = (CDemoClassInfo)items.First(o => o.ItemType == typeof(CDemoClassInfo)).Value;
-            this.classInfosNameMapping = class_infos.classes.ToDictionary(o => o.class_id, o => o.table_name);
-            this.classInfosIdMapping = class_infos.classes.ToDictionary(o => o.table_name, o => o.class_id);
-            this.sendTablesHelper = new SendTablesHelper(items.Where(o => o.ItemType == typeof(CSVCMsg_SendTable))
-                                                              .ToDictionary(o => ((CSVCMsg_SendTable)o.Value).net_table_name, o => (CSVCMsg_SendTable)o.Value));
-            foreach (string key in this.classInfosIdMapping.Keys) {
-                SendProp[] props = this.sendTablesHelper.LoadSendTable(key);
-                this.mapping.Add(this.classInfosIdMapping[key], props);
-                this.multiples.Add(this.classInfosIdMapping[key], (from o in props group o by new { o.dt_name, o.var_name } into g select new { Key = g.Key.dt_name + "." + g.Key.var_name, Count = g.Count() }).ToDictionary(o => o.Key, o => o.Count));
-            }
-
-            CDemoStringTables.table_t instanceBaseline = items.Where(o => o.ItemType == typeof(CDemoStringTables))
-                                                              .Select(o => (CDemoStringTables)o.Value)
-                                                              .Last(o => o.tables.Any(p => p.table_name == "instancebaseline"))
-                                                              .tables
-                                                              .First(o => o.table_name == "instancebaseline");
-            foreach (CDemoStringTables.items_t item in instanceBaseline.items) {
-                int class_id = int.Parse(item.str);
-                string class_name = this.classInfosNameMapping[class_id];
-                BitReader br = new BitReader(item.data);
-                List<int> indexes = br.ReadPropertiesIndex();
-                try {
-                    this.baseline.Add(int.Parse(item.str), br.ReadPropertiesValues(this.mapping[class_id], this.multiples[class_id], indexes));
-                }
-                catch (Exception ex) {
-                    var toto = true;
-                }
-            }
-        }
-
-        private PacketEntitiesParser() {
-        }
-
-        public delegate void Procedure(PacketEntity pe);
-
-        public delegate void ProcedurePreserve(PacketEntity pe, Dictionary<string, object> values);
-
-        public PacketEntity[] Entities {
-            get; private set;
-        }
-
-        public void AddCreateHandler(string class_name, Procedure callback) {
-            Handler h = new Handler();
-            h.ClassName = class_name;
-            h.Callback = callback;
-            this.createClassHandlers.Add(class_name, h);
-        }
-
-        public void AddDeleteHandler(string class_name, Procedure callback) {
-            Handler h = new Handler();
-            h.ClassName = class_name;
-            h.Callback = callback;
-            this.deleteClassHandlers.Add(class_name, h);
-        }
-
-        public void AddPreserveHandler(string class_name, ProcedurePreserve callback) {
-            HandlerPreserve h = new HandlerPreserve();
-            h.ClassName = class_name;
-            h.Callback = callback;
-            this.preserveClassHandlers.Add(class_name, h);
-        }
-
-        public void Parse() {
-            for (int i = 0; i < this.packets.Count; i++) {
-                this.ParsePacket(i);
-            }
-        }
-
-        private void EntityCreate(BitReader br, int current_index, int tick) {
-            PacketEntity pe = new PacketEntity();
-            pe.Tick = tick;
-            pe.ClassId = (int)br.ReadUBits(this.classIdNumBits);
-            pe.SerialNum = (int)br.ReadUBits(10);
-            pe.Index = current_index;
-            pe.Name = this.classInfosNameMapping[pe.ClassId];
-            pe.Type = UpdateType.Create;
-            pe.Values = new Dictionary<string, object>();
-            List<int> indexes = br.ReadPropertiesIndex();
-            Dictionary<string, object> values = br.ReadPropertiesValues(this.mapping[pe.ClassId], this.multiples[pe.ClassId], indexes);
-            if (this.baseline.ContainsKey(pe.ClassId)) {
-                foreach (string basekey in this.baseline[pe.ClassId].Keys) {
-                    object object_value;
-                    if (values.TryGetValue(basekey, out object_value)) {
-                        pe.Values.Add(basekey, object_value);
-                    } else {
-                        pe.Values.Add(basekey, this.baseline[pe.ClassId][basekey]);
-                    }
-                }
-            } else {
-                foreach (string key in values.Keys) {
-                    pe.Values.Add(key, values[key]);
-                }
-            }
-
-            this.Entities[pe.Index] = pe;
-            Handler handler;
-            if (this.createClassHandlers.TryGetValue(pe.Name, out handler)) {
-                handler.Callback(pe);
-            }
-        }
-
-        private void EntityDelete(BitReader br, int current_index, int tick) {
-            PacketEntity pe = (PacketEntity)this.Entities[current_index].Clone();
-            pe.Tick = tick;
-            pe.Type = UpdateType.Delete;
-            this.Entities[current_index] = null;
-            Handler handler;
-            if (this.deleteClassHandlers.TryGetValue(pe.Name, out handler)) {
-                handler.Callback(pe);
-            }
-        }
-
-        private void EntityPreserve(BitReader br, int current_index, int tick) {
-            PacketEntity pe = this.Entities[current_index];
-            pe.Tick = tick;
-            pe.Type = UpdateType.Preserve;
-            List<int> indexes = br.ReadPropertiesIndex();
-            Dictionary<string, object> values = br.ReadPropertiesValues(this.mapping[this.classInfosIdMapping[pe.Name]], this.multiples[this.classInfosIdMapping[pe.Name]], indexes);
-            foreach (string key in values.Keys) {
-                object object_value;
-                if (pe.Values.TryGetValue(key, out object_value)) {
-                    pe.Values[key] = values[key];
-                } else {
-                    pe.Values.Add(key, values[key]);
-                }
-            }
-
-            HandlerPreserve handler;
-            if (this.preserveClassHandlers.TryGetValue(pe.Name, out handler)) {
-                handler.Callback(pe, values);
-            }
-        }
-
-        private void ParsePacket(int index) {
-            CSVCMsg_PacketEntities pe = (CSVCMsg_PacketEntities)this.packets[index].Value;
-            BitReader br = new BitReader(pe.entity_data);
-            int current_index = -1;
-            for (int i = 0; i < pe.updated_entries; i++) {
-                current_index = br.ReadNextEntityIndex(current_index);
-                UpdateType type = br.ReadUpdateType();
-                if (type == UpdateType.Preserve) {
-                    this.EntityPreserve(br, current_index, this.packets[index].Tick);
-                } else if (type == UpdateType.Create) {
-                    this.EntityCreate(br, current_index, this.packets[index].Tick);
-                } else if (type == UpdateType.Delete) {
-                    this.EntityDelete(br, current_index, this.packets[index].Tick);
-                }
-            }
-        }
-
-        internal class Handler {
-            public Procedure Callback {
-                get; set;
-            }
-
-            public string ClassName {
-                get; set;
-            }
-
-            public override int GetHashCode() {
-                return this.ClassName.GetHashCode();
-            }
-        }
-
-        internal class HandlerPreserve {
-            public ProcedurePreserve Callback {
-                get; set;
-            }
-
-            public string ClassName {
-                get; set;
-            }
-
-            public override int GetHashCode() {
-                return this.ClassName.GetHashCode();
-            }
-        }
-    }
+type PacketEntitiesParser struct {
+	baseline              map[int]map[string]interface{}
+	classIdNumBits        int
+	classInfosIdMapping   map[string]int
+	classInfosNameMapping map[int]string
+	createClassHandlers   map[string]Handler
+	deleteClassHandlers   map[string]Handler
+	mapping               map[int][]dota.CSVCMsg_SendTableSendpropT
+	multiples             map[int]map[string]int
+	packets               parser.ParserBaseItems
+	preserveClassHandlers map[string]HandlerPreserve
+	sendTablesHelper      *send_tables.Helper
+	entities              []*PacketEntity
 }
 
+func (p PacketEntitiesParser) Entities() []*PacketEntity {
+	return p.entities
+}
+
+func NewParser(items parser.ParserBaseItems) {
+	p := PacketEntitiesParser{
+		entities: make([]*PacketEntity, 0, 2048),
+	}
+
+	var serverInfo dota.CSVCMsg_ServerInfo
+	packets := parser.ParserBaseItems{}
+	for _, item := range items {
+		switch value := item.Value.(type) {
+		case dota.CSVCMsg_ServerInfo:
+			serverInfo = value
+		case dota.CSVCMsg_PacketEntities:
+			if item.From == parser.DEM_Packet {
+				packets = append(packets, item)
+			}
+		}
+	}
+	sort.Sort(packets)
+	p.packets = packets
+
+	p.classIdNumBits = int(math.Log(float64(serverInfo.GetMaxClasses()))/math.Log(2)) + 1
+
+	var classInfos *dota.CDemoClassInfo
+	var instanceBaseline *dota.CDemoStringTablesTableT
+	sendTables := map[string]dota.CSVCMsg_SendTable{}
+
+	for _, item := range items {
+		switch value := item.Value.(type) {
+		case dota.CDemoClassInfo:
+			if classInfos == nil {
+				classInfos = &value
+			}
+		case dota.CSVCMsg_SendTable:
+			sendTables[value.GetNetTableName()] = value
+		case dota.CDemoStringTables:
+			for _, table := range value.GetTables() {
+				if table.GetTableName() == "instancebaseline" {
+					instanceBaseline = table
+				}
+			}
+		}
+	}
+
+	for _, info := range classInfos.GetClasses() {
+		id, name := int(info.GetClassId()), info.GetTableName()
+		p.classInfosNameMapping[id] = name
+		p.classInfosIdMapping[name] = id
+		props := p.sendTablesHelper.LoadSendTable(name)
+		p.mapping[id] = props
+
+		m := map[string]int{}
+		for _, prop := range props {
+			m[prop.GetDtName()+"."+prop.GetVarName()] += 1
+		}
+		p.multiples[id] = m
+	}
+
+	for _, item := range instanceBaseline.GetItems() {
+		classId, err := strconv.Atoi(item.GetStr())
+		if err != nil {
+			panic(err)
+		}
+		br := &utils.BitReader{Buffer: item.GetData()}
+		indices := ReadPropertiesIndex(br)
+		p.baseline[classId] =
+			ReadPropertiesValues(br, p.mapping[classId], p.multiples[classId], indices)
+	}
+}
+
+// public delegate void Procedure(PacketEntity pe);
+
+// public delegate void ProcedurePreserve(PacketEntity pe, Dictionary<string, object> values);
+
+func (p *PacketEntitiesParser) AddCreateHandler(className string, callback Callback) {
+	p.createClassHandlers[className] = Handler{ClassName: className, Callback: callback}
+}
+
+func (p *PacketEntitiesParser) AddDeleteHandler(className string, callback Callback) {
+	p.deleteClassHandlers[className] = Handler{ClassName: className, Callback: callback}
+}
+
+func (p *PacketEntitiesParser) AddPreserveHandler(className string, callback Callback) {
+	p.preserveClassHandlers[className] = HandlerPreserve{ClassName: className, Callback: callback}
+}
+
+func (p *PacketEntitiesParser) Parse() {
+	for _, packet := range p.packets {
+		p.ParsePacket(packet)
+	}
+}
+
+func (p *PacketEntitiesParser) EntityCreate(br *utils.BitReader, currentIndex, tick int) {
+	pe := &PacketEntity{
+		Tick:      tick,
+		ClassId:   int(br.ReadUBits(p.classIdNumBits)),
+		SerialNum: int(br.ReadUBits(10)),
+		Index:     currentIndex,
+		Type:      Create,
+		Values:    map[string]interface{}{},
+	}
+	pe.Name = p.classInfosNameMapping[pe.ClassId]
+	indices := ReadPropertiesIndex(br)
+	values := ReadPropertiesValues(br, p.mapping[pe.ClassId], p.multiples[pe.ClassId], indices)
+	if baseline, ok := p.baseline[pe.ClassId]; ok {
+		for key, baseValue := range baseline {
+			if subValue, ok := values[key]; ok {
+				pe.Values[key] = subValue
+			} else {
+				pe.Values[key] = baseValue
+			}
+		}
+	} else {
+		for key, value := range values {
+			pe.Values[key] = value
+		}
+	}
+
+	p.entities[pe.Index] = pe
+	if handler, ok := p.createClassHandlers[pe.Name]; ok {
+		handler.Callback(pe)
+	}
+}
+
+func (p *PacketEntitiesParser) EntityDelete(br *utils.BitReader, currentIndex, tick int) {
+	pe := p.entities[currentIndex].Clone()
+	pe.Tick = tick
+	pe.Type = Delete
+	p.entities[currentIndex] = nil
+	if handler, ok := p.deleteClassHandlers[pe.Name]; ok {
+		handler.Callback(pe)
+	}
+}
+
+func (p *PacketEntitiesParser) EntityPreserve(br *utils.BitReader, currentIndex, tick int) {
+	pe := p.entities[currentIndex]
+	pe.Tick = tick
+	pe.Type = Preserve
+	indices := ReadPropertiesIndex(br)
+	values := ReadPropertiesValues(
+		br,
+		p.mapping[p.classInfosIdMapping[pe.Name]],
+		p.multiples[p.classInfosIdMapping[pe.Name]],
+		indices,
+	)
+	for key, value := range values {
+		pe.Values[key] = value
+	}
+
+	if handler, ok := p.preserveClassHandlers[pe.Name]; ok {
+		handler.Callback(pe)
+	}
+}
+
+func (p *PacketEntitiesParser) ParsePacket(packet *parser.ParserBaseItem) {
+	pe := (packet.Value).(dota.CSVCMsg_PacketEntities)
+	br := &utils.BitReader{Buffer: pe.GetEntityData()}
+	currentIndex := -1
+	for i := 0; i < int(pe.GetUpdatedEntries()); i++ {
+		currentIndex = ReadNextEntityIndex(br, currentIndex)
+		switch ReadUpdateType(br) {
+		case Preserve:
+			p.EntityPreserve(br, currentIndex, packet.Tick)
+		case Create:
+			p.EntityCreate(br, currentIndex, packet.Tick)
+		case Delete:
+			p.EntityDelete(br, currentIndex, packet.Tick)
+		}
+	}
+}
+
+type Callback func(*PacketEntity)
+
+type Handler struct {
+	Callback  Callback
+	ClassName string
+}
+
+type HandlerPreserve struct {
+	Callback  Callback
+	ClassName string
+}

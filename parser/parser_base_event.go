@@ -105,39 +105,39 @@ const (
 	UM_VGUIMenu
 	UM_VoiceMask
 	UM_VoiceSubtitle
-	net_Disconnect
-	net_File
-	net_NOP
-	net_SetConVar
-	net_SignonState
-	net_SplitScreenUser
-	net_StringCmd
-	net_Tick
-	svc_BSPDecal
-	svc_ClassInfo
-	svc_CreateStringTable
-	svc_CrosshairAngle
-	svc_EntityMessage
-	svc_FixAngle
-	svc_GameEvent
-	svc_GameEventList
-	svc_GetCvarValue
-	svc_Menu
-	svc_PacketEntities
-	svc_PacketReliable
-	svc_Prefetch
-	svc_Print
-	svc_SendTable
-	svc_ServerInfo
-	svc_SetPause
-	svc_SetView
-	svc_Sounds
-	svc_SplitScreen
-	svc_TempEntities
-	svc_UpdateStringTable
-	svc_UserMessage
-	svc_VoiceData
-	svc_VoiceInit
+	NET_Disconnect
+	NET_File
+	NET_NOP
+	NET_SetConVar
+	NET_SignonState
+	NET_SplitScreenUser
+	NET_StringCmd
+	NET_Tick
+	SVC_BSPDecal
+	SVC_ClassInfo
+	SVC_CreateStringTable
+	SVC_CrosshairAngle
+	SVC_EntityMessage
+	SVC_FixAngle
+	SVC_GameEvent
+	SVC_GameEventList
+	SVC_GetCvarValue
+	SVC_Menu
+	SVC_PacketEntities
+	SVC_PacketReliable
+	SVC_Prefetch
+	SVC_Print
+	SVC_SendTable
+	SVC_ServerInfo
+	SVC_SetPause
+	SVC_SetView
+	SVC_Sounds
+	SVC_SplitScreen
+	SVC_TempEntities
+	SVC_UpdateStringTable
+	SVC_UserMessage
+	SVC_VoiceData
+	SVC_VoiceInit
 )
 
 var NetSvc []ParserBaseEventMap
@@ -146,38 +146,38 @@ var Maps = map[string]ParserBaseEventMap{}
 
 func init() {
 	NetSvc = []ParserBaseEventMap{
-		{MapType: NET, Value: 0, Name: "net_NOP", EventType: net_NOP, ItemType: reflect.TypeOf(dota.CNETMsg_NOP{})},
-		{MapType: NET, Value: 1, Name: "net_Disconnect", EventType: net_Disconnect, ItemType: reflect.TypeOf(dota.CNETMsg_Disconnect{})},
-		{MapType: NET, Value: 2, Name: "net_File", EventType: net_File, ItemType: reflect.TypeOf(dota.CNETMsg_File{})},
-		{MapType: NET, Value: 3, Name: "net_SplitScreenUser", EventType: net_SplitScreenUser, ItemType: reflect.TypeOf(dota.CNETMsg_SplitScreenUser{})},
-		{MapType: NET, Value: 4, Name: "net_Tick", EventType: net_Tick, ItemType: reflect.TypeOf(dota.CNETMsg_Tick{})},
-		{MapType: NET, Value: 5, Name: "net_StringCmd", EventType: net_StringCmd, ItemType: reflect.TypeOf(dota.CNETMsg_StringCmd{})},
-		{MapType: NET, Value: 6, Name: "net_SetConVar", EventType: net_SetConVar, ItemType: reflect.TypeOf(dota.CNETMsg_SetConVar{})},
-		{MapType: NET, Value: 7, Name: "net_SignonState", EventType: net_SignonState, ItemType: reflect.TypeOf(dota.CNETMsg_SignonState{})},
-		{MapType: SVC, Value: 8, Name: "svc_ServerInfo", EventType: svc_ServerInfo, ItemType: reflect.TypeOf(dota.CSVCMsg_ServerInfo{})},
-		{MapType: SVC, Value: 9, Name: "svc_SendTable", EventType: svc_SendTable, ItemType: reflect.TypeOf(dota.CSVCMsg_SendTable{})},
-		{MapType: SVC, Value: 10, Name: "svc_ClassInfo", EventType: svc_ClassInfo, ItemType: reflect.TypeOf(dota.CSVCMsg_ClassInfo{})},
-		{MapType: SVC, Value: 11, Name: "svc_SetPause", EventType: svc_SetPause, ItemType: reflect.TypeOf(dota.CSVCMsg_SetPause{})},
-		{MapType: SVC, Value: 12, Name: "svc_CreateStringTable", EventType: svc_CreateStringTable, ItemType: reflect.TypeOf(dota.CSVCMsg_CreateStringTable{})},
-		{MapType: SVC, Value: 13, Name: "svc_UpdateStringTable", EventType: svc_UpdateStringTable, ItemType: reflect.TypeOf(dota.CSVCMsg_UpdateStringTable{})},
-		{MapType: SVC, Value: 14, Name: "svc_VoiceInit", EventType: svc_VoiceInit, ItemType: reflect.TypeOf(dota.CSVCMsg_VoiceInit{})},
-		{MapType: SVC, Value: 15, Name: "svc_VoiceData", EventType: svc_VoiceData, ItemType: reflect.TypeOf(dota.CSVCMsg_VoiceData{})},
-		{MapType: SVC, Value: 16, Name: "svc_Print", EventType: svc_Print, ItemType: reflect.TypeOf(dota.CSVCMsg_Print{})},
-		{MapType: SVC, Value: 17, Name: "svc_Sounds", EventType: svc_Sounds, ItemType: reflect.TypeOf(dota.CSVCMsg_Sounds{})},
-		{MapType: SVC, Value: 18, Name: "svc_SetView", EventType: svc_SetView, ItemType: reflect.TypeOf(dota.CSVCMsg_SetView{})},
-		{MapType: SVC, Value: 19, Name: "svc_FixAngle", EventType: svc_FixAngle, ItemType: reflect.TypeOf(dota.CSVCMsg_FixAngle{})},
-		{MapType: SVC, Value: 20, Name: "svc_CrosshairAngle", EventType: svc_CrosshairAngle, ItemType: reflect.TypeOf(dota.CSVCMsg_CrosshairAngle{})},
-		{MapType: SVC, Value: 21, Name: "svc_BSPDecal", EventType: svc_BSPDecal, ItemType: reflect.TypeOf(dota.CSVCMsg_BSPDecal{})},
-		{MapType: SVC, Value: 22, Name: "svc_SplitScreen", EventType: svc_SplitScreen, ItemType: reflect.TypeOf(dota.CSVCMsg_SplitScreen{})},
-		{MapType: SVC, Value: 23, Name: "svc_UserMessage", EventType: svc_UserMessage, ItemType: reflect.TypeOf(dota.CSVCMsg_UserMessage{})},
-		{MapType: SVC, Value: 25, Name: "svc_GameEvent", EventType: svc_GameEvent, ItemType: reflect.TypeOf(dota.CSVCMsg_GameEvent{})},
-		{MapType: SVC, Value: 26, Name: "svc_PacketEntities", EventType: svc_PacketEntities, ItemType: reflect.TypeOf(dota.CSVCMsg_PacketEntities{})},
-		{MapType: SVC, Value: 27, Name: "svc_TempEntities", EventType: svc_TempEntities, ItemType: reflect.TypeOf(dota.CSVCMsg_TempEntities{})},
-		{MapType: SVC, Value: 28, Name: "svc_Prefetch", EventType: svc_Prefetch, ItemType: reflect.TypeOf(dota.CSVCMsg_Prefetch{})},
-		{MapType: SVC, Value: 29, Name: "svc_Menu", EventType: svc_Menu, ItemType: reflect.TypeOf(dota.CSVCMsg_Menu{})},
-		{MapType: SVC, Value: 30, Name: "svc_GameEventList", EventType: svc_GameEventList, ItemType: reflect.TypeOf(dota.CSVCMsg_GameEventList{})},
-		{MapType: SVC, Value: 31, Name: "svc_GetCvarValue", EventType: svc_GetCvarValue, ItemType: reflect.TypeOf(dota.CSVCMsg_GetCvarValue{})},
-		{MapType: SVC, Value: 32, Name: "svc_PacketReliable", EventType: svc_PacketReliable, ItemType: reflect.TypeOf(dota.CSVCMsg_PacketReliable{})},
+		{MapType: NET, Value: 0, Name: "net_NOP", EventType: NET_NOP, ItemType: reflect.TypeOf(dota.CNETMsg_NOP{})},
+		{MapType: NET, Value: 1, Name: "net_Disconnect", EventType: NET_Disconnect, ItemType: reflect.TypeOf(dota.CNETMsg_Disconnect{})},
+		{MapType: NET, Value: 2, Name: "net_File", EventType: NET_File, ItemType: reflect.TypeOf(dota.CNETMsg_File{})},
+		{MapType: NET, Value: 3, Name: "net_SplitScreenUser", EventType: NET_SplitScreenUser, ItemType: reflect.TypeOf(dota.CNETMsg_SplitScreenUser{})},
+		{MapType: NET, Value: 4, Name: "net_Tick", EventType: NET_Tick, ItemType: reflect.TypeOf(dota.CNETMsg_Tick{})},
+		{MapType: NET, Value: 5, Name: "net_StringCmd", EventType: NET_StringCmd, ItemType: reflect.TypeOf(dota.CNETMsg_StringCmd{})},
+		{MapType: NET, Value: 6, Name: "net_SetConVar", EventType: NET_SetConVar, ItemType: reflect.TypeOf(dota.CNETMsg_SetConVar{})},
+		{MapType: NET, Value: 7, Name: "net_SignonState", EventType: NET_SignonState, ItemType: reflect.TypeOf(dota.CNETMsg_SignonState{})},
+		{MapType: SVC, Value: 8, Name: "svc_ServerInfo", EventType: SVC_ServerInfo, ItemType: reflect.TypeOf(dota.CSVCMsg_ServerInfo{})},
+		{MapType: SVC, Value: 9, Name: "svc_SendTable", EventType: SVC_SendTable, ItemType: reflect.TypeOf(dota.CSVCMsg_SendTable{})},
+		{MapType: SVC, Value: 10, Name: "svc_ClassInfo", EventType: SVC_ClassInfo, ItemType: reflect.TypeOf(dota.CSVCMsg_ClassInfo{})},
+		{MapType: SVC, Value: 11, Name: "svc_SetPause", EventType: SVC_SetPause, ItemType: reflect.TypeOf(dota.CSVCMsg_SetPause{})},
+		{MapType: SVC, Value: 12, Name: "svc_CreateStringTable", EventType: SVC_CreateStringTable, ItemType: reflect.TypeOf(dota.CSVCMsg_CreateStringTable{})},
+		{MapType: SVC, Value: 13, Name: "svc_UpdateStringTable", EventType: SVC_UpdateStringTable, ItemType: reflect.TypeOf(dota.CSVCMsg_UpdateStringTable{})},
+		{MapType: SVC, Value: 14, Name: "svc_VoiceInit", EventType: SVC_VoiceInit, ItemType: reflect.TypeOf(dota.CSVCMsg_VoiceInit{})},
+		{MapType: SVC, Value: 15, Name: "svc_VoiceData", EventType: SVC_VoiceData, ItemType: reflect.TypeOf(dota.CSVCMsg_VoiceData{})},
+		{MapType: SVC, Value: 16, Name: "svc_Print", EventType: SVC_Print, ItemType: reflect.TypeOf(dota.CSVCMsg_Print{})},
+		{MapType: SVC, Value: 17, Name: "svc_Sounds", EventType: SVC_Sounds, ItemType: reflect.TypeOf(dota.CSVCMsg_Sounds{})},
+		{MapType: SVC, Value: 18, Name: "svc_SetView", EventType: SVC_SetView, ItemType: reflect.TypeOf(dota.CSVCMsg_SetView{})},
+		{MapType: SVC, Value: 19, Name: "svc_FixAngle", EventType: SVC_FixAngle, ItemType: reflect.TypeOf(dota.CSVCMsg_FixAngle{})},
+		{MapType: SVC, Value: 20, Name: "svc_CrosshairAngle", EventType: SVC_CrosshairAngle, ItemType: reflect.TypeOf(dota.CSVCMsg_CrosshairAngle{})},
+		{MapType: SVC, Value: 21, Name: "svc_BSPDecal", EventType: SVC_BSPDecal, ItemType: reflect.TypeOf(dota.CSVCMsg_BSPDecal{})},
+		{MapType: SVC, Value: 22, Name: "svc_SplitScreen", EventType: SVC_SplitScreen, ItemType: reflect.TypeOf(dota.CSVCMsg_SplitScreen{})},
+		{MapType: SVC, Value: 23, Name: "svc_UserMessage", EventType: SVC_UserMessage, ItemType: reflect.TypeOf(dota.CSVCMsg_UserMessage{})},
+		{MapType: SVC, Value: 25, Name: "svc_GameEvent", EventType: SVC_GameEvent, ItemType: reflect.TypeOf(dota.CSVCMsg_GameEvent{})},
+		{MapType: SVC, Value: 26, Name: "svc_PacketEntities", EventType: SVC_PacketEntities, ItemType: reflect.TypeOf(dota.CSVCMsg_PacketEntities{})},
+		{MapType: SVC, Value: 27, Name: "svc_TempEntities", EventType: SVC_TempEntities, ItemType: reflect.TypeOf(dota.CSVCMsg_TempEntities{})},
+		{MapType: SVC, Value: 28, Name: "svc_Prefetch", EventType: SVC_Prefetch, ItemType: reflect.TypeOf(dota.CSVCMsg_Prefetch{})},
+		{MapType: SVC, Value: 29, Name: "svc_Menu", EventType: SVC_Menu, ItemType: reflect.TypeOf(dota.CSVCMsg_Menu{})},
+		{MapType: SVC, Value: 30, Name: "svc_GameEventList", EventType: SVC_GameEventList, ItemType: reflect.TypeOf(dota.CSVCMsg_GameEventList{})},
+		{MapType: SVC, Value: 31, Name: "svc_GetCvarValue", EventType: SVC_GetCvarValue, ItemType: reflect.TypeOf(dota.CSVCMsg_GetCvarValue{})},
+		{MapType: SVC, Value: 32, Name: "svc_PacketReliable", EventType: SVC_PacketReliable, ItemType: reflect.TypeOf(dota.CSVCMsg_PacketReliable{})},
 	}
 	BumDum = []ParserBaseEventMap{
 		{MapType: BUM, Value: 1, Name: "UM_AchievementEvent", EventType: UM_AchievementEvent, ItemType: reflect.TypeOf(dota.CUserMsg_AchievementEvent{})},
@@ -270,38 +270,38 @@ func init() {
 		"DEM_CustomDataCallbacks":          {MapType: DEM, Value: 11, Name: "DEM_CustomDataCallbacks", EventType: DEM_CustomDataCallbacks, ItemType: reflect.TypeOf(dota.CDemoCustomDataCallbacks{})},
 		"DEM_UserCmd":                      {MapType: DEM, Value: 12, Name: "DEM_UserCmd", EventType: DEM_UserCmd, ItemType: reflect.TypeOf(dota.CDemoUserCmd{})},
 		"DEM_FullPacket":                   {MapType: DEM, Value: 13, Name: "DEM_FullPacket", EventType: DEM_FullPacket, ItemType: reflect.TypeOf(dota.CDemoFullPacket{})},
-		"net_NOP":                          {MapType: NET, Value: 0, Name: "net_NOP", EventType: net_NOP, ItemType: reflect.TypeOf(dota.CNETMsg_NOP{})},
-		"net_Disconnect":                   {MapType: NET, Value: 1, Name: "net_Disconnect", EventType: net_Disconnect, ItemType: reflect.TypeOf(dota.CNETMsg_Disconnect{})},
-		"net_File":                         {MapType: NET, Value: 2, Name: "net_File", EventType: net_File, ItemType: reflect.TypeOf(dota.CNETMsg_File{})},
-		"net_SplitScreenUser":              {MapType: NET, Value: 3, Name: "net_SplitScreenUser", EventType: net_SplitScreenUser, ItemType: reflect.TypeOf(dota.CNETMsg_SplitScreenUser{})},
-		"net_Tick":                         {MapType: NET, Value: 4, Name: "net_Tick", EventType: net_Tick, ItemType: reflect.TypeOf(dota.CNETMsg_Tick{})},
-		"net_StringCmd":                    {MapType: NET, Value: 5, Name: "net_StringCmd", EventType: net_StringCmd, ItemType: reflect.TypeOf(dota.CNETMsg_StringCmd{})},
-		"net_SetConVar":                    {MapType: NET, Value: 6, Name: "net_SetConVar", EventType: net_SetConVar, ItemType: reflect.TypeOf(dota.CNETMsg_SetConVar{})},
-		"net_SignonState":                  {MapType: NET, Value: 7, Name: "net_SignonState", EventType: net_SignonState, ItemType: reflect.TypeOf(dota.CNETMsg_SignonState{})},
-		"svc_ServerInfo":                   {MapType: SVC, Value: 8, Name: "svc_ServerInfo", EventType: svc_ServerInfo, ItemType: reflect.TypeOf(dota.CSVCMsg_ServerInfo{})},
-		"svc_SendTable":                    {MapType: SVC, Value: 9, Name: "svc_SendTable", EventType: svc_SendTable, ItemType: reflect.TypeOf(dota.CSVCMsg_SendTable{})},
-		"svc_ClassInfo":                    {MapType: SVC, Value: 10, Name: "svc_ClassInfo", EventType: svc_ClassInfo, ItemType: reflect.TypeOf(dota.CSVCMsg_ClassInfo{})},
-		"svc_SetPause":                     {MapType: SVC, Value: 11, Name: "svc_SetPause", EventType: svc_SetPause, ItemType: reflect.TypeOf(dota.CSVCMsg_SetPause{})},
-		"svc_CreateStringTable":            {MapType: SVC, Value: 12, Name: "svc_CreateStringTable", EventType: svc_CreateStringTable, ItemType: reflect.TypeOf(dota.CSVCMsg_CreateStringTable{})},
-		"svc_UpdateStringTable":            {MapType: SVC, Value: 13, Name: "svc_UpdateStringTable", EventType: svc_UpdateStringTable, ItemType: reflect.TypeOf(dota.CSVCMsg_UpdateStringTable{})},
-		"svc_VoiceInit":                    {MapType: SVC, Value: 14, Name: "svc_VoiceInit", EventType: svc_VoiceInit, ItemType: reflect.TypeOf(dota.CSVCMsg_VoiceInit{})},
-		"svc_VoiceData":                    {MapType: SVC, Value: 15, Name: "svc_VoiceData", EventType: svc_VoiceData, ItemType: reflect.TypeOf(dota.CSVCMsg_VoiceData{})},
-		"svc_Print":                        {MapType: SVC, Value: 16, Name: "svc_Print", EventType: svc_Print, ItemType: reflect.TypeOf(dota.CSVCMsg_Print{})},
-		"svc_Sounds":                       {MapType: SVC, Value: 17, Name: "svc_Sounds", EventType: svc_Sounds, ItemType: reflect.TypeOf(dota.CSVCMsg_Sounds{})},
-		"svc_SetView":                      {MapType: SVC, Value: 18, Name: "svc_SetView", EventType: svc_SetView, ItemType: reflect.TypeOf(dota.CSVCMsg_SetView{})},
-		"svc_FixAngle":                     {MapType: SVC, Value: 19, Name: "svc_FixAngle", EventType: svc_FixAngle, ItemType: reflect.TypeOf(dota.CSVCMsg_FixAngle{})},
-		"svc_CrosshairAngle":               {MapType: SVC, Value: 20, Name: "svc_CrosshairAngle", EventType: svc_CrosshairAngle, ItemType: reflect.TypeOf(dota.CSVCMsg_CrosshairAngle{})},
-		"svc_BSPDecal":                     {MapType: SVC, Value: 21, Name: "svc_BSPDecal", EventType: svc_BSPDecal, ItemType: reflect.TypeOf(dota.CSVCMsg_BSPDecal{})},
-		"svc_SplitScreen":                  {MapType: SVC, Value: 22, Name: "svc_SplitScreen", EventType: svc_SplitScreen, ItemType: reflect.TypeOf(dota.CSVCMsg_SplitScreen{})},
-		"svc_UserMessage":                  {MapType: SVC, Value: 23, Name: "svc_UserMessage", EventType: svc_UserMessage, ItemType: reflect.TypeOf(dota.CSVCMsg_UserMessage{})},
-		"svc_GameEvent":                    {MapType: SVC, Value: 25, Name: "svc_GameEvent", EventType: svc_GameEvent, ItemType: reflect.TypeOf(dota.CSVCMsg_GameEvent{})},
-		"svc_PacketEntities":               {MapType: SVC, Value: 26, Name: "svc_PacketEntities", EventType: svc_PacketEntities, ItemType: reflect.TypeOf(dota.CSVCMsg_PacketEntities{})},
-		"svc_TempEntities":                 {MapType: SVC, Value: 27, Name: "svc_TempEntities", EventType: svc_TempEntities, ItemType: reflect.TypeOf(dota.CSVCMsg_TempEntities{})},
-		"svc_Prefetch":                     {MapType: SVC, Value: 28, Name: "svc_Prefetch", EventType: svc_Prefetch, ItemType: reflect.TypeOf(dota.CSVCMsg_Prefetch{})},
-		"svc_Menu":                         {MapType: SVC, Value: 29, Name: "svc_Menu", EventType: svc_Menu, ItemType: reflect.TypeOf(dota.CSVCMsg_Menu{})},
-		"svc_GameEventList":                {MapType: SVC, Value: 30, Name: "svc_GameEventList", EventType: svc_GameEventList, ItemType: reflect.TypeOf(dota.CSVCMsg_GameEventList{})},
-		"svc_GetCvarValue":                 {MapType: SVC, Value: 31, Name: "svc_GetCvarValue", EventType: svc_GetCvarValue, ItemType: reflect.TypeOf(dota.CSVCMsg_GetCvarValue{})},
-		"svc_PacketReliable":               {MapType: SVC, Value: 32, Name: "svc_PacketReliable", EventType: svc_PacketReliable, ItemType: reflect.TypeOf(dota.CSVCMsg_PacketReliable{})},
+		"net_NOP":                          {MapType: NET, Value: 0, Name: "net_NOP", EventType: NET_NOP, ItemType: reflect.TypeOf(dota.CNETMsg_NOP{})},
+		"net_Disconnect":                   {MapType: NET, Value: 1, Name: "net_Disconnect", EventType: NET_Disconnect, ItemType: reflect.TypeOf(dota.CNETMsg_Disconnect{})},
+		"net_File":                         {MapType: NET, Value: 2, Name: "net_File", EventType: NET_File, ItemType: reflect.TypeOf(dota.CNETMsg_File{})},
+		"net_SplitScreenUser":              {MapType: NET, Value: 3, Name: "net_SplitScreenUser", EventType: NET_SplitScreenUser, ItemType: reflect.TypeOf(dota.CNETMsg_SplitScreenUser{})},
+		"net_Tick":                         {MapType: NET, Value: 4, Name: "net_Tick", EventType: NET_Tick, ItemType: reflect.TypeOf(dota.CNETMsg_Tick{})},
+		"net_StringCmd":                    {MapType: NET, Value: 5, Name: "net_StringCmd", EventType: NET_StringCmd, ItemType: reflect.TypeOf(dota.CNETMsg_StringCmd{})},
+		"net_SetConVar":                    {MapType: NET, Value: 6, Name: "net_SetConVar", EventType: NET_SetConVar, ItemType: reflect.TypeOf(dota.CNETMsg_SetConVar{})},
+		"net_SignonState":                  {MapType: NET, Value: 7, Name: "net_SignonState", EventType: NET_SignonState, ItemType: reflect.TypeOf(dota.CNETMsg_SignonState{})},
+		"svc_ServerInfo":                   {MapType: SVC, Value: 8, Name: "svc_ServerInfo", EventType: SVC_ServerInfo, ItemType: reflect.TypeOf(dota.CSVCMsg_ServerInfo{})},
+		"svc_SendTable":                    {MapType: SVC, Value: 9, Name: "svc_SendTable", EventType: SVC_SendTable, ItemType: reflect.TypeOf(dota.CSVCMsg_SendTable{})},
+		"svc_ClassInfo":                    {MapType: SVC, Value: 10, Name: "svc_ClassInfo", EventType: SVC_ClassInfo, ItemType: reflect.TypeOf(dota.CSVCMsg_ClassInfo{})},
+		"svc_SetPause":                     {MapType: SVC, Value: 11, Name: "svc_SetPause", EventType: SVC_SetPause, ItemType: reflect.TypeOf(dota.CSVCMsg_SetPause{})},
+		"svc_CreateStringTable":            {MapType: SVC, Value: 12, Name: "svc_CreateStringTable", EventType: SVC_CreateStringTable, ItemType: reflect.TypeOf(dota.CSVCMsg_CreateStringTable{})},
+		"svc_UpdateStringTable":            {MapType: SVC, Value: 13, Name: "svc_UpdateStringTable", EventType: SVC_UpdateStringTable, ItemType: reflect.TypeOf(dota.CSVCMsg_UpdateStringTable{})},
+		"svc_VoiceInit":                    {MapType: SVC, Value: 14, Name: "svc_VoiceInit", EventType: SVC_VoiceInit, ItemType: reflect.TypeOf(dota.CSVCMsg_VoiceInit{})},
+		"svc_VoiceData":                    {MapType: SVC, Value: 15, Name: "svc_VoiceData", EventType: SVC_VoiceData, ItemType: reflect.TypeOf(dota.CSVCMsg_VoiceData{})},
+		"svc_Print":                        {MapType: SVC, Value: 16, Name: "svc_Print", EventType: SVC_Print, ItemType: reflect.TypeOf(dota.CSVCMsg_Print{})},
+		"svc_Sounds":                       {MapType: SVC, Value: 17, Name: "svc_Sounds", EventType: SVC_Sounds, ItemType: reflect.TypeOf(dota.CSVCMsg_Sounds{})},
+		"svc_SetView":                      {MapType: SVC, Value: 18, Name: "svc_SetView", EventType: SVC_SetView, ItemType: reflect.TypeOf(dota.CSVCMsg_SetView{})},
+		"svc_FixAngle":                     {MapType: SVC, Value: 19, Name: "svc_FixAngle", EventType: SVC_FixAngle, ItemType: reflect.TypeOf(dota.CSVCMsg_FixAngle{})},
+		"svc_CrosshairAngle":               {MapType: SVC, Value: 20, Name: "svc_CrosshairAngle", EventType: SVC_CrosshairAngle, ItemType: reflect.TypeOf(dota.CSVCMsg_CrosshairAngle{})},
+		"svc_BSPDecal":                     {MapType: SVC, Value: 21, Name: "svc_BSPDecal", EventType: SVC_BSPDecal, ItemType: reflect.TypeOf(dota.CSVCMsg_BSPDecal{})},
+		"svc_SplitScreen":                  {MapType: SVC, Value: 22, Name: "svc_SplitScreen", EventType: SVC_SplitScreen, ItemType: reflect.TypeOf(dota.CSVCMsg_SplitScreen{})},
+		"svc_UserMessage":                  {MapType: SVC, Value: 23, Name: "svc_UserMessage", EventType: SVC_UserMessage, ItemType: reflect.TypeOf(dota.CSVCMsg_UserMessage{})},
+		"svc_GameEvent":                    {MapType: SVC, Value: 25, Name: "svc_GameEvent", EventType: SVC_GameEvent, ItemType: reflect.TypeOf(dota.CSVCMsg_GameEvent{})},
+		"svc_PacketEntities":               {MapType: SVC, Value: 26, Name: "svc_PacketEntities", EventType: SVC_PacketEntities, ItemType: reflect.TypeOf(dota.CSVCMsg_PacketEntities{})},
+		"svc_TempEntities":                 {MapType: SVC, Value: 27, Name: "svc_TempEntities", EventType: SVC_TempEntities, ItemType: reflect.TypeOf(dota.CSVCMsg_TempEntities{})},
+		"svc_Prefetch":                     {MapType: SVC, Value: 28, Name: "svc_Prefetch", EventType: SVC_Prefetch, ItemType: reflect.TypeOf(dota.CSVCMsg_Prefetch{})},
+		"svc_Menu":                         {MapType: SVC, Value: 29, Name: "svc_Menu", EventType: SVC_Menu, ItemType: reflect.TypeOf(dota.CSVCMsg_Menu{})},
+		"svc_GameEventList":                {MapType: SVC, Value: 30, Name: "svc_GameEventList", EventType: SVC_GameEventList, ItemType: reflect.TypeOf(dota.CSVCMsg_GameEventList{})},
+		"svc_GetCvarValue":                 {MapType: SVC, Value: 31, Name: "svc_GetCvarValue", EventType: SVC_GetCvarValue, ItemType: reflect.TypeOf(dota.CSVCMsg_GetCvarValue{})},
+		"svc_PacketReliable":               {MapType: SVC, Value: 32, Name: "svc_PacketReliable", EventType: SVC_PacketReliable, ItemType: reflect.TypeOf(dota.CSVCMsg_PacketReliable{})},
 		"UM_AchievementEvent":              {MapType: BUM, Value: 1, Name: "UM_AchievementEvent", EventType: UM_AchievementEvent, ItemType: reflect.TypeOf(dota.CUserMsg_AchievementEvent{})},
 		"UM_CloseCaption":                  {MapType: BUM, Value: 2, Name: "UM_CloseCaption", EventType: UM_CloseCaption, ItemType: reflect.TypeOf(dota.CUserMsg_CloseCaption{})},
 		"UM_CurrentTimescale":              {MapType: BUM, Value: 4, Name: "UM_CurrentTimescale", EventType: UM_CurrentTimescale, ItemType: reflect.TypeOf(dota.CUserMsg_CurrentTimescale{})},

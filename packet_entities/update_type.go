@@ -1,3 +1,5 @@
+package packet_entities
+
 type UpdateType int
 
 const (
