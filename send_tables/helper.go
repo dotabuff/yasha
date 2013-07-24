@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"sort"
 
-	// "code.google.com/p/gogoprotobuf/proto"
 	"github.com/davecgh/go-spew/spew"
 	dota "github.com/elobuff/d2rp/dota"
 )
@@ -171,7 +170,9 @@ func (sth *Helper) sendTableSortByPriority() {
 		for {
 			for i = start; i < len(sth.flatSendTable); i++ {
 				p := sth.flatSendTable[i]
-				if (priority == int(*p.Priority)) || ((*p.Flags&int32(SPROP_CHANGES_OFTEN)) == int32(SPROP_CHANGES_OFTEN)) && priority == 64 {
+				if (priority == int(p.GetPriority())) ||
+					((Flag(p.GetFlags())&SPROP_CHANGES_OFTEN) == SPROP_CHANGES_OFTEN) &&
+						priority == 64 {
 					if i != start {
 						sth.flatSendTable[i] = sth.flatSendTable[start]
 						sth.flatSendTable[start] = p

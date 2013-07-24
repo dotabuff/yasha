@@ -9,7 +9,7 @@ func Parse(bytes []byte, numEntries, maxEntries int32, isFixedSize bool, numBits
 	result := map[int]*StringTableItem{}
 	lastEntry := -1
 	history := make([]string, 0, 33)
-	br := utils.BitReader{Buffer: bytes}
+	br := utils.NewBitReader(bytes)
 	br.SeekBits(1, -1)
 	for i := int32(0); i < numEntries; i++ {
 		item := &StringTableItem{}

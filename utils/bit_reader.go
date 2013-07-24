@@ -3,6 +3,11 @@ package utils
 import (
 	"bytes"
 	"encoding/binary"
+	"math"
+
+	"github.com/elobuff/d2rp/core"
+	"github.com/elobuff/d2rp/core/send_tables"
+	dota "github.com/elobuff/d2rp/dota"
 )
 
 const (
@@ -17,15 +22,19 @@ const (
 )
 
 type BitReader struct {
-	Buffer     []byte
+	buffer     []byte
 	currentBit int
 }
 
-func (br *BitReader) Length() int      { return len(br.Buffer) }
+func NewBitReader(buffer []byte) *BitReader {
+	return &BitReader{buffer: buffer}
+}
+
+func (br *BitReader) Length() int      { return len(br.buffer) }
 func (br *BitReader) CurrentBit() int  { return br.currentBit }
 func (br *BitReader) CurrentByte() int { return br.currentBit / 8 }
-func (br *BitReader) BitsLeft() int    { return (len(br.Buffer) * 8) - br.currentBit }
-func (br *BitReader) BytesLeft() int   { return len(br.Buffer) - br.CurrentByte() }
+func (br *BitReader) BitsLeft() int    { return (len(br.buffer) * 8) - br.currentBit }
+func (br *BitReader) BytesLeft() int   { return len(br.buffer) - br.CurrentByte() }
 
 // origin -1: current
 // origin  0: begin
@@ -51,7 +60,7 @@ func (br *BitReader) ReadUBitsByteAligned(nBits int) uint {
 	}
 	var result uint
 	for i := 0; i < nBits/8; i++ {
-		result += uint(br.Buffer[br.CurrentByte()] << (uint(i) * 8))
+		result += uint(br.buffer[br.CurrentByte()] << (uint(i) * 8))
 		br.currentBit += 8
 	}
 	return result
@@ -66,7 +75,7 @@ func (br *BitReader) ReadUBitsNotByteAligned(nBits int) uint {
 
 	var currentValue uint64
 	for i := 0; i < nBytesToRead; i++ {
-		b := br.Buffer[br.CurrentByte()+1]
+		b := br.buffer[br.CurrentByte()+1]
 		currentValue += (uint64(b) << uint(i*8))
 	}
 	currentValue >>= uint(bitOffset)
@@ -118,7 +127,7 @@ func (br *BitReader) ReadBoolean() bool {
 	}
 	currentByte := br.CurrentBit() / 8
 	bitOffset := br.CurrentBit() % 8
-	result := br.Buffer[currentByte]&(1<<uint(bitOffset)) != 0
+	result := br.buffer[currentByte]&(1<<uint(bitOffset)) != 0
 	br.currentBit++
 	return result
 }
@@ -199,4 +208,117 @@ func (br *BitReader) ReadString() string {
 		bs = append(bs, b)
 	}
 	return string(bs)
+}
+
+func (br *BitReader) ReadFloat(prop dota.CSVCMsg_SendTableSendpropT) float64 {
+	if result, ok := br.ReadSpecialFloat(prop); ok {
+		return result
+	}
+	dwInterp := float64(br.ReadUBits(int(prop.GetNumBits())))
+	bits := 1 << uint(prop.GetNumBits())
+	result := dwInterp / float64(bits-1)
+	low, high := float64(prop.GetLowValue()), float64(prop.GetHighValue())
+	return low + (high-low)*result
+}
+
+func (br *BitReader) ReadLengthPrefixedString() string {
+	stringLength := int(br.ReadUBits(9))
+	if stringLength > 0 {
+		return string(br.ReadBytes(stringLength))
+	}
+	return ""
+}
+
+func (br *BitReader) ReadNextEntityIndex(oldEntity int) int {
+	ret := br.ReadUBits(4)
+	more1 := br.ReadBoolean()
+	more2 := br.ReadBoolean()
+	if more1 {
+		ret += (br.ReadUBits(4) << 4)
+	}
+	if more2 {
+		ret += (br.ReadUBits(8) << 4)
+	}
+	return oldEntity + 1 + int(ret)
+}
+
+func (br *BitReader) ReadVector(prop dota.CSVCMsg_SendTableSendpropT) *core.Vector {
+	result := &core.Vector{
+		X: br.ReadFloat(prop),
+		Y: br.ReadFloat(prop),
+	}
+	if (flag(prop) & send_tables.SPROP_NORMAL) == 0 {
+		result.Z = br.ReadFloat(prop)
+	} else {
+		signbit := br.ReadBoolean()
+		v0v0v1v1 := result.X*result.X + result.Y*result.Y
+		if v0v0v1v1 < 1.0 {
+			result.Z = math.Sqrt(1.0 - v0v0v1v1)
+		} else {
+			result.Z = 0.0
+		}
+		if signbit {
+			result.Z *= -1.0
+		}
+	}
+
+	return result
+}
+
+func (br *BitReader) ReadVectorXY(prop dota.CSVCMsg_SendTableSendpropT) *core.Vector {
+	return &core.Vector{
+		X: br.ReadFloat(prop),
+		Y: br.ReadFloat(prop),
+	}
+}
+
+func (br *BitReader) ReadInt(prop dota.CSVCMsg_SendTableSendpropT) int {
+	if (flag(prop) & send_tables.SPROP_UNSIGNED) != 0 {
+		return int(br.ReadUBits(int(prop.GetNumBits())))
+	}
+	return br.ReadBits(int(prop.GetNumBits()))
+}
+
+func (br *BitReader) ReadSpecialFloat(prop dota.CSVCMsg_SendTableSendpropT) (float64, bool) {
+	flags := flag(prop)
+	if (flags & send_tables.SPROP_COORD) != 0 {
+		return br.ReadBitCoord(), true
+	} else if (flags & send_tables.SPROP_COORD_MP) != 0 {
+		panic("wtf")
+	} else if (flags & send_tables.SPROP_COORD_MP_INTEGRAL) != 0 {
+		panic("wtf")
+	} else if (flags & send_tables.SPROP_COORD_MP_LOWPRECISION) != 0 {
+		panic("wtf")
+	} else if (flags & send_tables.SPROP_CELL_COORD) != 0 {
+		return br.ReadBitCellCoord(int(prop.GetNumBits()), false, false), true
+	} else if (flags & send_tables.SPROP_CELL_COORD_INTEGRAL) != 0 {
+		return br.ReadBitCellCoord(int(prop.GetNumBits()), true, false), true
+	} else if (flags & send_tables.SPROP_CELL_COORD_LOWPRECISION) != 0 {
+		return br.ReadBitCellCoord(int(prop.GetNumBits()), false, true), true
+	} else if (flags & send_tables.SPROP_NOSCALE) != 0 {
+		return float64(br.ReadBitFloat()), true
+	} else if (flags & send_tables.SPROP_NORMAL) != 0 {
+		return br.ReadBitNormal(), true
+	}
+	return 0, false
+}
+
+func (br *BitReader) ReadInt64(prop dota.CSVCMsg_SendTableSendpropT) uint64 {
+	var low, high uint
+	if (flag(prop) & send_tables.SPROP_UNSIGNED) != 0 {
+		low = br.ReadUBits(32)
+		high = br.ReadUBits(32)
+	} else {
+		br.SeekBits(1, 0)
+		low = br.ReadUBits(32)
+		high = br.ReadUBits(31)
+	}
+	res := uint64(high)
+	res = (res << 32)
+	res = res | uint64(low)
+	return res
+}
+
+func flag(prop dota.CSVCMsg_SendTableSendpropT) send_tables.Flag {
+	return send_tables.Flag(prop.GetFlags())
 }

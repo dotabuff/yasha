@@ -92,16 +92,12 @@ func NewParser(items parser.ParserBaseItems) {
 		if err != nil {
 			panic(err)
 		}
-		br := &utils.BitReader{Buffer: item.GetData()}
+		br := utils.NewBitReader(item.GetData())
 		indices := ReadPropertiesIndex(br)
 		p.baseline[classId] =
 			ReadPropertiesValues(br, p.mapping[classId], p.multiples[classId], indices)
 	}
 }
-
-// public delegate void Procedure(PacketEntity pe);
-
-// public delegate void ProcedurePreserve(PacketEntity pe, Dictionary<string, object> values);
 
 func (p *PacketEntitiesParser) AddCreateHandler(className string, callback Callback) {
 	p.createClassHandlers[className] = Handler{ClassName: className, Callback: callback}
@@ -111,7 +107,7 @@ func (p *PacketEntitiesParser) AddDeleteHandler(className string, callback Callb
 	p.deleteClassHandlers[className] = Handler{ClassName: className, Callback: callback}
 }
 
-func (p *PacketEntitiesParser) AddPreserveHandler(className string, callback Callback) {
+func (p *PacketEntitiesParser) AddPreserveHandler(className string, callback PreserveCallback) {
 	p.preserveClassHandlers[className] = HandlerPreserve{ClassName: className, Callback: callback}
 }
 
@@ -179,13 +175,13 @@ func (p *PacketEntitiesParser) EntityPreserve(br *utils.BitReader, currentIndex,
 	}
 
 	if handler, ok := p.preserveClassHandlers[pe.Name]; ok {
-		handler.Callback(pe)
+		handler.Callback(pe, values)
 	}
 }
 
 func (p *PacketEntitiesParser) ParsePacket(packet *parser.ParserBaseItem) {
 	pe := (packet.Value).(dota.CSVCMsg_PacketEntities)
-	br := &utils.BitReader{Buffer: pe.GetEntityData()}
+	br := utils.NewBitReader(pe.GetEntityData())
 	currentIndex := -1
 	for i := 0; i < int(pe.GetUpdatedEntries()); i++ {
 		currentIndex = ReadNextEntityIndex(br, currentIndex)
@@ -207,7 +203,9 @@ type Handler struct {
 	ClassName string
 }
 
+type PreserveCallback func(*PacketEntity, map[string]interface{})
+
 type HandlerPreserve struct {
-	Callback  Callback
+	Callback  PreserveCallback
 	ClassName string
 }
