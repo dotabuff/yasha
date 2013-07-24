@@ -80,8 +80,8 @@ func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
 				resItems := result[int(t.GetTableId())].Items
 				innerItem, exists := resItems[key]
 				if exists {
-					innerItem.str = value.str
-					innerItem.data = value.data
+					innerItem.Str = value.Str
+					innerItem.Data = value.Data
 				} else {
 					result[int(t.GetTableId())].Items[key] = value
 				}

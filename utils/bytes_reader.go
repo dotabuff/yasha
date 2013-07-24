@@ -1,8 +1,12 @@
 package utils
 
 type BytesReader struct {
-	Data     []byte
-	Position int
+	data     []byte
+	position int
+}
+
+func NewBytesReader(data []byte) *BytesReader {
+	return &BytesReader{data: data, position: 0}
 }
 
 func (br *BytesReader) ReadVarInt32() (result uint32) {
@@ -12,11 +16,11 @@ func (br *BytesReader) ReadVarInt32() (result uint32) {
 	for {
 		if count == 5 {
 			return
-		} else if br.Position >= len(br.Data) {
+		} else if br.position >= len(br.data) {
 			return
 		}
-		b = uint32(br.Data[br.Position])
-		br.Position++
+		b = uint32(br.data[br.position])
+		br.position++
 		result |= (b & 0x7F) << (7 * count)
 		count++
 		if (b & 0x80) != 0x80 {
@@ -33,14 +37,14 @@ func (br *BytesReader) ReadInt32() (result int32) {
 }
 
 func (br *BytesReader) Read(length int) []byte {
-	res := br.Data[br.Position:length]
-	br.Position += length
+	res := br.data[br.position:(br.position + length)]
+	br.position += length
 	return res
 }
 
 func (br BytesReader) CanRead() bool {
-	return br.Position < len(br.Data)
+	return br.position < len(br.data)
 }
 func (br *BytesReader) Skip(length int) {
-	br.Position += length
+	br.position += length
 }

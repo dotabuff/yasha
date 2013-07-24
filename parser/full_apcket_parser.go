@@ -75,7 +75,7 @@ func (fpp *FullPacketParser) Analyze() {
 }
 
 func (fpp *FullPacketParser) AnalyzePacket(fromEvent ParserBaseEvent, tick int, data []byte) {
-	reader := utils.BytesReader{Data: data}
+	reader := utils.NewBytesReader(data)
 	for reader.CanRead() {
 		iType := int(reader.ReadVarInt32())
 		pbEvent := fpp.AsParserBaseEventNETSVC(iType)

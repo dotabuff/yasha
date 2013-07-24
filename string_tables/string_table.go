@@ -8,6 +8,6 @@ type StringTable struct {
 }
 
 type StringTableItem struct {
-	str  string
-	data []byte
+	Str  string
+	Data []byte
 }

@@ -86,7 +86,7 @@ func (p *Parser) Analyze() {
 	}
 }
 func (p *Parser) AnalyzePacket(fromEvent ParserBaseEvent, tick int, data []byte) {
-	reader := utils.BytesReader{Data: data}
+	reader := utils.NewBytesReader(data)
 	for reader.CanRead() {
 		iType := int(reader.ReadVarInt32())
 		length := int(reader.ReadVarInt32())

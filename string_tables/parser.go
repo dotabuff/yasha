@@ -28,15 +28,15 @@ func Parse(bytes []byte, numEntries, maxEntries int32, isFixedSize bool, numBits
 			} else {
 				value = br.ReadString()
 			}
-			item.str = value
+			item.Str = value
 			history = append(history, value)
 		}
 		if br.ReadBoolean() {
 			if isFixedSize {
-				item.data = []byte{byte(br.ReadBits(int(numBits)))}
+				item.Data = []byte{byte(br.ReadBits(int(numBits)))}
 			} else {
 				length := int(br.ReadUBits(14))
-				item.data = br.ReadBytes(length)
+				item.Data = br.ReadBytes(length)
 			}
 		}
 		if len(history) > 32 {

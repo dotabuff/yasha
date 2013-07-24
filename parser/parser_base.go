@@ -78,9 +78,9 @@ func NewParserBase(data []byte) *ParserBase {
 		panic("couldn't open file")
 	}
 
-	buffer := data[headerLength:totalLength]
+	buffer := data[headerLength:(headerLength + totalLength)]
 	return &ParserBase{
-		reader: &utils.BytesReader{Data: buffer},
+		reader: utils.NewBytesReader(buffer),
 	}
 }
 

@@ -93,9 +93,12 @@ func NewParser(items parser.ParserBaseItems) {
 			panic(err)
 		}
 		br := utils.NewBitReader(item.GetData())
-		indices := ReadPropertiesIndex(br)
-		p.baseline[classId] =
-			ReadPropertiesValues(br, p.mapping[classId], p.multiples[classId], indices)
+		indices := br.ReadPropertiesIndex()
+		p.baseline[classId] = br.ReadPropertiesValues(
+			p.mapping[classId],
+			p.multiples[classId],
+			indices,
+		)
 	}
 }
 
@@ -127,8 +130,12 @@ func (p *PacketEntitiesParser) EntityCreate(br *utils.BitReader, currentIndex, t
 		Values:    map[string]interface{}{},
 	}
 	pe.Name = p.classInfosNameMapping[pe.ClassId]
-	indices := ReadPropertiesIndex(br)
-	values := ReadPropertiesValues(br, p.mapping[pe.ClassId], p.multiples[pe.ClassId], indices)
+	indices := br.ReadPropertiesIndex()
+	values := br.ReadPropertiesValues(
+		p.mapping[pe.ClassId],
+		p.multiples[pe.ClassId],
+		indices,
+	)
 	if baseline, ok := p.baseline[pe.ClassId]; ok {
 		for key, baseValue := range baseline {
 			if subValue, ok := values[key]; ok {
@@ -163,9 +170,8 @@ func (p *PacketEntitiesParser) EntityPreserve(br *utils.BitReader, currentIndex,
 	pe := p.entities[currentIndex]
 	pe.Tick = tick
 	pe.Type = Preserve
-	indices := ReadPropertiesIndex(br)
-	values := ReadPropertiesValues(
-		br,
+	indices := br.ReadPropertiesIndex()
+	values := br.ReadPropertiesValues(
 		p.mapping[p.classInfosIdMapping[pe.Name]],
 		p.multiples[p.classInfosIdMapping[pe.Name]],
 		indices,
@@ -184,7 +190,7 @@ func (p *PacketEntitiesParser) ParsePacket(packet *parser.ParserBaseItem) {
 	br := utils.NewBitReader(pe.GetEntityData())
 	currentIndex := -1
 	for i := 0; i < int(pe.GetUpdatedEntries()); i++ {
-		currentIndex = ReadNextEntityIndex(br, currentIndex)
+		currentIndex = br.ReadNextEntityIndex(currentIndex)
 		switch ReadUpdateType(br) {
 		case Preserve:
 			p.EntityPreserve(br, currentIndex, packet.Tick)
