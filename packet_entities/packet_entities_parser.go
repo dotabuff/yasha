@@ -18,7 +18,7 @@ type PacketEntitiesParser struct {
 	classInfosNameMapping map[int]string
 	createClassHandlers   map[string]Handler
 	deleteClassHandlers   map[string]Handler
-	mapping               map[int][]dota.CSVCMsg_SendTableSendpropT
+	mapping               map[int][]*send_tables.SendProp
 	multiples             map[int]map[string]int
 	packets               parser.ParserBaseItems
 	preserveClassHandlers map[string]HandlerPreserve
@@ -82,7 +82,7 @@ func NewParser(items parser.ParserBaseItems) {
 
 		m := map[string]int{}
 		for _, prop := range props {
-			m[prop.GetDtName()+"."+prop.GetVarName()] += 1
+			m[prop.DtName+"."+prop.VarName] += 1
 		}
 		p.multiples[id] = m
 	}

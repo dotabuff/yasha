@@ -9,10 +9,6 @@ import (
 	dota "github.com/elobuff/d2rp/dota"
 )
 
-const (
-	watchSequence = 56282
-)
-
 func foo() { spew.Dump("hi") }
 
 type Parser struct {
@@ -55,10 +51,6 @@ func (p *Parser) Analyze() {
 			} else {
 				item.Data = p.reader.Read(length)
 			}
-			if item.Sequence == watchSequence {
-				spew.Println("Analyze()")
-				spew.Dump(item)
-			}
 			switch o := obj.(type) {
 			case *SignonPacket:
 				full := &dota.CDemoPacket{}
@@ -95,14 +87,6 @@ func (p *Parser) AnalyzePacket(fromEvent dota.EDemoCommands, tick int, data []by
 		iType := int(reader.ReadVarInt32())
 		length := int(reader.ReadVarInt32())
 		obj, err := p.AsBaseEventNETSVC(iType)
-		if p.Sequence == watchSequence {
-			spew.Println("AnalyzePacket() {")
-			spew.Dump(iType)
-			spew.Dump(length)
-			spew.Dump(obj)
-			spew.Dump(reader)
-			spew.Println("}")
-		}
 		if err != nil {
 			spew.Println(err)
 			reader.Skip(length)
@@ -113,11 +97,6 @@ func (p *Parser) AnalyzePacket(fromEvent dota.EDemoCommands, tick int, data []by
 				Object:   obj,
 				Tick:     tick,
 				Data:     reader.Read(length),
-			}
-			if p.Sequence == watchSequence {
-				spew.Println("AnalyzePacket() {")
-				spew.Dump(item.Data)
-				spew.Println("}")
 			}
 			p.Sequence++
 			switch obj.(type) {

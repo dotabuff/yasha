@@ -64,18 +64,21 @@ func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
 				t.GetNumEntries(),
 				t.GetMaxEntries(),
 				t.GetUserDataFixedSize(),
-				t.GetUserDataSizeBits())
+				t.GetUserDataSizeBits(),
+			)
 			for key, value := range cstr {
 				st.Items[key] = value
 			}
 			result[helper.lastIndexUsed] = st
 		case *dota.CSVCMsg_UpdateStringTable:
 			stc := helper.cache[int(t.GetTableId())]
-			ustr := Parse(t.GetStringData(),
+			ustr := Parse(
+				t.GetStringData(),
 				t.GetNumChangedEntries(),
 				int32(stc.MaxEntries),
 				stc.IsFixedSize,
-				int32(stc.Bits))
+				int32(stc.Bits),
+			)
 			for key, value := range ustr {
 				resItems := result[int(t.GetTableId())].Items
 				innerItem, exists := resItems[key]

@@ -8,12 +8,7 @@ import (
 
 	"github.com/elobuff/d2rp/core"
 	"github.com/elobuff/d2rp/core/send_tables"
-	dota "github.com/elobuff/d2rp/dota"
 )
-
-func flag(prop dota.CSVCMsg_SendTableSendpropT) send_tables.Flag {
-	return send_tables.Flag(prop.GetFlags())
-}
 
 const (
 	CoordIntegerBits            = 14
@@ -90,11 +85,11 @@ func (br *BitReader) ReadUBitsNotByteAligned(nBits int) uint {
 
 	var currentValue uint64
 	for i := 0; i < nBytesToRead; i++ {
-		b := br.buffer[br.CurrentByte()+1]
+		b := br.buffer[br.CurrentByte()+i]
 		currentValue += (uint64(b) << (uint64(i) * 8))
 	}
 	currentValue >>= uint(bitOffset)
-	currentValue &= ((1 << uint(nBits)) - 1)
+	currentValue &= ((1 << uint64(nBits)) - 1)
 	br.currentBit += nBits
 	return uint(currentValue)
 }
@@ -118,7 +113,7 @@ func (br *BitReader) ReadUBits(nBits int) uint {
 	if nBits <= 0 || nBits > 32 {
 		panic("Value must be a positive integer between 1 and 32 inclusive.")
 	}
-	if br.CurrentBit()+nBits > br.Length()*8 {
+	if br.currentBit+nBits > len(br.buffer)*8 {
 		panic("Out of range")
 	}
 	if br.currentBit%8 == 0 && nBits%8 == 0 {
@@ -137,10 +132,11 @@ func (br *BitReader) ReadBoolean() bool {
 	if br.CurrentBit()+1 > br.Length()*8 {
 		panic("Out of range")
 	}
-	currentByte := br.CurrentBit() / 8
-	bitOffset := br.CurrentBit() % 8
+	currentByte := br.currentBit / 8
+	bitOffset := br.currentBit % 8
 	result := br.buffer[currentByte]&(1<<uint(bitOffset)) != 0
 	br.currentBit++
+	println(result)
 	return result
 }
 func (br *BitReader) ReadByte() byte {
@@ -222,14 +218,14 @@ func (br *BitReader) ReadString() string {
 	return string(bs)
 }
 
-func (br *BitReader) ReadFloat(prop dota.CSVCMsg_SendTableSendpropT) float64 {
+func (br *BitReader) ReadFloat(prop *send_tables.SendProp) float64 {
 	if result, ok := br.ReadSpecialFloat(prop); ok {
 		return result
 	}
-	dwInterp := float64(br.ReadUBits(int(prop.GetNumBits())))
-	bits := 1 << uint(prop.GetNumBits())
+	dwInterp := float64(br.ReadUBits(prop.NumBits))
+	bits := 1 << uint(prop.NumBits)
 	result := dwInterp / float64(bits-1)
-	low, high := float64(prop.GetLowValue()), float64(prop.GetHighValue())
+	low, high := float64(prop.LowValue), float64(prop.HighValue)
 	return low + (high-low)*result
 }
 
@@ -241,12 +237,12 @@ func (br *BitReader) ReadLengthPrefixedString() string {
 	return ""
 }
 
-func (br *BitReader) ReadVector(prop dota.CSVCMsg_SendTableSendpropT) *core.Vector {
+func (br *BitReader) ReadVector(prop *send_tables.SendProp) *core.Vector {
 	result := &core.Vector{
 		X: br.ReadFloat(prop),
 		Y: br.ReadFloat(prop),
 	}
-	if (flag(prop) & send_tables.SPROP_NORMAL) == 0 {
+	if prop.Flags&send_tables.SPROP_NORMAL == 0 {
 		result.Z = br.ReadFloat(prop)
 	} else {
 		signbit := br.ReadBoolean()
@@ -264,47 +260,46 @@ func (br *BitReader) ReadVector(prop dota.CSVCMsg_SendTableSendpropT) *core.Vect
 	return result
 }
 
-func (br *BitReader) ReadVectorXY(prop dota.CSVCMsg_SendTableSendpropT) *core.Vector {
+func (br *BitReader) ReadVectorXY(prop *send_tables.SendProp) *core.Vector {
 	return &core.Vector{
 		X: br.ReadFloat(prop),
 		Y: br.ReadFloat(prop),
 	}
 }
 
-func (br *BitReader) ReadInt(prop dota.CSVCMsg_SendTableSendpropT) int {
-	if (flag(prop) & send_tables.SPROP_UNSIGNED) != 0 {
-		return int(br.ReadUBits(int(prop.GetNumBits())))
+func (br *BitReader) ReadInt(prop *send_tables.SendProp) int {
+	if prop.Flags&send_tables.SPROP_UNSIGNED != 0 {
+		return int(br.ReadUBits(prop.NumBits))
 	}
-	return br.ReadBits(int(prop.GetNumBits()))
+	return br.ReadBits(prop.NumBits)
 }
 
-func (br *BitReader) ReadSpecialFloat(prop dota.CSVCMsg_SendTableSendpropT) (float64, bool) {
-	flags := flag(prop)
-	if (flags & send_tables.SPROP_COORD) != 0 {
+func (br *BitReader) ReadSpecialFloat(prop *send_tables.SendProp) (float64, bool) {
+	if prop.Flags&send_tables.SPROP_COORD != 0 {
 		return br.ReadBitCoord(), true
-	} else if (flags & send_tables.SPROP_COORD_MP) != 0 {
+	} else if prop.Flags&send_tables.SPROP_COORD_MP != 0 {
 		panic("wtf")
-	} else if (flags & send_tables.SPROP_COORD_MP_INTEGRAL) != 0 {
+	} else if prop.Flags&send_tables.SPROP_COORD_MP_INTEGRAL != 0 {
 		panic("wtf")
-	} else if (flags & send_tables.SPROP_COORD_MP_LOWPRECISION) != 0 {
+	} else if prop.Flags&send_tables.SPROP_COORD_MP_LOWPRECISION != 0 {
 		panic("wtf")
-	} else if (flags & send_tables.SPROP_CELL_COORD) != 0 {
-		return br.ReadBitCellCoord(int(prop.GetNumBits()), false, false), true
-	} else if (flags & send_tables.SPROP_CELL_COORD_INTEGRAL) != 0 {
-		return br.ReadBitCellCoord(int(prop.GetNumBits()), true, false), true
-	} else if (flags & send_tables.SPROP_CELL_COORD_LOWPRECISION) != 0 {
-		return br.ReadBitCellCoord(int(prop.GetNumBits()), false, true), true
-	} else if (flags & send_tables.SPROP_NOSCALE) != 0 {
+	} else if prop.Flags&send_tables.SPROP_CELL_COORD != 0 {
+		return br.ReadBitCellCoord(prop.NumBits, false, false), true
+	} else if prop.Flags&send_tables.SPROP_CELL_COORD_INTEGRAL != 0 {
+		return br.ReadBitCellCoord(prop.NumBits, true, false), true
+	} else if prop.Flags&send_tables.SPROP_CELL_COORD_LOWPRECISION != 0 {
+		return br.ReadBitCellCoord(prop.NumBits, false, true), true
+	} else if prop.Flags&send_tables.SPROP_NOSCALE != 0 {
 		return float64(br.ReadBitFloat()), true
-	} else if (flags & send_tables.SPROP_NORMAL) != 0 {
+	} else if prop.Flags&send_tables.SPROP_NORMAL != 0 {
 		return br.ReadBitNormal(), true
 	}
 	return 0, false
 }
 
-func (br *BitReader) ReadInt64(prop dota.CSVCMsg_SendTableSendpropT) uint64 {
+func (br *BitReader) ReadInt64(prop *send_tables.SendProp) uint64 {
 	var low, high uint
-	if (flag(prop) & send_tables.SPROP_UNSIGNED) != 0 {
+	if prop.Flags&send_tables.SPROP_UNSIGNED != 0 {
 		low = br.ReadUBits(32)
 		high = br.ReadUBits(32)
 	} else {
@@ -350,56 +345,56 @@ func (br *BitReader) ReadPropertiesIndex() []int {
 	return props
 }
 
-func (br *BitReader) ReadPropertiesValues(mapping []dota.CSVCMsg_SendTableSendpropT, multiples map[string]int, indices []int) map[string]interface{} {
+func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multiples map[string]int, indices []int) map[string]interface{} {
 	values := map[string]interface{}{}
 	for _, index := range indices {
 		prop := mapping[index]
-		multiple := multiples[prop.GetDtName()+"."+prop.GetVarName()] > 1
+		multiple := multiples[prop.DtName+"."+prop.VarName] > 1
 		elements := 1
-		if (flag(prop) & send_tables.SPROP_INSIDEARRAY) != 0 {
+		if (prop.Flags & send_tables.SPROP_INSIDEARRAY) != 0 {
 			elements = int(br.ReadUBits(6))
 		}
 		for k := 0; k < elements; k++ {
-			key := prop.GetDtName() + "." + prop.GetVarName()
+			key := prop.DtName + "." + prop.VarName
 			if multiple {
 				key += ("-" + strconv.Itoa(index))
 			}
 			if elements > 1 {
 				key += ("-" + strconv.Itoa(k))
 			}
-			switch send_tables.DPTType(prop.GetType()) {
+			switch send_tables.DPTType(prop.Type) {
 			case send_tables.DPT_Int:
-				if (flag(prop) & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+				if prop.Flags&send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT != 0 {
 					values[key] = br.ReadVarInt()
 				} else {
 					values[key] = br.ReadInt(prop)
 				}
 			case send_tables.DPT_Float:
-				if (flag(prop) & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+				if prop.Flags&send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT != 0 {
 					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
 				} else {
 					values[key] = br.ReadFloat(prop)
 				}
 			case send_tables.DPT_Vector:
-				if (flag(prop) & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+				if prop.Flags&send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT != 0 {
 					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
 				} else {
 					values[key] = br.ReadVector(prop)
 				}
 			case send_tables.DPT_VectorXY:
-				if (flag(prop) & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+				if prop.Flags&send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT != 0 {
 					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
 				} else {
 					values[key] = br.ReadVectorXY(prop)
 				}
 			case send_tables.DPT_String:
-				if (flag(prop) & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+				if prop.Flags&send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT != 0 {
 					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
 				} else {
 					values[key] = br.ReadLengthPrefixedString()
 				}
 			case send_tables.DPT_Int64:
-				if (flag(prop) & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+				if prop.Flags&send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT != 0 {
 					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
 				} else {
 					values[key] = br.ReadInt64(prop)

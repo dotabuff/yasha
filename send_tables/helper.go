@@ -2,7 +2,9 @@ package send_tables
 
 import (
 	"io/ioutil"
+	"runtime"
 	"sort"
+	"time"
 
 	"github.com/davecgh/go-spew/spew"
 	dota "github.com/elobuff/d2rp/dota"
@@ -47,27 +49,37 @@ const (
 	SPROP_ENCODED_AGAINST_TICKCOUNT Flag = 1 << 19
 )
 
+type SendProp struct {
+	DtName    string
+	VarName   string
+	Type      DPTType
+	Flags     Flag
+	Priority  int
+	NumBits   int
+	LowValue  float32
+	HighValue float32
+}
+
 type Helper struct {
 	sendTables       map[string]*dota.CSVCMsg_SendTable
-	flatSendTable    []dota.CSVCMsg_SendTableSendpropT
-	excludedSendProp []dota.CSVCMsg_SendTableSendpropT
+	flatSendTable    []*SendProp
+	excludedSendProp []*SendProp
 }
 
 func NewHelper(sendTables map[string]*dota.CSVCMsg_SendTable) *Helper {
 	return &Helper{
 		sendTables:       sendTables,
-		flatSendTable:    []dota.CSVCMsg_SendTableSendpropT{},
-		excludedSendProp: []dota.CSVCMsg_SendTableSendpropT{},
+		flatSendTable:    []*SendProp{},
+		excludedSendProp: []*SendProp{},
 	}
 }
 
-func (sth *Helper) LoadSendTable(sendTableName string) []dota.CSVCMsg_SendTableSendpropT {
-	sth.flatSendTable = []dota.CSVCMsg_SendTableSendpropT{}
-	sth.excludedSendProp = []dota.CSVCMsg_SendTableSendpropT{}
-	spew.Dump(sendTableName)
-	sth.excludedSendProp = sth.sendTableGetPropsExcluded(sendTableName)
-	sth.sendTableBuildHierarchy(sendTableName)
-	sth.sendTableSortByPriority()
+func (sth *Helper) LoadSendTable(sendTableName string) []*SendProp {
+	sth.flatSendTable = []*SendProp{}
+	sth.excludedSendProp = []*SendProp{}
+	sth.excludedSendProp = sth.getPropsExcluded(sendTableName)
+	sth.buildHierarchy(sendTableName)
+	sth.sortByPriority()
 	return sth.flatSendTable
 }
 
@@ -81,40 +93,44 @@ func (sth *Helper) flagString(flag Flag) (result string) {
 	panic("no easy way to do that in go.")
 }
 
-func (sth *Helper) sendTableGetPropsExcluded(sendTableName string) []dota.CSVCMsg_SendTableSendpropT {
-	result := []dota.CSVCMsg_SendTableSendpropT{}
+func (sth *Helper) getPropsExcluded(sendTableName string) []*SendProp {
+	time.Now()
+	runtime.Gosched()
+	// defer func() { println(time.Since(now).String()) }()
+
+	result := []*SendProp{}
 	sendTable := sth.sendTables[sendTableName]
 	for _, prop := range sendTable.GetProps() {
 		flags := prop.GetFlags()
 		if (flags & int32(SPROP_EXCLUDE)) != 0 {
-			s := dota.CSVCMsg_SendTableSendpropT{
-				Flags:    &flags,
-				DtName:   prop.DtName,
-				NumBits:  prop.NumBits,
-				Priority: prop.Priority,
-				Type:     prop.Type,
-				VarName:  prop.VarName,
-			}
-			result = append(result, s)
+			result = append(result, &SendProp{
+				Flags:    Flag(flags),
+				DtName:   prop.GetDtName(),
+				NumBits:  int(prop.GetNumBits()),
+				Priority: int(prop.GetPriority()),
+				Type:     DPTType(prop.GetType()),
+				VarName:  prop.GetVarName(),
+			})
 		}
-		for _, prop := range sendTable.GetProps() {
-			if prop.GetType() == 6 {
-				result = append(result, sth.sendTableGetPropsExcluded(prop.GetDtName())...)
-			}
+	}
+
+	for _, prop := range sendTable.GetProps() {
+		if prop.GetType() == 6 {
+			result = append(result, sth.getPropsExcluded(prop.GetDtName())...)
 		}
 	}
 
 	return result
 }
 
-func (sth *Helper) sendTableBuildHierarchy(sendTableName string) {
-	result := []dota.CSVCMsg_SendTableSendpropT{}
-	sth.sendTableBuildHierarchyIterateProps(sendTableName, result)
+func (sth *Helper) buildHierarchy(sendTableName string) {
+	result := []*SendProp{}
+	sth.buildHierarchyIterateProps(sendTableName, result)
 	for _, res := range result {
 		sth.flatSendTable = append(sth.flatSendTable, res)
 	}
 }
-func (sth *Helper) sendTableBuildHierarchyIterateProps(sendTableName string, result []dota.CSVCMsg_SendTableSendpropT) {
+func (sth *Helper) buildHierarchyIterateProps(sendTableName string, result []*SendProp) {
 	pTable := sth.sendTables[sendTableName]
 	for _, pProp := range pTable.GetProps() {
 		pFlags := pProp.GetFlags()
@@ -126,20 +142,20 @@ func (sth *Helper) sendTableBuildHierarchyIterateProps(sendTableName string, res
 		}
 		if pType == int32(DPT_DataTable) {
 			if pFlags&int32(SPROP_COLLAPSIBLE) != 0 {
-				sth.sendTableBuildHierarchyIterateProps(pProp.GetDtName(), result)
+				sth.buildHierarchyIterateProps(pProp.GetDtName(), result)
 			} else {
-				sth.sendTableBuildHierarchy(pProp.GetDtName())
+				sth.buildHierarchy(pProp.GetDtName())
 			}
 		} else {
-			result = append(result, dota.CSVCMsg_SendTableSendpropT{
-				DtName:    &sendTableName,
-				Flags:     pProp.Flags,
-				NumBits:   pProp.NumBits,
-				Priority:  pProp.Priority,
-				Type:      pProp.Type,
-				VarName:   pProp.VarName,
-				LowValue:  pProp.LowValue,
-				HighValue: pProp.HighValue,
+			result = append(result, &SendProp{
+				DtName:    sendTableName,
+				Flags:     Flag(pProp.GetFlags()),
+				NumBits:   int(pProp.GetNumBits()),
+				Priority:  int(pProp.GetPriority()),
+				Type:      DPTType(pProp.GetType()),
+				VarName:   pProp.GetVarName(),
+				LowValue:  pProp.GetLowValue(),
+				HighValue: pProp.GetHighValue(),
 			})
 		}
 	}
@@ -147,17 +163,17 @@ func (sth *Helper) sendTableBuildHierarchyIterateProps(sendTableName string, res
 
 func (sth *Helper) hasExcludedSendProp(sendTableName string, pVarName string) bool {
 	for _, p := range sth.excludedSendProp {
-		if *p.DtName == sendTableName && *p.VarName == pVarName {
+		if p.DtName == sendTableName && p.VarName == pVarName {
 			return true
 		}
 	}
 	return false
 }
 
-func (sth *Helper) sendTableSortByPriority() {
+func (sth *Helper) sortByPriority() {
 	prioritySet := map[int]bool{}
 	for _, prop := range sth.flatSendTable {
-		prioritySet[int(*prop.Priority)] = true
+		prioritySet[prop.Priority] = true
 	}
 	priorities := []int{}
 	for k, _ := range prioritySet {
@@ -171,8 +187,8 @@ func (sth *Helper) sendTableSortByPriority() {
 		for {
 			for i = start; i < len(sth.flatSendTable); i++ {
 				p := sth.flatSendTable[i]
-				if (priority == int(p.GetPriority())) ||
-					((Flag(p.GetFlags())&SPROP_CHANGES_OFTEN) == SPROP_CHANGES_OFTEN) &&
+				if priority == p.Priority ||
+					(p.Flags&SPROP_CHANGES_OFTEN == SPROP_CHANGES_OFTEN) &&
 						priority == 64 {
 					if i != start {
 						sth.flatSendTable[i] = sth.flatSendTable[start]
