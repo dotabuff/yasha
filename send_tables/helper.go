@@ -10,6 +10,8 @@ import (
 	dota "github.com/elobuff/d2rp/dota"
 )
 
+func foo() { spew.Dump("hi") }
+
 type DPTType int
 
 const (
@@ -56,8 +58,8 @@ type SendProp struct {
 	Flags     Flag
 	Priority  int
 	NumBits   int
-	LowValue  float32
-	HighValue float32
+	LowValue  float64
+	HighValue float64
 }
 
 type Helper struct {
@@ -125,12 +127,12 @@ func (sth *Helper) getPropsExcluded(sendTableName string) []*SendProp {
 
 func (sth *Helper) buildHierarchy(sendTableName string) {
 	result := []*SendProp{}
-	sth.buildHierarchyIterateProps(sendTableName, result)
+	sth.buildHierarchyIterateProps(sendTableName, &result)
 	for _, res := range result {
 		sth.flatSendTable = append(sth.flatSendTable, res)
 	}
 }
-func (sth *Helper) buildHierarchyIterateProps(sendTableName string, result []*SendProp) {
+func (sth *Helper) buildHierarchyIterateProps(sendTableName string, result *[]*SendProp) {
 	pTable := sth.sendTables[sendTableName]
 	for _, pProp := range pTable.GetProps() {
 		pFlags := pProp.GetFlags()
@@ -147,15 +149,15 @@ func (sth *Helper) buildHierarchyIterateProps(sendTableName string, result []*Se
 				sth.buildHierarchy(pProp.GetDtName())
 			}
 		} else {
-			result = append(result, &SendProp{
+			*result = append(*result, &SendProp{
 				DtName:    sendTableName,
 				Flags:     Flag(pProp.GetFlags()),
 				NumBits:   int(pProp.GetNumBits()),
 				Priority:  int(pProp.GetPriority()),
 				Type:      DPTType(pProp.GetType()),
 				VarName:   pProp.GetVarName(),
-				LowValue:  pProp.GetLowValue(),
-				HighValue: pProp.GetHighValue(),
+				LowValue:  float64(pProp.GetLowValue()),
+				HighValue: float64(pProp.GetHighValue()),
 			})
 		}
 	}
@@ -171,6 +173,7 @@ func (sth *Helper) hasExcludedSendProp(sendTableName string, pVarName string) bo
 }
 
 func (sth *Helper) sortByPriority() {
+	// spew.Dump(sth.flatSendTable)
 	prioritySet := map[int]bool{}
 	for _, prop := range sth.flatSendTable {
 		prioritySet[prop.Priority] = true

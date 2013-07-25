@@ -58,6 +58,7 @@ func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
 				Index: helper.lastIndexUsed,
 				Name:  *t.Name,
 				Tick:  item.Tick,
+				Items: map[int]*StringTableItem{},
 			}
 			cstr := Parse(
 				t.GetStringData(),

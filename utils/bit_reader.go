@@ -6,9 +6,12 @@ import (
 	"math"
 	"strconv"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/elobuff/d2rp/core"
 	"github.com/elobuff/d2rp/core/send_tables"
 )
+
+func foo() { spew.Dump("hi") }
 
 const (
 	CoordIntegerBits            = 14
@@ -113,6 +116,14 @@ func (br *BitReader) ReadUBits(nBits int) uint {
 	if nBits <= 0 || nBits > 32 {
 		panic("Value must be a positive integer between 1 and 32 inclusive.")
 	}
+	/*
+		println("br.currentBit:", br.currentBit)
+		println("nBits:", nBits)
+		println("br.currentBit+nBits:", br.currentBit+nBits)
+
+		println("len(br.buffer):", len(br.buffer))
+		println("len(br.buffer)*8:", len(br.buffer)*8)
+	*/
 	if br.currentBit+nBits > len(br.buffer)*8 {
 		panic("Out of range")
 	}
@@ -136,7 +147,6 @@ func (br *BitReader) ReadBoolean() bool {
 	bitOffset := br.currentBit % 8
 	result := br.buffer[currentByte]&(1<<uint(bitOffset)) != 0
 	br.currentBit++
-	println(result)
 	return result
 }
 func (br *BitReader) ReadByte() byte {
@@ -225,8 +235,7 @@ func (br *BitReader) ReadFloat(prop *send_tables.SendProp) float64 {
 	dwInterp := float64(br.ReadUBits(prop.NumBits))
 	bits := 1 << uint(prop.NumBits)
 	result := dwInterp / float64(bits-1)
-	low, high := float64(prop.LowValue), float64(prop.HighValue)
-	return low + (high-low)*result
+	return prop.LowValue + (prop.HighValue-prop.LowValue)*result
 }
 
 func (br *BitReader) ReadLengthPrefixedString() string {
@@ -338,7 +347,8 @@ func (br *BitReader) ReadPropertiesIndex() []int {
 			if value == 16383 {
 				break
 			}
-			prop += (int(value) + 1)
+			prop += 1
+			prop += int(value)
 			props = append(props, prop)
 		}
 	}
@@ -347,15 +357,18 @@ func (br *BitReader) ReadPropertiesIndex() []int {
 
 func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multiples map[string]int, indices []int) map[string]interface{} {
 	values := map[string]interface{}{}
+	println(len(indices))
 	for _, index := range indices {
 		prop := mapping[index]
-		multiple := multiples[prop.DtName+"."+prop.VarName] > 1
+		baseKey := prop.DtName + "." + prop.VarName
+		multiple := multiples[baseKey] > 1
 		elements := 1
 		if (prop.Flags & send_tables.SPROP_INSIDEARRAY) != 0 {
 			elements = int(br.ReadUBits(6))
 		}
+		// spew.Dump(prop)
 		for k := 0; k < elements; k++ {
-			key := prop.DtName + "." + prop.VarName
+			key := baseKey
 			if multiple {
 				key += ("-" + strconv.Itoa(index))
 			}
