@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"reflect"
 	"sort"
 
 	"code.google.com/p/gogoprotobuf/proto"
@@ -10,10 +9,16 @@ import (
 	dota "github.com/elobuff/d2rp/dota"
 )
 
+const (
+	watchSequence = 56282
+)
+
+func foo() { spew.Dump("hi") }
+
 type Parser struct {
 	*ParserBase
-	Sequence float64
-	Items    map[float64]*ParserItem
+	Sequence int64
+	Items    map[int64]*ParserItem
 }
 
 func ParserFromFile(path string) *Parser {
@@ -28,25 +33,21 @@ func NewParser(data []byte) *Parser {
 
 func (p *Parser) Analyze() {
 	p.Sequence = 1
-	p.Items = map[float64]*ParserItem{}
-	compressed := false
-	command := p.ReadEDemoCommands(&compressed)
+	p.Items = map[int64]*ParserItem{}
+	command, compressed := p.ReadEDemoCommands()
 	if command == dota.EDemoCommands_DEM_Error {
 		panic(command)
 	}
 	for p.reader.CanRead() {
 		tick := int(p.reader.ReadVarInt32())
 		length := int(p.reader.ReadVarInt32())
-		pbEvent := p.AsParserBaseEvent(command)
-		if pbEvent.EventType == BaseError {
-			p.reader.Skip(length)
-		} else {
+		obj, err := p.AsBaseEvent(command.String())
+		if err == nil {
 			item := &ParserItem{
-				Sequence:  p.Sequence,
-				From:      pbEvent.EventType,
-				EventType: pbEvent.EventType,
-				ItemType:  p.AsBaseType(pbEvent.Name).ItemType,
-				Tick:      tick,
+				Sequence: p.Sequence,
+				// From:     obj,
+				Object: obj,
+				Tick:   tick,
 			}
 			p.Sequence++
 			if compressed {
@@ -54,87 +55,94 @@ func (p *Parser) Analyze() {
 			} else {
 				item.Data = p.reader.Read(length)
 			}
-			if pbEvent.EventType == DEM_SignonPacket {
+			if item.Sequence == watchSequence {
+				spew.Println("Analyze()")
+				spew.Dump(item)
+			}
+			switch o := obj.(type) {
+			case *SignonPacket:
 				full := &dota.CDemoPacket{}
 				ProtoUnmarshal(item.Data, full)
-				p.AnalyzePacket(DEM_SignonPacket, tick, full.Data)
-			} else if pbEvent.EventType == DEM_Packet {
-				full := &dota.CDemoPacket{}
-				ProtoUnmarshal(item.Data, full)
-				p.AnalyzePacket(DEM_Packet, tick, full.Data)
-			} else if pbEvent.EventType == DEM_FullPacket {
-				full := &dota.CDemoFullPacket{}
-				ProtoUnmarshal(item.Data, full)
-				item.From = DEM_FullPacket
-				item.EventType = DEM_StringTables
-				item.ItemType = p.AsBaseType("DEM_StringTables").ItemType
+				p.AnalyzePacket(dota.EDemoCommands_DEM_SignonPacket, tick, full.GetData())
+			case *dota.CDemoPacket:
+				ProtoUnmarshal(item.Data, o)
+				p.AnalyzePacket(dota.EDemoCommands_DEM_Packet, tick, o.GetData())
+			case *dota.CDemoFullPacket:
+				ProtoUnmarshal(item.Data, o)
+				item.From = dota.EDemoCommands_DEM_FullPacket
 				item.Data = nil
-				item.Value = full.StringTable
+				item.Object = o.GetStringTable()
 				p.Items[item.Sequence] = item
-				p.AnalyzePacket(DEM_FullPacket, tick, full.GetPacket().Data)
-			} else if pbEvent.EventType == DEM_SendTables {
-				full := &dota.CDemoSendTables{}
-				ProtoUnmarshal(item.Data, full)
-				p.AnalyzePacket(DEM_SendTables, tick, full.Data)
-			} else {
+				p.AnalyzePacket(dota.EDemoCommands_DEM_FullPacket, tick, o.GetPacket().GetData())
+			case *dota.CDemoSendTables:
+				ProtoUnmarshal(item.Data, o)
+				p.AnalyzePacket(dota.EDemoCommands_DEM_SendTables, tick, o.GetData())
+			default:
 				p.Items[item.Sequence] = item
 			}
+		} else {
+			p.reader.Skip(length)
 		}
-		command = p.ReadEDemoCommands(&compressed)
+		command, compressed = p.ReadEDemoCommands()
 		if command == dota.EDemoCommands_DEM_Error {
 			panic(command)
 		}
 	}
 }
-func (p *Parser) AnalyzePacket(fromEvent ParserBaseEvent, tick int, data []byte) {
+func (p *Parser) AnalyzePacket(fromEvent dota.EDemoCommands, tick int, data []byte) {
 	reader := utils.NewBytesReader(data)
 	for reader.CanRead() {
 		iType := int(reader.ReadVarInt32())
 		length := int(reader.ReadVarInt32())
-		pbEvent := p.AsParserBaseEventNETSVC(iType)
-		if pbEvent.EventType == BaseError {
+		obj, err := p.AsBaseEventNETSVC(iType)
+		if p.Sequence == watchSequence {
+			spew.Println("AnalyzePacket() {")
+			spew.Dump(iType)
+			spew.Dump(length)
+			spew.Dump(obj)
+			spew.Dump(reader)
+			spew.Println("}")
+		}
+		if err != nil {
+			spew.Println(err)
 			reader.Skip(length)
 		} else {
 			item := &ParserItem{
-				Sequence:  p.Sequence,
-				From:      fromEvent,
-				EventType: pbEvent.EventType,
-				ItemType:  p.AsBaseType(pbEvent.Name).ItemType,
-				Tick:      tick,
-				Data:      reader.Read(length),
+				Sequence: p.Sequence,
+				From:     fromEvent,
+				Object:   obj,
+				Tick:     tick,
+				Data:     reader.Read(length),
+			}
+			if p.Sequence == watchSequence {
+				spew.Println("AnalyzePacket() {")
+				spew.Dump(item.Data)
+				spew.Println("}")
 			}
 			p.Sequence++
-			if pbEvent.EventType == SVC_UserMessage {
+			switch obj.(type) {
+			case *dota.CSVCMsg_UserMessage:
 				message := &dota.CSVCMsg_UserMessage{}
 				ProtoUnmarshal(item.Data, message)
-				umEvent := p.AsParserBaseEventBUMDUM(int(message.GetMsgType()))
-				if umEvent.EventType != BaseError {
-					item.EventType = umEvent.EventType
-					item.ItemType = p.AsBaseType(umEvent.Name).ItemType
+				um, err := p.AsBaseEventBUMDUM(int(message.GetMsgType()))
+				if err == nil {
+					item.Object = um
 					item.Data = message.GetMsgData()
 					p.Items[item.Sequence] = item
 				}
-			} else {
+			default:
 				p.Items[item.Sequence] = item
 			}
 		}
 	}
 }
 
-func (p *Parser) Parse(events ...ParserBaseEvent) (items ParserBaseItems) {
-	found := false
-
+func (p *Parser) Parse(check func(proto.Message) bool) (items ParserBaseItems) {
 	for _, item := range p.Items {
 		if item.Data == nil {
 			continue
 		}
-		found = false
-		for _, event := range events {
-			if found = event == item.EventType; found {
-				break
-			}
-		}
-		if !found {
+		if !check(item.Object) {
 			continue
 		}
 		items = append(items, parseOne(item))
@@ -144,23 +152,18 @@ func (p *Parser) Parse(events ...ParserBaseEvent) (items ParserBaseItems) {
 }
 
 func parseOne(item *ParserItem) *ParserBaseItem {
-	instance := reflect.New(item.ItemType)
-	message := instance.Interface().(proto.Message)
-	err := ProtoUnmarshal(item.Data, message)
+	err := ProtoUnmarshal(item.Data, item.Object)
 	if err != nil {
+		spew.Println("parseOne()")
 		spew.Dump(item)
-		spew.Dump(message)
 		panic(err)
 		return &ParserBaseItem{}
 	}
-	item.Value = message
 	item.Data = nil
-	spew.Dump(item)
 	return &ParserBaseItem{
 		Sequence: item.Sequence,
-		From:     item.From,
-		ItemType: item.ItemType,
 		Tick:     item.Tick,
-		Value:    message,
+		From:     item.From,
+		Object:   item.Object,
 	}
 }

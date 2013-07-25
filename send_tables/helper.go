@@ -64,6 +64,7 @@ func NewHelper(sendTables map[string]*dota.CSVCMsg_SendTable) *Helper {
 func (sth *Helper) LoadSendTable(sendTableName string) []dota.CSVCMsg_SendTableSendpropT {
 	sth.flatSendTable = []dota.CSVCMsg_SendTableSendpropT{}
 	sth.excludedSendProp = []dota.CSVCMsg_SendTableSendpropT{}
+	spew.Dump(sendTableName)
 	sth.excludedSendProp = sth.sendTableGetPropsExcluded(sendTableName)
 	sth.sendTableBuildHierarchy(sendTableName)
 	sth.sendTableSortByPriority()

@@ -10,10 +10,10 @@ func NewBytesReader(data []byte) *BytesReader {
 }
 
 func (br *BytesReader) ReadVarInt32() (result uint32) {
-	var b uint32
+	var b uint32 = 0x80
 	var count uint
 
-	for {
+	for (b & 0x80) == 0x80 {
 		if count == 5 {
 			return
 		} else if br.position >= len(br.data) {
@@ -23,9 +23,6 @@ func (br *BytesReader) ReadVarInt32() (result uint32) {
 		br.position++
 		result |= (b & 0x7F) << (7 * count)
 		count++
-		if (b & 0x80) != 0x80 {
-			break
-		}
 	}
 
 	return

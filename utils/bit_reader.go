@@ -32,6 +32,9 @@ type BitReader struct {
 }
 
 func NewBitReader(buffer []byte) *BitReader {
+	if len(buffer) == 0 {
+		panic("empty buffer?")
+	}
 	return &BitReader{buffer: buffer}
 }
 
@@ -41,21 +44,27 @@ func (br *BitReader) CurrentByte() int { return br.currentBit / 8 }
 func (br *BitReader) BitsLeft() int    { return (len(br.buffer) * 8) - br.currentBit }
 func (br *BitReader) BytesLeft() int   { return len(br.buffer) - br.CurrentByte() }
 
-// origin -1: current
-// origin  0: begin
-// origin  1: end
-func (br *BitReader) SeekBits(offset int, origin int) {
-	if origin == -1 {
+type SeekOrigin int
+
+const (
+	Current SeekOrigin = iota
+	Begin
+	End
+)
+
+func (br *BitReader) SeekBits(offset int, origin SeekOrigin) {
+	if origin == Current {
 		br.currentBit += offset
-	} else if origin == 0 {
+	} else if origin == Begin {
 		br.currentBit = offset
-	} else if origin == 1 {
-		br.currentBit = (br.Length() * 8) - offset
+	} else if origin == End {
+		br.currentBit = (len(br.buffer) * 8) - offset
 	}
-	if br.currentBit < 0 || br.currentBit > (br.Length()*8) {
+	if br.currentBit < 0 || br.currentBit > (len(br.buffer)*8) {
 		panic("out of range")
 	}
 }
+
 func (br *BitReader) ReadUBitsByteAligned(nBits int) uint {
 	if nBits%8 != 0 {
 		panic("Must be multple of 8")
@@ -70,6 +79,7 @@ func (br *BitReader) ReadUBitsByteAligned(nBits int) uint {
 	}
 	return result
 }
+
 func (br *BitReader) ReadUBitsNotByteAligned(nBits int) uint {
 	bitOffset := br.currentBit % 8
 	nBitsToRead := bitOffset + nBits
@@ -81,7 +91,7 @@ func (br *BitReader) ReadUBitsNotByteAligned(nBits int) uint {
 	var currentValue uint64
 	for i := 0; i < nBytesToRead; i++ {
 		b := br.buffer[br.CurrentByte()+1]
-		currentValue += (uint64(b) << uint(i*8))
+		currentValue += (uint64(b) << (uint64(i) * 8))
 	}
 	currentValue >>= uint(bitOffset)
 	currentValue &= ((1 << uint(nBits)) - 1)
@@ -89,21 +99,18 @@ func (br *BitReader) ReadUBitsNotByteAligned(nBits int) uint {
 	return uint(currentValue)
 }
 func (br *BitReader) ReadVarInt() uint {
-	var b uint
+	var b uint = 0x80
 	var count int
 	var result uint
-	for {
+	for (b & 0x80) == 0x80 {
 		if count == 5 {
 			return result
-		} else if br.CurrentByte() >= br.Length() {
+		} else if br.CurrentByte() >= len(br.buffer) {
 			return result
 		}
 		b = br.ReadUBits(8)
 		result |= (b & 0x7f) << uint(7*count)
 		count++
-		if (b & 0x80) == 0x80 {
-			break
-		}
 	}
 	return result
 }
@@ -114,7 +121,7 @@ func (br *BitReader) ReadUBits(nBits int) uint {
 	if br.CurrentBit()+nBits > br.Length()*8 {
 		panic("Out of range")
 	}
-	if br.CurrentBit()%8 == 0 && nBits%8 == 0 {
+	if br.currentBit%8 == 0 && nBits%8 == 0 {
 		return br.ReadUBitsByteAligned(nBits)
 	}
 	return br.ReadUBitsNotByteAligned(nBits)
@@ -301,7 +308,7 @@ func (br *BitReader) ReadInt64(prop dota.CSVCMsg_SendTableSendpropT) uint64 {
 		low = br.ReadUBits(32)
 		high = br.ReadUBits(32)
 	} else {
-		br.SeekBits(1, 0)
+		br.SeekBits(1, Current)
 		low = br.ReadUBits(32)
 		high = br.ReadUBits(31)
 	}

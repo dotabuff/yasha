@@ -1,18 +1,17 @@
 package parser
 
 import (
-	"reflect"
+	"code.google.com/p/gogoprotobuf/proto"
+	dota "github.com/elobuff/d2rp/dota"
 )
 
 type ParserItem struct {
-	Sequence  float64
-	From      ParserBaseEvent
-	EventType ParserBaseEvent
-	ItemType  reflect.Type
-	Tick      int
-	Data      []byte
-	Value     interface{}
-	Bits      string
+	Sequence int64
+	Tick     int
+	Data     []byte
+	From     dota.EDemoCommands
+	Object   proto.Message
+	// Bits     string
 }
 
 // ParserItems attaches the methods of Interface to []*ParserItem, sorting in increasing order by Sequence.

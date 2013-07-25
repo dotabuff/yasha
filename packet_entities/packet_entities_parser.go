@@ -38,11 +38,11 @@ func NewParser(items parser.ParserBaseItems) {
 	var serverInfo *dota.CSVCMsg_ServerInfo
 	packets := parser.ParserBaseItems{}
 	for _, item := range items {
-		switch value := item.Value.(type) {
+		switch value := item.Object.(type) {
 		case *dota.CSVCMsg_ServerInfo:
 			serverInfo = value
 		case *dota.CSVCMsg_PacketEntities:
-			if item.From == parser.DEM_Packet {
+			if item.From == dota.EDemoCommands_DEM_Packet {
 				packets = append(packets, item)
 			}
 		}
@@ -57,7 +57,7 @@ func NewParser(items parser.ParserBaseItems) {
 	sendTables := map[string]*dota.CSVCMsg_SendTable{}
 
 	for _, item := range items {
-		switch value := item.Value.(type) {
+		switch value := item.Object.(type) {
 		case *dota.CDemoClassInfo:
 			if classInfos == nil {
 				classInfos = value
@@ -186,7 +186,7 @@ func (p *PacketEntitiesParser) EntityPreserve(br *utils.BitReader, currentIndex,
 }
 
 func (p *PacketEntitiesParser) ParsePacket(packet *parser.ParserBaseItem) {
-	pe := (packet.Value).(*dota.CSVCMsg_PacketEntities)
+	pe := (packet.Object).(*dota.CSVCMsg_PacketEntities)
 	br := utils.NewBitReader(pe.GetEntityData())
 	currentIndex := -1
 	for i := 0; i < int(pe.GetUpdatedEntries()); i++ {
