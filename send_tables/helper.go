@@ -2,9 +2,6 @@ package send_tables
 
 import (
 	"io/ioutil"
-	"runtime"
-	"sort"
-	"time"
 
 	"github.com/davecgh/go-spew/spew"
 	dota "github.com/elobuff/d2rp/dota"
@@ -96,10 +93,6 @@ func (sth *Helper) flagString(flag Flag) (result string) {
 }
 
 func (sth *Helper) getPropsExcluded(sendTableName string) []*SendProp {
-	time.Now()
-	runtime.Gosched()
-	// defer func() { println(time.Since(now).String()) }()
-
 	result := []*SendProp{}
 	sendTable := sth.sendTables[sendTableName]
 	for _, prop := range sendTable.GetProps() {
@@ -173,26 +166,34 @@ func (sth *Helper) hasExcludedSendProp(sendTableName string, pVarName string) bo
 }
 
 func (sth *Helper) sortByPriority() {
-	// spew.Dump(sth.flatSendTable)
-	prioritySet := map[int]bool{}
-	for _, prop := range sth.flatSendTable {
-		prioritySet[prop.Priority] = true
-	}
 	priorities := []int{}
-	for k, _ := range prioritySet {
-		priorities = append(priorities, k)
+	has64 := false
+	for _, prop := range sth.flatSendTable {
+		priority := prop.Priority
+		unique := true
+		for _, existing := range priorities {
+			if priority == existing {
+				unique = false
+				break
+			}
+		}
+		if unique {
+			has64 = has64 || priority == 64
+			priorities = append(priorities, priority)
+		}
 	}
-	sort.Ints(priorities)
+	if !has64 {
+		priorities = append(priorities, 64)
+	}
 
 	start := 0
-	for _, priority := range priorities {
+	for pi := 0; pi < len(priorities); pi++ {
+		priority := priorities[pi]
 		i := 0
 		for {
 			for i = start; i < len(sth.flatSendTable); i++ {
 				p := sth.flatSendTable[i]
-				if priority == p.Priority ||
-					(p.Flags&SPROP_CHANGES_OFTEN == SPROP_CHANGES_OFTEN) &&
-						priority == 64 {
+				if priority == p.Priority || ((p.Flags&SPROP_CHANGES_OFTEN) == SPROP_CHANGES_OFTEN) && priority == 64 {
 					if i != start {
 						sth.flatSendTable[i] = sth.flatSendTable[start]
 						sth.flatSendTable[start] = p

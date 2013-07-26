@@ -5,7 +5,7 @@ import (
 )
 
 type Vector struct {
-	X, Y, Z float64
+	X, Y, Z float32
 }
 
 func (v Vector) String() string {

@@ -14,14 +14,14 @@ import (
 func foo() { spew.Dump("hi") }
 
 const (
-	CoordIntegerBits            = 14
-	CoordFractionalBits         = 5
-	CoordDenominator            = (1 << CoordFractionalBits)
-	CoordResolution     float64 = (1.0 / CoordDenominator)
+	CoordIntegerBits    = 14
+	CoordFractionalBits = 5
+	CoordDenominator    = (1 << CoordFractionalBits)
+	CoordResolution     = (1.0 / CoordDenominator)
 
-	NormalFractionalBits         = 11
-	NormalDenominator            = ((1 << NormalFractionalBits) - 1)
-	NormalResolution     float64 = (1.0 / NormalDenominator)
+	NormalFractionalBits = 11
+	NormalDenominator    = ((1 << NormalFractionalBits) - 1)
+	NormalResolution     = (1.0 / NormalDenominator)
 )
 
 type BitReader struct {
@@ -40,7 +40,7 @@ func (br *BitReader) Length() int      { return len(br.buffer) }
 func (br *BitReader) CurrentBit() int  { return br.currentBit }
 func (br *BitReader) CurrentByte() int { return br.currentBit / 8 }
 func (br *BitReader) BitsLeft() int    { return (len(br.buffer) * 8) - br.currentBit }
-func (br *BitReader) BytesLeft() int   { return len(br.buffer) - br.CurrentByte() }
+func (br *BitReader) BytesLeft() int   { return len(br.buffer) - (br.currentBit * 8) }
 
 type SeekOrigin int
 
@@ -96,11 +96,12 @@ func (br *BitReader) ReadUBitsNotByteAligned(nBits int) uint {
 	br.currentBit += nBits
 	return uint(currentValue)
 }
+
 func (br *BitReader) ReadVarInt() uint {
-	var b uint = 0x80
+	var b uint
 	var count int
 	var result uint
-	for (b & 0x80) == 0x80 {
+	for {
 		if count == 5 {
 			return result
 		} else if br.CurrentByte() >= len(br.buffer) {
@@ -109,22 +110,24 @@ func (br *BitReader) ReadVarInt() uint {
 		b = br.ReadUBits(8)
 		result |= (b & 0x7f) << uint(7*count)
 		count++
+		if (b & 0x80) != 0x80 {
+			break
+		}
 	}
 	return result
 }
+
 func (br *BitReader) ReadUBits(nBits int) uint {
 	if nBits <= 0 || nBits > 32 {
 		panic("Value must be a positive integer between 1 and 32 inclusive.")
 	}
-	/*
-		println("br.currentBit:", br.currentBit)
+	if (br.currentBit + nBits) > (len(br.buffer) * 8) {
+		println(br)
 		println("nBits:", nBits)
-		println("br.currentBit+nBits:", br.currentBit+nBits)
-
-		println("len(br.buffer):", len(br.buffer))
+		println("br.currentBit:", br.currentBit)
 		println("len(br.buffer)*8:", len(br.buffer)*8)
-	*/
-	if br.currentBit+nBits > len(br.buffer)*8 {
+		println("br.CurrentByte():", br.CurrentByte())
+		println("len(br.buffer):", len(br.buffer))
 		panic("Out of range")
 	}
 	if br.currentBit%8 == 0 && nBits%8 == 0 {
@@ -132,13 +135,15 @@ func (br *BitReader) ReadUBits(nBits int) uint {
 	}
 	return br.ReadUBitsNotByteAligned(nBits)
 }
+
 func (br *BitReader) ReadBits(nBits int) int {
 	result := br.ReadUBits(nBits - 1)
 	if br.ReadBoolean() {
-		result = -((1 << uint(nBits-1)) - result)
+		result = -((1 << (uint(nBits) - 1)) - result)
 	}
 	return int(result)
 }
+
 func (br *BitReader) ReadBoolean() bool {
 	if br.CurrentBit()+1 > br.Length()*8 {
 		panic("Out of range")
@@ -149,12 +154,15 @@ func (br *BitReader) ReadBoolean() bool {
 	br.currentBit++
 	return result
 }
+
 func (br *BitReader) ReadByte() byte {
 	return byte(br.ReadUBits(8))
 }
+
 func (br *BitReader) ReadSByte() int8 {
 	return int8(br.ReadBits(8))
 }
+
 func (br *BitReader) ReadBytes(nBytes int) []byte {
 	if nBytes <= 0 {
 		panic("Must be positive integer: nBytes")
@@ -165,50 +173,50 @@ func (br *BitReader) ReadBytes(nBytes int) []byte {
 	}
 	return result
 }
+
 func (br *BitReader) ReadBitFloat() float32 {
 	b := bytes.NewBuffer(br.ReadBytes(4))
 	var f float32
 	binary.Read(b, binary.LittleEndian, &f)
 	return f
 }
-func (br *BitReader) ReadBitNormal() float64 {
+
+func (br *BitReader) ReadBitNormal() float32 {
 	signbit := br.ReadBoolean()
-	fractval := float64(br.ReadUBits(NormalFractionalBits))
+	fractval := float32(br.ReadUBits(NormalFractionalBits))
 	value := fractval * NormalResolution
 	if signbit {
 		value = -value
 	}
 	return value
 }
-func (br *BitReader) ReadBitCellCoord(bits int, integral, lowPrecision bool) float64 {
-	intval := 0
-	fractval := 0
-	value := 0.0
+
+func (br *BitReader) ReadBitCellCoord(bits int, integral, lowPrecision bool) (value float32) {
 	if integral {
-		value = float64(br.ReadBits(bits))
+		value = float32(br.ReadBits(bits))
 	} else {
-		intval = br.ReadBits(bits)
+		intval := br.ReadBits(bits)
 		if lowPrecision {
-			fractval = br.ReadBits(3)
-			value = float64(intval) + (float64(fractval) * (1.0 / (1 << 3)))
+			fractval := float32(br.ReadBits(3))
+			value = float32(intval) + (fractval * (1.0 / (1 << 3)))
 		} else {
-			fractval = br.ReadBits(5)
-			value = float64(intval) + (float64(fractval) * (1.0 / (1 << 5)))
+			fractval := float32(br.ReadBits(5))
+			value = float32(intval) + (fractval * (1.0 / (1 << 5)))
 		}
 	}
 	return value
 }
-func (br *BitReader) ReadBitCoord() float64 {
+
+func (br *BitReader) ReadBitCoord() (value float32) {
 	intFlag := br.ReadBoolean()
 	fractFlag := br.ReadBoolean()
-	value := 0.0
 	if intFlag || fractFlag {
 		negative := br.ReadBoolean()
 		if intFlag {
-			value += float64(br.ReadUBits(CoordIntegerBits)) + 1
+			value += float32(br.ReadUBits(CoordIntegerBits)) + 1
 		}
 		if fractFlag {
-			value += float64(br.ReadUBits(CoordFractionalBits)) * CoordResolution
+			value += float32(br.ReadUBits(CoordFractionalBits)) * CoordResolution
 		}
 		if negative {
 			value = -value
@@ -216,6 +224,7 @@ func (br *BitReader) ReadBitCoord() float64 {
 	}
 	return value
 }
+
 func (br *BitReader) ReadString() string {
 	bs := []byte{}
 	for {
@@ -228,20 +237,20 @@ func (br *BitReader) ReadString() string {
 	return string(bs)
 }
 
-func (br *BitReader) ReadFloat(prop *send_tables.SendProp) float64 {
+func (br *BitReader) ReadFloat(prop *send_tables.SendProp) float32 {
 	if result, ok := br.ReadSpecialFloat(prop); ok {
 		return result
 	}
-	dwInterp := float64(br.ReadUBits(prop.NumBits))
-	bits := 1 << uint(prop.NumBits)
-	result := dwInterp / float64(bits-1)
-	return prop.LowValue + (prop.HighValue-prop.LowValue)*result
+	dwInterp := uint(br.ReadUBits(prop.NumBits))
+	result := float32(dwInterp) / float32((uint(1)<<uint(prop.NumBits))-1)
+	result = float32(prop.LowValue+(prop.HighValue-prop.LowValue)) * result
+	return result
 }
 
 func (br *BitReader) ReadLengthPrefixedString() string {
-	stringLength := int(br.ReadUBits(9))
+	stringLength := uint(br.ReadUBits(9))
 	if stringLength > 0 {
-		return string(br.ReadBytes(stringLength))
+		return string(br.ReadBytes(int(stringLength)))
 	}
 	return ""
 }
@@ -255,9 +264,9 @@ func (br *BitReader) ReadVector(prop *send_tables.SendProp) *core.Vector {
 		result.Z = br.ReadFloat(prop)
 	} else {
 		signbit := br.ReadBoolean()
-		v0v0v1v1 := result.X*result.X + result.Y*result.Y
+		v0v0v1v1 := float64(result.X*result.X + result.Y*result.Y)
 		if v0v0v1v1 < 1.0 {
-			result.Z = math.Sqrt(1.0 - v0v0v1v1)
+			result.Z = float32(math.Sqrt(1.0 - v0v0v1v1))
 		} else {
 			result.Z = 0.0
 		}
@@ -283,7 +292,7 @@ func (br *BitReader) ReadInt(prop *send_tables.SendProp) int {
 	return br.ReadBits(prop.NumBits)
 }
 
-func (br *BitReader) ReadSpecialFloat(prop *send_tables.SendProp) (float64, bool) {
+func (br *BitReader) ReadSpecialFloat(prop *send_tables.SendProp) (float32, bool) {
 	if prop.Flags&send_tables.SPROP_COORD != 0 {
 		return br.ReadBitCoord(), true
 	} else if prop.Flags&send_tables.SPROP_COORD_MP != 0 {
@@ -299,7 +308,7 @@ func (br *BitReader) ReadSpecialFloat(prop *send_tables.SendProp) (float64, bool
 	} else if prop.Flags&send_tables.SPROP_CELL_COORD_LOWPRECISION != 0 {
 		return br.ReadBitCellCoord(prop.NumBits, false, true), true
 	} else if prop.Flags&send_tables.SPROP_NOSCALE != 0 {
-		return float64(br.ReadBitFloat()), true
+		return br.ReadBitFloat(), true
 	} else if prop.Flags&send_tables.SPROP_NORMAL != 0 {
 		return br.ReadBitNormal(), true
 	}
@@ -357,63 +366,62 @@ func (br *BitReader) ReadPropertiesIndex() []int {
 
 func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multiples map[string]int, indices []int) map[string]interface{} {
 	values := map[string]interface{}{}
-	println(len(indices))
-	for _, index := range indices {
-		prop := mapping[index]
-		baseKey := prop.DtName + "." + prop.VarName
-		multiple := multiples[baseKey] > 1
+	for j := 0; j < len(indices); j++ {
+		prop := mapping[indices[j]]
+		multiple := multiples[prop.DtName+"."+prop.VarName] > 1
 		elements := 1
-		if (prop.Flags & send_tables.SPROP_INSIDEARRAY) != 0 {
+		if prop.Flags&send_tables.SPROP_INSIDEARRAY != 0 {
 			elements = int(br.ReadUBits(6))
-		}
-		// spew.Dump(prop)
-		for k := 0; k < elements; k++ {
-			key := baseKey
-			if multiple {
-				key += ("-" + strconv.Itoa(index))
-			}
-			if elements > 1 {
-				key += ("-" + strconv.Itoa(k))
-			}
-			switch send_tables.DPTType(prop.Type) {
-			case send_tables.DPT_Int:
-				if prop.Flags&send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT != 0 {
-					values[key] = br.ReadVarInt()
-				} else {
-					values[key] = br.ReadInt(prop)
+			for k := 0; k < elements; k++ {
+				key := prop.DtName + "." + prop.VarName
+				if multiple {
+					key += "-" + strconv.Itoa(indices[j])
 				}
-			case send_tables.DPT_Float:
-				if prop.Flags&send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT != 0 {
-					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
-				} else {
-					values[key] = br.ReadFloat(prop)
+				if elements > 1 {
+					key += "-" + strconv.Itoa(k)
 				}
-			case send_tables.DPT_Vector:
-				if prop.Flags&send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT != 0 {
-					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
-				} else {
-					values[key] = br.ReadVector(prop)
-				}
-			case send_tables.DPT_VectorXY:
-				if prop.Flags&send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT != 0 {
-					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
-				} else {
-					values[key] = br.ReadVectorXY(prop)
-				}
-			case send_tables.DPT_String:
-				if prop.Flags&send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT != 0 {
-					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
-				} else {
-					values[key] = br.ReadLengthPrefixedString()
-				}
-			case send_tables.DPT_Int64:
-				if prop.Flags&send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT != 0 {
-					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
-				} else {
-					values[key] = br.ReadInt64(prop)
+
+				switch prop.Type {
+				case send_tables.DPT_Int:
+					if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+						values[key] = br.ReadVarInt()
+					} else {
+						values[key] = br.ReadInt(prop)
+					}
+				case send_tables.DPT_Float:
+					if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+						panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
+					} else {
+						values[key] = br.ReadFloat(prop)
+					}
+				case send_tables.DPT_Vector:
+					if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+						panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
+					} else {
+						values[key] = br.ReadVector(prop)
+					}
+				case send_tables.DPT_VectorXY:
+					if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+						panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
+					} else {
+						values[key] = br.ReadVectorXY(prop)
+					}
+				case send_tables.DPT_String:
+					if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+						panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
+					} else {
+						values[key] = br.ReadLengthPrefixedString()
+					}
+				case send_tables.DPT_Int64:
+					if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+						panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
+					} else {
+						values[key] = br.ReadInt64(prop)
+					}
 				}
 			}
 		}
 	}
+
 	return values
 }
