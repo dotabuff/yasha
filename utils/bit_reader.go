@@ -373,7 +373,6 @@ func (br *BitReader) ReadPropertiesIndex() []int {
 
 func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multiples map[string]int, indices []int) map[string]interface{} {
 	values := map[string]interface{}{}
-	debug = true
 
 	for _, index := range indices {
 		prop := mapping[index]
@@ -434,6 +433,5 @@ func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multi
 		}
 	}
 
-	debug = false
 	return values
 }

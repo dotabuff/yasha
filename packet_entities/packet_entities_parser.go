@@ -11,7 +11,7 @@ import (
 	dota "github.com/elobuff/d2rp/dota"
 )
 
-type PacketEntitiesParser struct {
+type Parser struct {
 	baseline              map[int]map[string]interface{}
 	classIdNumBits        int
 	classInfosIdMapping   map[string]int
@@ -26,12 +26,12 @@ type PacketEntitiesParser struct {
 	entities              []*PacketEntity
 }
 
-func (p PacketEntitiesParser) Entities() []*PacketEntity {
+func (p Parser) Entities() []*PacketEntity {
 	return p.entities
 }
 
 func NewParser(items parser.ParserBaseItems) {
-	p := PacketEntitiesParser{
+	p := Parser{
 		entities: make([]*PacketEntity, 0, 2048),
 	}
 
@@ -102,25 +102,25 @@ func NewParser(items parser.ParserBaseItems) {
 	}
 }
 
-func (p *PacketEntitiesParser) AddCreateHandler(className string, callback Callback) {
+func (p *Parser) AddCreateHandler(className string, callback Callback) {
 	p.createClassHandlers[className] = Handler{ClassName: className, Callback: callback}
 }
 
-func (p *PacketEntitiesParser) AddDeleteHandler(className string, callback Callback) {
+func (p *Parser) AddDeleteHandler(className string, callback Callback) {
 	p.deleteClassHandlers[className] = Handler{ClassName: className, Callback: callback}
 }
 
-func (p *PacketEntitiesParser) AddPreserveHandler(className string, callback PreserveCallback) {
+func (p *Parser) AddPreserveHandler(className string, callback PreserveCallback) {
 	p.preserveClassHandlers[className] = HandlerPreserve{ClassName: className, Callback: callback}
 }
 
-func (p *PacketEntitiesParser) Parse() {
+func (p *Parser) Parse() {
 	for _, packet := range p.packets {
 		p.ParsePacket(packet)
 	}
 }
 
-func (p *PacketEntitiesParser) EntityCreate(br *utils.BitReader, currentIndex, tick int) {
+func (p *Parser) EntityCreate(br *utils.BitReader, currentIndex, tick int) {
 	pe := &PacketEntity{
 		Tick:      tick,
 		ClassId:   int(br.ReadUBits(p.classIdNumBits)),
@@ -156,7 +156,7 @@ func (p *PacketEntitiesParser) EntityCreate(br *utils.BitReader, currentIndex, t
 	}
 }
 
-func (p *PacketEntitiesParser) EntityDelete(br *utils.BitReader, currentIndex, tick int) {
+func (p *Parser) EntityDelete(br *utils.BitReader, currentIndex, tick int) {
 	pe := p.entities[currentIndex].Clone()
 	pe.Tick = tick
 	pe.Type = Delete
@@ -166,7 +166,7 @@ func (p *PacketEntitiesParser) EntityDelete(br *utils.BitReader, currentIndex, t
 	}
 }
 
-func (p *PacketEntitiesParser) EntityPreserve(br *utils.BitReader, currentIndex, tick int) {
+func (p *Parser) EntityPreserve(br *utils.BitReader, currentIndex, tick int) {
 	pe := p.entities[currentIndex]
 	pe.Tick = tick
 	pe.Type = Preserve
@@ -185,7 +185,7 @@ func (p *PacketEntitiesParser) EntityPreserve(br *utils.BitReader, currentIndex,
 	}
 }
 
-func (p *PacketEntitiesParser) ParsePacket(packet *parser.ParserBaseItem) {
+func (p *Parser) ParsePacket(packet *parser.ParserBaseItem) {
 	pe := (packet.Object).(*dota.CSVCMsg_PacketEntities)
 	br := utils.NewBitReader(pe.GetEntityData())
 	currentIndex := -1

@@ -3,7 +3,6 @@ package string_tables
 import (
 	"sort"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/elobuff/d2rp/core/parser"
 	dota "github.com/elobuff/d2rp/dota"
 )
@@ -41,8 +40,6 @@ func NewStateHelper(items parser.ParserBaseItems) *StateHelper {
 }
 
 func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
-	spew.Println("<GetStateAtTick tick=", tick, ">")
-	defer spew.Println("</GetStateAtTick>")
 	helper.lastIndexUsed = -1
 	result := map[int]*StringTable{}
 	packets := parser.ParserBaseItems{}
