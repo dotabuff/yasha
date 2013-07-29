@@ -11,7 +11,18 @@ import (
 	"github.com/elobuff/d2rp/core/send_tables"
 )
 
-func foo() { spew.Dump("hi") }
+var debug = false
+
+func dump(args ...interface{}) {
+	if debug {
+		spew.Dump(args...)
+	}
+}
+func printLn(args ...interface{}) {
+	if debug {
+		spew.Println(args...)
+	}
+}
 
 const (
 	CoordIntegerBits    = 14
@@ -67,9 +78,11 @@ func (br *BitReader) ReadUBitsByteAligned(nBits int) uint {
 	if nBits%8 != 0 {
 		panic("Must be multple of 8")
 	}
+
 	if br.currentBit%8 != 0 {
 		panic("Current bit is not byte-aligned")
 	}
+
 	var result uint
 	for i := 0; i < nBits/8; i++ {
 		result += uint(br.buffer[br.CurrentByte()] << (uint(i) * 8))
@@ -122,12 +135,6 @@ func (br *BitReader) ReadUBits(nBits int) uint {
 		panic("Value must be a positive integer between 1 and 32 inclusive.")
 	}
 	if (br.currentBit + nBits) > (len(br.buffer) * 8) {
-		println(br)
-		println("nBits:", nBits)
-		println("br.currentBit:", br.currentBit)
-		println("len(br.buffer)*8:", len(br.buffer)*8)
-		println("br.CurrentByte():", br.CurrentByte())
-		println("len(br.buffer):", len(br.buffer))
 		panic("Out of range")
 	}
 	if br.currentBit%8 == 0 && nBits%8 == 0 {
@@ -366,62 +373,67 @@ func (br *BitReader) ReadPropertiesIndex() []int {
 
 func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multiples map[string]int, indices []int) map[string]interface{} {
 	values := map[string]interface{}{}
-	for j := 0; j < len(indices); j++ {
-		prop := mapping[indices[j]]
-		multiple := multiples[prop.DtName+"."+prop.VarName] > 1
+	debug = true
+
+	for _, index := range indices {
+		prop := mapping[index]
+		name := prop.DtName + "." + prop.VarName
+		multiple := multiples[name] > 1
 		elements := 1
 		if prop.Flags&send_tables.SPROP_INSIDEARRAY != 0 {
 			elements = int(br.ReadUBits(6))
-			for k := 0; k < elements; k++ {
-				key := prop.DtName + "." + prop.VarName
-				if multiple {
-					key += "-" + strconv.Itoa(indices[j])
+		}
+		for k := 0; k < elements; k++ {
+			key := name
+			if multiple {
+				key += "-" + strconv.Itoa(index)
+			}
+			if elements > 1 {
+				key += "-" + strconv.Itoa(k)
+			}
+			switch prop.Type {
+			case send_tables.DPT_Int:
+				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+					values[key] = br.ReadVarInt()
+				} else {
+					values[key] = br.ReadInt(prop)
 				}
-				if elements > 1 {
-					key += "-" + strconv.Itoa(k)
+			case send_tables.DPT_Float:
+				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
+				} else {
+					values[key] = br.ReadFloat(prop)
 				}
-
-				switch prop.Type {
-				case send_tables.DPT_Int:
-					if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-						values[key] = br.ReadVarInt()
-					} else {
-						values[key] = br.ReadInt(prop)
-					}
-				case send_tables.DPT_Float:
-					if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-						panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
-					} else {
-						values[key] = br.ReadFloat(prop)
-					}
-				case send_tables.DPT_Vector:
-					if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-						panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
-					} else {
-						values[key] = br.ReadVector(prop)
-					}
-				case send_tables.DPT_VectorXY:
-					if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-						panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
-					} else {
-						values[key] = br.ReadVectorXY(prop)
-					}
-				case send_tables.DPT_String:
-					if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-						panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
-					} else {
-						values[key] = br.ReadLengthPrefixedString()
-					}
-				case send_tables.DPT_Int64:
-					if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-						panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
-					} else {
-						values[key] = br.ReadInt64(prop)
-					}
+			case send_tables.DPT_Vector:
+				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
+				} else {
+					values[key] = br.ReadVector(prop)
 				}
+			case send_tables.DPT_VectorXY:
+				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
+				} else {
+					values[key] = br.ReadVectorXY(prop)
+				}
+			case send_tables.DPT_String:
+				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
+				} else {
+					values[key] = br.ReadLengthPrefixedString()
+				}
+			case send_tables.DPT_Int64:
+				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
+				} else {
+					values[key] = br.ReadInt64(prop)
+				}
+			default:
+				panic("unknown type")
 			}
 		}
 	}
 
+	debug = false
 	return values
 }

@@ -1,7 +1,7 @@
 package send_tables
 
 import (
-	"io/ioutil"
+	"sort"
 
 	"github.com/davecgh/go-spew/spew"
 	dota "github.com/elobuff/d2rp/dota"
@@ -82,16 +82,6 @@ func (sth *Helper) LoadSendTable(sendTableName string) []*SendProp {
 	return sth.flatSendTable
 }
 
-func (sth *Helper) DumpSendTable(sendTableName string, filePath string) {
-	result := sth.LoadSendTable(sendTableName)
-	s := spew.Sdump(result)
-	ioutil.WriteFile(filePath, []byte(s), 0644)
-}
-
-func (sth *Helper) flagString(flag Flag) (result string) {
-	panic("no easy way to do that in go.")
-}
-
 func (sth *Helper) getPropsExcluded(sendTableName string) []*SendProp {
 	result := []*SendProp{}
 	sendTable := sth.sendTables[sendTableName]
@@ -121,9 +111,7 @@ func (sth *Helper) getPropsExcluded(sendTableName string) []*SendProp {
 func (sth *Helper) buildHierarchy(sendTableName string) {
 	result := []*SendProp{}
 	sth.buildHierarchyIterateProps(sendTableName, &result)
-	for _, res := range result {
-		sth.flatSendTable = append(sth.flatSendTable, res)
-	}
+	sth.flatSendTable = append(sth.flatSendTable, result...)
 }
 func (sth *Helper) buildHierarchyIterateProps(sendTableName string, result *[]*SendProp) {
 	pTable := sth.sendTables[sendTableName]
@@ -186,9 +174,10 @@ func (sth *Helper) sortByPriority() {
 		priorities = append(priorities, 64)
 	}
 
+	sort.Ints(priorities)
+
 	start := 0
-	for pi := 0; pi < len(priorities); pi++ {
-		priority := priorities[pi]
+	for _, priority := range priorities {
 		i := 0
 		for {
 			for i = start; i < len(sth.flatSendTable); i++ {

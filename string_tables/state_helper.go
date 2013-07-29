@@ -3,6 +3,7 @@ package string_tables
 import (
 	"sort"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/elobuff/d2rp/core/parser"
 	dota "github.com/elobuff/d2rp/dota"
 )
@@ -40,6 +41,8 @@ func NewStateHelper(items parser.ParserBaseItems) *StateHelper {
 }
 
 func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
+	spew.Println("<GetStateAtTick tick=", tick, ">")
+	defer spew.Println("</GetStateAtTick>")
 	helper.lastIndexUsed = -1
 	result := map[int]*StringTable{}
 	packets := parser.ParserBaseItems{}
@@ -56,20 +59,16 @@ func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
 			helper.lastIndexUsed += 1
 			st := &StringTable{
 				Index: helper.lastIndexUsed,
-				Name:  *t.Name,
+				Name:  t.GetName(),
 				Tick:  item.Tick,
-				Items: map[int]*StringTableItem{},
 			}
-			cstr := Parse(
+			st.Items = Parse(
 				t.GetStringData(),
 				t.GetNumEntries(),
 				t.GetMaxEntries(),
 				t.GetUserDataFixedSize(),
 				t.GetUserDataSizeBits(),
 			)
-			for key, value := range cstr {
-				st.Items[key] = value
-			}
 			result[helper.lastIndexUsed] = st
 		case *dota.CSVCMsg_UpdateStringTable:
 			stc := helper.cache[int(t.GetTableId())]
@@ -82,8 +81,7 @@ func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
 			)
 			for key, value := range ustr {
 				resItems := result[int(t.GetTableId())].Items
-				innerItem, exists := resItems[key]
-				if exists {
+				if innerItem, exists := resItems[key]; exists {
 					innerItem.Str = value.Str
 					innerItem.Data = value.Data
 				} else {
@@ -94,6 +92,7 @@ func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
 			panic("this shouldn't be happening")
 		}
 	}
+
 	return result
 }
 
