@@ -3,11 +3,11 @@ package utils
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"math"
 	"strconv"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/elobuff/d2rp/core"
 	"github.com/elobuff/d2rp/core/send_tables"
 )
 
@@ -52,6 +52,17 @@ func (br *BitReader) CurrentBit() int  { return br.currentBit }
 func (br *BitReader) CurrentByte() int { return br.currentBit / 8 }
 func (br *BitReader) BitsLeft() int    { return (len(br.buffer) * 8) - br.currentBit }
 func (br *BitReader) BytesLeft() int   { return len(br.buffer) - (br.currentBit * 8) }
+
+type Vector struct {
+	X, Y, Z float32
+}
+
+func (v Vector) String() string {
+	return fmt.Sprintf("{{ x: %f, y: %f: z: %f }}", v.X, v.Y, v.Z)
+}
+func (v Vector) StringXY() string {
+	return fmt.Sprintf("{{ x: %f, y: %f }}", v.X, v.Y)
+}
 
 type SeekOrigin int
 
@@ -262,8 +273,8 @@ func (br *BitReader) ReadLengthPrefixedString() string {
 	return ""
 }
 
-func (br *BitReader) ReadVector(prop *send_tables.SendProp) *core.Vector {
-	result := &core.Vector{
+func (br *BitReader) ReadVector(prop *send_tables.SendProp) *Vector {
+	result := &Vector{
 		X: br.ReadFloat(prop),
 		Y: br.ReadFloat(prop),
 	}
@@ -285,8 +296,8 @@ func (br *BitReader) ReadVector(prop *send_tables.SendProp) *core.Vector {
 	return result
 }
 
-func (br *BitReader) ReadVectorXY(prop *send_tables.SendProp) *core.Vector {
-	return &core.Vector{
+func (br *BitReader) ReadVectorXY(prop *send_tables.SendProp) *Vector {
+	return &Vector{
 		X: br.ReadFloat(prop),
 		Y: br.ReadFloat(prop),
 	}

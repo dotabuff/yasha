@@ -41,9 +41,8 @@ func (p *Parser) Analyze() {
 		if err == nil {
 			item := &ParserItem{
 				Sequence: p.Sequence,
-				// From:     obj,
-				Object: obj,
-				Tick:   tick,
+				Object:   obj,
+				Tick:     tick,
 			}
 			p.Sequence++
 			if compressed {
