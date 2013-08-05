@@ -53,14 +53,19 @@ func (br *BitReader) CurrentByte() int { return br.currentBit / 8 }
 func (br *BitReader) BitsLeft() int    { return (len(br.buffer) * 8) - br.currentBit }
 func (br *BitReader) BytesLeft() int   { return len(br.buffer) - (br.currentBit * 8) }
 
-type Vector struct {
+type Vector3 struct {
 	X, Y, Z float32
 }
 
-func (v Vector) String() string {
-	return fmt.Sprintf("{{ x: %f, y: %f: z: %f }}", v.X, v.Y, v.Z)
+func (v Vector3) String() string {
+	return fmt.Sprintf("{{ x: %f, y: %f, z: %f }}", v.X, v.Y, v.Z)
 }
-func (v Vector) StringXY() string {
+
+type Vector2 struct {
+	X, Y float32
+}
+
+func (v Vector2) String() string {
 	return fmt.Sprintf("{{ x: %f, y: %f }}", v.X, v.Y)
 }
 
@@ -273,8 +278,8 @@ func (br *BitReader) ReadLengthPrefixedString() string {
 	return ""
 }
 
-func (br *BitReader) ReadVector(prop *send_tables.SendProp) *Vector {
-	result := &Vector{
+func (br *BitReader) ReadVector(prop *send_tables.SendProp) *Vector3 {
+	result := &Vector3{
 		X: br.ReadFloat(prop),
 		Y: br.ReadFloat(prop),
 	}
@@ -296,8 +301,8 @@ func (br *BitReader) ReadVector(prop *send_tables.SendProp) *Vector {
 	return result
 }
 
-func (br *BitReader) ReadVectorXY(prop *send_tables.SendProp) *Vector {
-	return &Vector{
+func (br *BitReader) ReadVectorXY(prop *send_tables.SendProp) *Vector2 {
+	return &Vector2{
 		X: br.ReadFloat(prop),
 		Y: br.ReadFloat(prop),
 	}

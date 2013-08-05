@@ -100,6 +100,11 @@ func (p *Parser) PicksBans() (picksbans []*PickBan, isCaptainsMode bool) {
 }
 
 func (p *Parser) Parse() {
+	p.ParseBaseline()
+	p.ParsePackets()
+}
+
+func (p *Parser) ParseBaseline() {
 	p.Items = p.Parser.Parse(MessageFilter)
 	sort.Sort(p.Items)
 
@@ -107,7 +112,9 @@ func (p *Parser) Parse() {
 
 	p.processItems()
 	p.makeBaseline()
+}
 
+func (p *Parser) ParsePackets() {
 	for _, packet := range p.Packets {
 		p.ParsePacket(packet)
 	}
