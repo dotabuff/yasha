@@ -367,20 +367,6 @@ func (p *Parser) EntityPreserve(br *utils.BitReader, currentIndex, tick int) {
 		for key, value := range values {
 			pe.Values[key] = value
 		}
-
-		/*
-			if strings.HasPrefix(pe.Name, "DT_DOTA_Unit_Hero_") {
-				if pe.Tick > 10000 && pe.Tick < 10500 {
-					if v, found := values["DT_DOTA_BaseNPC.m_vecOrigin"]; found {
-						vec := v.(*core.Vector)
-						cx := pe.Values["DT_DOTA_BaseNPC.m_cellX"].(int)
-						cy := pe.Values["DT_DOTA_BaseNPC.m_cellY"].(int)
-						cz := pe.Values["DT_DOTA_BaseNPC.m_cellZ"].(int)
-						spew.Printf("\"%s\": {%3d, %3d, %3d, %3d, %3d, %3d},\n", pe.Name, cx, cy, cz, int(vec.X), int(vec.Y), int(vec.Z))
-					}
-				}
-			}
-		*/
 	}
 
 	if p.EntityPreserved != nil {
