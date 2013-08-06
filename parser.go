@@ -266,34 +266,20 @@ func (p *Parser) EntityCreate(br *utils.BitReader, currentIndex, tick int) {
 	pMultiples := p.Multiples[pe.ClassId]
 	values := br.ReadPropertiesValues(pMapping, pMultiples, indices)
 
-	if pe.Name == "DT_DOTAPlayer" {
-		if iPlayerID, found := values["DT_DOTAPlayer.m_iPlayerID"]; found {
-			if _, found := p.PlayerIdClientId[pe.Index]; !found {
-				p.PlayerIdClientId[pe.Index] = iPlayerID.(int)
+	baseline, foundBaseline := p.Baseline[pe.ClassId]
+	if foundBaseline {
+		for key, baseValue := range baseline {
+			if subValue, ok := values[key]; ok {
+				pe.Values[key] = subValue
+			} else {
+				pe.Values[key] = baseValue
 			}
 		}
 	} else {
-		baseline, foundBaseline := p.Baseline[pe.ClassId]
-		if foundBaseline {
-			for key, baseValue := range baseline {
-				if subValue, ok := values[key]; ok {
-					pe.Values[key] = subValue
-				} else {
-					pe.Values[key] = baseValue
-				}
-			}
-		} else {
-			for key, value := range values {
-				pe.Values[key] = value
-			}
-		}
-		if pe.Name == "DT_DOTA_Item_Physical" {
-			p.ItemsOnGround[(pe.Values["DT_DOTA_Item_Physical.m_hItem"]).(int)] = true
+		for key, value := range values {
+			pe.Values[key] = value
 		}
 	}
-
-	// spew.Println("=== Create", pe.Name, "(", currentIndex, ")", "@", pe.Tick)
-	// spew.Dump(values)
 
 	p.Entities[pe.Index] = pe
 	if p.PlayerResourceIndex == -1 && pe.Name == "DT_DOTA_PlayerResource" {
@@ -313,60 +299,8 @@ func (p *Parser) EntityPreserve(br *utils.BitReader, currentIndex, tick int) {
 	classId := p.ClassInfosIdMapping[pe.Name]
 	values := br.ReadPropertiesValues(p.Mapping[classId], p.Multiples[classId], indices)
 
-	if len(values) == 0 {
-		return
-	}
-
-	// spew.Println("=== Preserve", pe.Name, "(", currentIndex, ")", "@", pe.Tick)
-	// spew.Dump(values)
-
-	switch pe.Name {
-	case "DT_DOTAGamerulesProxy":
-		if gameTime, found := values["DT_DOTAGamerules.m_fGameTime"]; found {
-			p.TickTime[pe.Tick] = float64(gameTime.(float32))
-		}
-
-		if startTime, found := values["DT_DOTAGamerules.m_flGameStartTime"]; found {
-			p.StartTime = float64(startTime.(float32))
-		}
-
-		if p.StartTime > 0 {
-			if tickTime, found := p.TickTime[pe.Tick]; found {
-				realGameTime := tickTime - p.StartTime
-				minutesPassed := int(realGameTime / 60)
-				if minutesPassed > p.LastHitMinutes {
-					lpe := p.Entities[p.PlayerResourceIndex]
-					for i := 0; i < 10; i++ {
-						is := ".000" + strconv.Itoa(i)
-						p.LastHits[&LastHitTracker{
-							HeroHandle: int(lpe.Values["m_hSelectedHero"+is].(int)),
-							LastHit:    int(lpe.Values["m_iLastHitCount"+is].(uint)),
-							Tick:       pe.Tick,
-						}] = true
-					}
-					p.LastHitMinutes++
-				}
-			}
-		}
-	case "DT_DOTA_PlayerResource":
-		for key, value := range values {
-			pe.Values[key] = value
-		}
-	default:
-		if strings.Contains(pe.Name, "Ability") {
-			if level, found := values["DT_DOTABaseAbility.m_iLevel"]; found {
-				p.Abilities[&AbilityTracker{
-					HeroHandle: pe.Values["DT_BaseEntity.m_hOwnerEntity"].(int),
-					Level:      level.(int),
-					Name:       pe.Values["DT_BaseEntity.m_iName"].(string),
-					Tick:       pe.Tick,
-				}] = true
-			}
-		}
-
-		for key, value := range values {
-			pe.Values[key] = value
-		}
+	for key, value := range values {
+		pe.Values[key] = value
 	}
 
 	if p.EntityPreserved != nil {
@@ -376,12 +310,7 @@ func (p *Parser) EntityPreserve(br *utils.BitReader, currentIndex, tick int) {
 
 func (p *Parser) EntityDelete(br *utils.BitReader, currentIndex, tick int) {
 	pe := p.Entities[currentIndex]
-	// spew.Println("=== Delete", pe.Name, "(", currentIndex, ")", "@", pe.Tick)
-	// spew.Dump(pe)
-	if pe.Name == "DT_DOTA_Item_Physical" {
-		delete(p.ItemsOnGround, pe.Values["DT_DOTA_Item_Physical.m_hItem"].(int))
-	}
-	p.Entities[currentIndex] = nil
+
 	if p.EntityDeleted != nil {
 		p.EntityDeleted(pe)
 	}
