@@ -368,8 +368,10 @@ func MessageFilter(msg proto.Message) bool {
 		// (player_id:16 statpopup:<style:k_EDOTA_SPT_Textline stat_strings:"I spoke to Bruno in the break, he called Na`Vi's strat last game \"Electric Bear\"" > )
 		// (player_id:16 statpopup:<style:k_EDOTA_SPT_Basic stat_strings:"Chat Poll Results" stat_strings:"62% of viewers expected TobiWan to miss first blood.\rThey were wrong." stat_images:1001 > )
 	case *dota.CDOTAUserMsg_SendRoshanPopup:
-		// (reclaimed:true gametime:2075 )
-		// (reclaimed:false gametime:2314 )
+	// (reclaimed:true gametime:2075 )
+	// (reclaimed:false gametime:2314 )
+	case *dota.CDOTAUserMsg_NevermoreRequiem:
+		// (entity_handle:605564 lines:18 origin:<x:40.487564 y:2291.1592 z:256 > )
 	case *dota.CDOTAUserMsg_LocationPing:
 		// pings, might be useful later
 		// (player_id:1 location_ping:<x:-3513 y:-5111 target:1063 direct_ping:true type:0 > )
