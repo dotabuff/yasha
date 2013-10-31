@@ -17,8 +17,6 @@ import (
 	dota "github.com/elobuff/d2rp/dota"
 )
 
-func foo() { spew.Dump("hi") }
-
 type Parser struct {
 	ItemsOnGround         map[int]bool
 	TickTime              map[int]float64
@@ -368,13 +366,18 @@ func MessageFilter(msg proto.Message) bool {
 		// (player_id:16 statpopup:<style:k_EDOTA_SPT_Textline stat_strings:"I spoke to Bruno in the break, he called Na`Vi's strat last game \"Electric Bear\"" > )
 		// (player_id:16 statpopup:<style:k_EDOTA_SPT_Basic stat_strings:"Chat Poll Results" stat_strings:"62% of viewers expected TobiWan to miss first blood.\rThey were wrong." stat_images:1001 > )
 	case *dota.CDOTAUserMsg_SendRoshanPopup:
-	// (reclaimed:true gametime:2075 )
-	// (reclaimed:false gametime:2314 )
+		// (reclaimed:true gametime:2075 )
+		// (reclaimed:false gametime:2314 )
 	case *dota.CDOTAUserMsg_NevermoreRequiem:
 		// (entity_handle:605564 lines:18 origin:<x:40.487564 y:2291.1592 z:256 > )
 	case *dota.CDOTAUserMsg_LocationPing:
 		// pings, might be useful later
 		// (player_id:1 location_ping:<x:-3513 y:-5111 target:1063 direct_ping:true type:0 > )
+	case *dota.CDOTAUserMsg_SharedCooldown:
+		// (entindex:1283 cooldown:4 name_index:2 )
+		// (entindex:1409 cooldown:17 name_index:14 )
+		// (entindex:1409 cooldown:0.5 name_index:19 )
+		// (entindex:1283 cooldown:5 name_index:3 )
 	case *dota.CDOTAUserMsg_ParticleManager:
 		// http://www.cyborgmatt.com/2013/01/dota-2-replay-parser-bruno/#cdotausermsg-particlemanager
 		// this might be useful, just gotta find out for what :)
@@ -626,16 +629,22 @@ func (p *Parser) WriteVoiceData(dir string) {
 	}
 }
 
+func (p *Parser) StringTablesAtTick(tick int) map[string]map[int]*string_tables.StringTableItem {
+	out := map[string]map[int]*string_tables.StringTableItem{}
+	for _, table := range p.Stsh.GetStateAtTick(int(p.FileInfo.GetPlaybackTicks())) {
+		out[table.Name] = table.Items
+	}
+	return out
+}
+
 func (p *Parser) WriteStringTables(dir string) {
-	for _, table := range p.StringTables {
-		prefix := dir + "/" + table.GetTableName()
-		ic := table.GetItemsClientside()
-		if len(ic) > 0 {
-			ioutil.WriteFile(prefix+"_items_clientside.txt", []byte(spew.Sdump(ic)), 0644)
-		}
-		i := table.GetItems()
-		if len(i) > 0 {
-			ioutil.WriteFile(prefix+"_items.txt", []byte(spew.Sdump(i)), 0644)
+	for name, items := range p.StringTablesAtTick(int(p.FileInfo.GetPlaybackTicks())) {
+		prefix := dir + "/" + name
+		if len(items) > 0 {
+			err := ioutil.WriteFile(prefix+".txt", []byte(spew.Sdump(items)), 0644)
+			if err != nil {
+				panic(err)
+			}
 		}
 	}
 }
