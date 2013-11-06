@@ -13,7 +13,6 @@ type Cache struct {
 	MaxEntries  int
 	Name        string
 }
-type CreateStringTables []*dota.CSVCMsg_CreateStringTable
 
 type StateHelper struct {
 	cache         map[int]*Cache
@@ -22,21 +21,19 @@ type StateHelper struct {
 	lastIndexUsed int
 }
 
-func NewStateHelper(items parser.ParserBaseItems) *StateHelper {
-	packets := parser.ParserBaseItems{}
-	fullPackets := parser.ParserBaseItems{}
-
-	for _, item := range items {
-		switch item.Object.(type) {
-		case *dota.CSVCMsg_CreateStringTable, *dota.CSVCMsg_UpdateStringTable:
-			packets = append(packets, item)
-		case *dota.CDemoStringTables, *dota.CDemoFullPacket:
-			fullPackets = append(fullPackets, item)
-		}
+func NewStateHelper() *StateHelper {
+	return &StateHelper{
+		packets:     parser.ParserBaseItems{},
+		fullPackets: parser.ParserBaseItems{},
 	}
-	helper := &StateHelper{packets: packets, fullPackets: fullPackets}
-	helper.populateCache()
-	return helper
+}
+
+func (helper *StateHelper) AppendPacket(packet *parser.ParserBaseItem) {
+	helper.packets = append(helper.packets, packet)
+}
+
+func (helper *StateHelper) AppendFullPacket(fullPacket *parser.ParserBaseItem) {
+	helper.fullPackets = append(helper.fullPackets, fullPacket)
 }
 
 func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
@@ -93,7 +90,7 @@ func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
 	return result
 }
 
-func (helper *StateHelper) populateCache() {
+func (helper *StateHelper) PopulateCache() {
 	helper.lastIndexUsed = -1
 	helper.cache = map[int]*Cache{}
 

@@ -83,3 +83,24 @@ type PickBan struct {
 	Team   int
 	HeroId int
 }
+
+type RawClick struct {
+	Tick   int
+	Entity int
+	Type   int
+	Target int
+}
+
+type CombatLogEntry struct {
+	Type               string
+	SourceName         string
+	TargetName         string
+	AttackerName       string
+	InflictorName      string
+	AttackerIsIllusion bool
+	TargetIsIllusion   bool
+	Value              int32
+	Health             int32
+	Timestamp          float32
+	TargetSourceName   string
+}

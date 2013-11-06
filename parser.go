@@ -18,36 +18,38 @@ import (
 )
 
 type Parser struct {
-	ItemsOnGround         map[int]bool
-	TickTime              map[int]float64
-	StartTime             float64
-	LastHitMinutes        int
-	PlayerIdClientId      map[int]int
+	Parser                *parser.Parser
 	Abilities             map[*AbilityTracker]bool
-	LastHits              map[*LastHitTracker]bool
-	PlayerResourceIndex   int
+	AllChat               []*dota.CUserMsg_SayText2
 	Baseline              map[int]map[string]interface{}
-	ClassInfos            *dota.CDemoClassInfo
 	ClassIdNumBits        int
+	ClassInfos            *dota.CDemoClassInfo
 	ClassInfosIdMapping   map[string]int
 	ClassInfosNameMapping map[int]string
+	CombatLog             []*CombatLogEntry
+	Entities              []*packet_entities.PacketEntity
+	EntityCreated         func(*packet_entities.PacketEntity)
+	EntityDeleted         func(*packet_entities.PacketEntity)
+	EntityPreserved       func(*packet_entities.PacketEntity, map[string]interface{})
+	FileInfo              *dota.CDemoFileInfo
+	GameEventMap          map[int32]*dota.CSVCMsg_GameEventListDescriptorT
+	ItemsOnGround         map[int]bool
+	Items                 parser.ParserBaseItems
+	LastHitMinutes        int
+	LastHits              map[*LastHitTracker]bool
 	Mapping               map[int][]*send_tables.SendProp
 	Multiples             map[int]map[string]int
 	Packets               parser.ParserBaseItems
-	Entities              []*packet_entities.PacketEntity
-	Items                 parser.ParserBaseItems
-	Stsh                  *string_tables.StateHelper
+	PlayerIdClientId      map[int]int
+	PlayerResourceIndex   int
+	RawClicks             []*RawClick
+	StartTime             float64
 	Sth                   *send_tables.Helper
-	Parser                *parser.Parser
+	stringTableCache      map[string]map[int]string
+	Stsh                  *string_tables.StateHelper
 	TextMsg               []string
-	AllChat               []*dota.CUserMsg_SayText2
+	TickTime              map[int]float64
 	VoiceData             map[int][]byte
-	GameEventMap          map[int32]*dota.CSVCMsg_GameEventListDescriptorT
-	FileInfo              *dota.CDemoFileInfo
-	StringTables          []*dota.CDemoStringTablesTableT
-	EntityPreserved       func(*packet_entities.PacketEntity)
-	EntityCreated         func(*packet_entities.PacketEntity)
-	EntityDeleted         func(*packet_entities.PacketEntity)
 }
 
 func ParserFromFile(path string) *Parser {
@@ -57,23 +59,26 @@ func ParserFromFile(path string) *Parser {
 func NewParser(data []byte) *Parser {
 	return &Parser{
 		Parser:                parser.NewParser(data),
-		ItemsOnGround:         map[int]bool{},
-		TickTime:              map[int]float64{},
-		PlayerIdClientId:      map[int]int{},
 		Abilities:             map[*AbilityTracker]bool{},
-		LastHits:              map[*LastHitTracker]bool{},
-		PlayerResourceIndex:   -1,
+		AllChat:               []*dota.CUserMsg_SayText2{},
 		Baseline:              map[int]map[string]interface{}{},
 		ClassInfosIdMapping:   map[string]int{},
 		ClassInfosNameMapping: map[int]string{},
+		CombatLog:             []*CombatLogEntry{},
+		GameEventMap:          map[int32]*dota.CSVCMsg_GameEventListDescriptorT{},
+		ItemsOnGround:         map[int]bool{},
+		Items:                 []*parser.ParserBaseItem{},
+		LastHits:              map[*LastHitTracker]bool{},
 		Mapping:               map[int][]*send_tables.SendProp{},
 		Multiples:             map[int]map[string]int{},
 		Packets:               []*parser.ParserBaseItem{},
-		Items:                 []*parser.ParserBaseItem{},
+		PlayerIdClientId:      map[int]int{},
+		PlayerResourceIndex:   -1,
+		RawClicks:             []*RawClick{},
+		stringTableCache:      map[string]map[int]string{},
 		TextMsg:               []string{},
-		AllChat:               []*dota.CUserMsg_SayText2{},
+		TickTime:              map[int]float64{},
 		VoiceData:             map[int][]byte{},
-		GameEventMap:          map[int32]*dota.CSVCMsg_GameEventListDescriptorT{},
 	}
 }
 
@@ -302,7 +307,7 @@ func (p *Parser) EntityPreserve(br *utils.BitReader, currentIndex, tick int) {
 	}
 
 	if p.EntityPreserved != nil {
-		p.EntityPreserved(pe)
+		p.EntityPreserved(pe, values)
 	}
 }
 
@@ -327,7 +332,6 @@ func MessageFilter(msg proto.Message) bool {
 		// (signon_state:3 spawn_count:2 num_server_players:0 )
 	case *dota.CSVCMsg_ClassInfo:
 		// (create_on_client:true )
-		return true
 	case *dota.CSVCMsg_VoiceInit:
 		// (quality:5 codec:"vaudio_celt" version:3 )
 	case *dota.CSVCMsg_SetView:
@@ -340,10 +344,6 @@ func MessageFilter(msg proto.Message) bool {
 		// looks like some kind of notification for upcoming StringTableUpdate
 		// (order_id:19 )
 		// (*dota.CSVCMsg_UpdateStringTable)(table_id:19 num_changed_entries:1 string_data:"\360\301\005\000A\000\302\261\320\006C\000$\032\n" )
-	case *dota.CDOTAUserMsg_SpectatorPlayerClick:
-		// no idea what that is good for.
-		// (entindex:9 order_type:1 target_index:0 )
-		// (entindex:26 order_type:4 target_index:1125 )
 	case *dota.CDOTAUserMsg_MapLine:
 		// I guess those are lines drawn?
 		// (player_id:2 mapline:<x:-7813 y:-5988 initial:false > )
@@ -423,6 +423,7 @@ func (p *Parser) processItems() {
 	var serverInfo *dota.CSVCMsg_ServerInfo
 	sthItems := map[string]*dota.CSVCMsg_SendTable{}
 	p.Sth = send_tables.NewHelper(sthItems)
+	p.Stsh = string_tables.NewStateHelper()
 
 	for _, item := range p.Items {
 		switch value := item.Object.(type) {
@@ -430,6 +431,12 @@ func (p *Parser) processItems() {
 			if item.From == dota.EDemoCommands_DEM_Packet {
 				p.Packets = append(p.Packets, item)
 			}
+		case *dota.CDemoClassInfo:
+			p.ClassInfos = value
+		case *dota.CSVCMsg_CreateStringTable, *dota.CSVCMsg_UpdateStringTable:
+			p.Stsh.AppendPacket(item)
+		case *dota.CDemoStringTables, *dota.CDemoFullPacket:
+			p.Stsh.AppendFullPacket(item)
 		case *dota.CDemoFileInfo:
 			if p.FileInfo == nil {
 				p.FileInfo = value
@@ -467,6 +474,33 @@ func (p *Parser) processItems() {
 				// health : <*>type:4 val_short:31
 				// timestamp : <*>type:2 val_float:2166.2576
 				// targetsourcename : <*>type:4 val_short:74
+				/*
+					tick := item.Tick
+					table := 1
+					for _, s := range p.StringTables {
+						if s.GetTableName() == "CombatLogNames" {
+							table = s.GetItems()
+							for _, x := range table {
+								x.foo()
+							}
+						}
+					}
+
+					keys := value.GetKeys()
+					p.CombatLog = append(p.CombatLog, &CombatLogEntry{
+						Type:               dota.DOTA_COMBATLOG_TYPES(keys[0].GetValByte()).String()[15:],
+						SourceName:         p.GetStringTableEntry(tick, "CombatLogNames", int(keys[1].GetValShort())),
+						TargetName:         p.GetStringTableEntry(tick, "CombatLogNames", int(keys[2].GetValShort())),
+						AttackerName:       p.GetStringTableEntry(tick, "CombatLogNames", int(keys[3].GetValShort())),
+						InflictorName:      p.GetStringTableEntry(tick, "CombatLogNames", int(keys[4].GetValShort())),
+						AttackerIsIllusion: keys[5].GetValBool(),
+						TargetIsIllusion:   keys[6].GetValBool(),
+						Value:              keys[7].GetValShort(),
+						Health:             keys[8].GetValShort(),
+						Timestamp:          keys[9].GetValFloat(),
+						TargetSourceName:   p.GetStringTableEntry(tick, "CombatLogNames", int(keys[10].GetValShort())),
+					})
+				*/
 			case "dota_chase_hero":
 				// target1 : <*>type:4 val_short:1418
 				// target2 : <*>type:4 val_short:0
@@ -552,9 +586,14 @@ func (p *Parser) processItems() {
 			} else {
 				p.VoiceData[client] = value.GetVoiceData()
 			}
-		case *dota.CDemoStringTables:
-			p.StringTables = value.GetTables()
-		case *dota.CDemoClassInfo, *dota.CSVCMsg_UpdateStringTable, *dota.CNETMsg_Tick, *dota.CSVCMsg_CreateStringTable, *dota.CSVCMsg_ClassInfo:
+		case *dota.CDOTAUserMsg_SpectatorPlayerClick:
+			p.RawClicks = append(p.RawClicks, &RawClick{
+				Tick:   item.Tick,
+				Entity: int(value.GetEntindex()),
+				Type:   int(value.GetOrderType()),
+				Target: int(value.GetTargetIndex()),
+			})
+		case *dota.CNETMsg_Tick:
 			// don't print
 		default:
 			spew.Dump(value)
@@ -563,16 +602,7 @@ func (p *Parser) processItems() {
 
 	sort.Sort(p.Packets)
 	p.ClassIdNumBits = int(math.Log(float64(serverInfo.GetMaxClasses()))/math.Log(2)) + 1
-	p.Stsh = string_tables.NewStateHelper(p.Items)
-
-	for _, item := range p.Items {
-		switch value := item.Object.(type) {
-		case *dota.CDemoClassInfo:
-			p.ClassInfos = value
-			break
-		}
-	}
-
+	p.Stsh.PopulateCache()
 	return
 }
 
@@ -629,12 +659,43 @@ func (p *Parser) WriteVoiceData(dir string) {
 	}
 }
 
+// logs chronologically close to this event (usually within 1-2 ticks).
+func (p *Parser) CombatLogsCloseTo(now float32) (logs []*CombatLogEntry) {
+	closestDelta := 0.5 // be generous and look around ±0.5 second
+
+	for _, log := range p.CombatLog {
+		if log.Type == "DEATH" && log.TargetName == "npc_dota_observer_wards" {
+			logDelta := math.Abs(float64(now - log.Timestamp))
+			if closestDelta > logDelta {
+				logs = append(logs, log)
+				closestDelta = logDelta
+			}
+		}
+	}
+
+	return logs
+}
+
 func (p *Parser) StringTablesAtTick(tick int) map[string]map[int]*string_tables.StringTableItem {
 	out := map[string]map[int]*string_tables.StringTableItem{}
 	for _, table := range p.Stsh.GetStateAtTick(int(p.FileInfo.GetPlaybackTicks())) {
 		out[table.Name] = table.Items
 	}
 	return out
+}
+
+func (p *Parser) GetStringTableEntry(tick int, tableName string, key int) string {
+	if table, found := p.stringTableCache[tableName]; found {
+		if item, found := table[key]; found {
+			return item
+		}
+	} else {
+		p.stringTableCache[tableName] = map[int]string{}
+	}
+	tables := p.StringTablesAtTick(tick)
+	item := tables[tableName][key].Str
+	p.stringTableCache[tableName][key] = item
+	return item
 }
 
 func (p *Parser) WriteStringTables(dir string) {

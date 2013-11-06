@@ -9,17 +9,17 @@ func NewBytesReader(data []byte) *BytesReader {
 	return &BytesReader{data: data, position: 0}
 }
 
-func (br *BytesReader) ReadVarInt32() (result uint32) {
-	var b uint32 = 0x80
+func (br *BytesReader) ReadVarInt32() (result int32) {
+	var b int32 = 0x80
 	var count uint
 
 	for (b & 0x80) == 0x80 {
 		if count == 5 {
-			return
+			break
 		} else if br.position >= len(br.data) {
-			return
+			break
 		}
-		b = uint32(br.data[br.position])
+		b = int32(br.data[br.position])
 		br.position++
 		result |= (b & 0x7F) << (7 * count)
 		count++

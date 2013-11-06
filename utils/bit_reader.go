@@ -413,36 +413,20 @@ func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multi
 				} else {
 					values[key] = br.ReadInt(prop)
 				}
-			case send_tables.DPT_Float:
-				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
-				} else {
-					values[key] = br.ReadFloat(prop)
-				}
-			case send_tables.DPT_Vector:
-				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
-				} else {
-					values[key] = br.ReadVector(prop)
-				}
-			case send_tables.DPT_VectorXY:
-				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
-				} else {
-					values[key] = br.ReadVectorXY(prop)
-				}
-			case send_tables.DPT_String:
-				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
-				} else {
-					values[key] = br.ReadLengthPrefixedString()
-				}
 			case send_tables.DPT_Int64:
 				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-					panic("SPROP_ENCODED_AGAINST_TICKCOUNT")
+					panic("Int64 encoded against tickcount")
 				} else {
 					values[key] = br.ReadInt64(prop)
 				}
+			case send_tables.DPT_Float:
+				values[key] = br.ReadFloat(prop)
+			case send_tables.DPT_Vector:
+				values[key] = br.ReadVector(prop)
+			case send_tables.DPT_VectorXY:
+				values[key] = br.ReadVectorXY(prop)
+			case send_tables.DPT_String:
+				values[key] = br.ReadLengthPrefixedString()
 			default:
 				panic("unknown type")
 			}
