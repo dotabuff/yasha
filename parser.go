@@ -433,10 +433,8 @@ func (p *Parser) processItems() {
 			}
 		case *dota.CDemoClassInfo:
 			p.ClassInfos = value
-		case *dota.CSVCMsg_CreateStringTable, *dota.CSVCMsg_UpdateStringTable:
+		case *dota.CSVCMsg_CreateStringTable, *dota.CSVCMsg_UpdateStringTable, *dota.CDemoStringTables:
 			p.Stsh.AppendPacket(item)
-		case *dota.CDemoStringTables, *dota.CDemoFullPacket:
-			p.Stsh.AppendFullPacket(item)
 		case *dota.CDemoFileInfo:
 			if p.FileInfo == nil {
 				p.FileInfo = value
@@ -560,6 +558,12 @@ func (p *Parser) processItems() {
 			// (type:CHAT_MESSAGE_UNPAUSED value:0 playerid_1:3 playerid_2:-1 )
 		case *dota.CSVCMsg_SendTable:
 			sthItems[value.GetNetTableName()] = value
+		case *dota.CDOTAUserMsg_GlobalLightColor:
+			// extremely rare, maybe only on very specific ability?
+			// (color:32214126 duration:0.145 )
+		case *dota.CDOTAUserMsg_GlobalLightDirection:
+			// extremely rare, maybe only on very specific ability?
+			// (direction:<x:-0.53466 y:0.13 z:-0.9 > duration:0.145 )
 		case *dota.CUserMsg_TextMsg:
 			p.TextMsg = append(p.TextMsg, value.GetParam()...)
 		case *dota.CUserMsg_SayText2:
@@ -602,7 +606,7 @@ func (p *Parser) processItems() {
 
 	sort.Sort(p.Packets)
 	p.ClassIdNumBits = int(math.Log(float64(serverInfo.GetMaxClasses()))/math.Log(2)) + 1
-	p.Stsh.PopulateCache()
+	// p.Stsh.PopulateCache()
 	return
 }
 
