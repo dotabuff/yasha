@@ -348,34 +348,35 @@ func (p *Parser) processItems() {
 				// proxies : <*>type:4 val_short:59
 				// master : <*>type:1 val_string:"146.66.152.49:28027"
 			case "dota_combatlog":
-				// type : <*>type:5 val_byte:0
-				// sourcename : <*>type:4 val_short:2
-				// targetname : <*>type:4 val_short:74
-				// attackername : <*>type:4 val_short:2
-				// inflictorname : <*>type:4 val_short:0
-				// attackerillusion : <*>type:6 val_bool:false
-				// targetillusion : <*>type:6 val_bool:false
-				// value : <*>type:4 val_short:111
-				// health : <*>type:4 val_short:31
-				// timestamp : <*>type:2 val_float:2166.2576
-				// targetsourcename : <*>type:4 val_short:74
-				tick := item.Tick
-				table := p.Stsh.GetTableAtTick(tick, "CombatLogNames").Items
-
 				keys := value.GetKeys()
-				p.CombatLog = append(p.CombatLog, &CombatLogEntry{
+				table := p.Stsh.GetTableAtTick(item.Tick, "CombatLogNames").Items
+
+				log := &CombatLogEntry{
 					Type:               dota.DOTA_COMBATLOG_TYPES(keys[0].GetValByte()).String()[15:],
-					SourceName:         table[int(keys[1].GetValShort())].Str,
-					TargetName:         table[int(keys[2].GetValShort())].Str,
-					AttackerName:       table[int(keys[3].GetValShort())].Str,
-					InflictorName:      table[int(keys[4].GetValShort())].Str,
 					AttackerIsIllusion: keys[5].GetValBool(),
 					TargetIsIllusion:   keys[6].GetValBool(),
 					Value:              keys[7].GetValShort(),
 					Health:             keys[8].GetValShort(),
 					Timestamp:          keys[9].GetValFloat(),
-					TargetSourceName:   table[int(keys[10].GetValShort())].Str,
-				})
+				}
+
+				if k := table[int(keys[1].GetValShort())]; k != nil {
+					log.SourceName = k.Str
+				}
+				if k := table[int(keys[2].GetValShort())]; k != nil {
+					log.TargetName = k.Str
+				}
+				if k := table[int(keys[3].GetValShort())]; k != nil {
+					log.AttackerName = k.Str
+				}
+				if k := table[int(keys[4].GetValShort())]; k != nil {
+					log.InflictorName = k.Str
+				}
+				if k := table[int(keys[10].GetValShort())]; k != nil {
+					log.TargetSourceName = k.Str
+				}
+
+				p.CombatLog = append(p.CombatLog, log)
 			case "dota_chase_hero":
 				// target1 : <*>type:4 val_short:1418
 				// target2 : <*>type:4 val_short:0
@@ -483,7 +484,6 @@ func (p *Parser) processItems() {
 
 	sort.Sort(p.Packets)
 	p.ClassIdNumBits = int(math.Log(float64(serverInfo.GetMaxClasses()))/math.Log(2)) + 1
-	// p.Stsh.PopulateCache()
 	return
 }
 
