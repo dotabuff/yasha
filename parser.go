@@ -5,7 +5,6 @@ import (
 	"math"
 	"sort"
 	"strconv"
-	"strings"
 
 	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/davecgh/go-spew/spew"
@@ -121,118 +120,6 @@ func (p *Parser) ParsePackets() {
 	for _, packet := range p.Packets {
 		p.ParsePacket(packet)
 	}
-}
-
-func (p *Parser) Players() map[int]*Player {
-	lpe := p.Entities[p.PlayerResourceIndex]
-	lpev := lpe.Values
-
-	total := map[int]map[string]interface{}{}
-
-	for key, value := range lpev {
-		keys := strings.SplitN(key, ".", 2)
-		key := keys[0]
-		i, _ := strconv.Atoi(keys[1])
-		if _, ok := total[i]; !ok {
-			total[i] = map[string]interface{}{}
-		}
-		total[i][key] = value
-	}
-
-	players := map[int]*Player{}
-
-	for _, vs := range total {
-		heroHandle, ok := vs["m_hSelectedHero"].(int)
-		if !ok {
-			continue
-		}
-		player := &Player{
-			Abilities:  Abilities{},
-			LastHits:   LastHits{},
-			HeroHandle: heroHandle,
-		}
-		players[heroHandle] = player
-
-		player.BroadcasterChannelSlot = vs["m_iBroadcasterChannelSlot"].(int)
-		player.BroadcasterChannel = vs["m_iBroadcasterChannel"].(int)
-		player.BroadcasterLanguage = vs["m_iBroadcasterLanguage"].(int)
-		player.IsBroadcaster = vs["m_bIsBroadcaster"].(int) == 1
-
-		player.BattleBonusActive = vs["m_bBattleBonusActive"].(int) == 1
-		player.BattleBonusRate = vs["m_iBattleBonusRate"].(int)
-		player.MetaExperienceAwarded = vs["m_iMetaExperienceAwarded"].(int)
-		player.MetaExperienceBonusRate = vs["m_iMetaExperienceBonusRate"].(int)
-		player.MetaExperience = vs["m_iMetaExperience"].(int)
-		player.MetaLevel = vs["m_iMetaLevel"].(int)
-		player.TimedRewardCrates = vs["m_iTimedRewardCrates"].(int)
-		player.TimedRewardDrops = vs["m_iTimedRewardDrops"].(int)
-
-		player.ConnectionState = vs["m_iConnectionState"].(int)
-		player.FakeClient = vs["m_bFakeClient"].(int) == 1
-		player.FullyJoinedServer = vs["m_bFullyJoinedServer"].(int) == 1
-		player.AFK = vs["m_bAFK"].(int) == 1
-
-		player.Kills = vs["m_iKills"].(uint)
-		player.Deaths = vs["m_iDeaths"].(uint)
-		player.Assists = vs["m_iAssists"].(uint)
-		player.Level = vs["m_iLevel"].(int)
-		player.ReliableGold = vs["m_iReliableGold"].(uint)
-		player.TotalEarnedGold = vs["m_iTotalEarnedGold"].(uint)
-		player.TotalEarnedXP = vs["m_iTotalEarnedXP"].(uint)
-		player.UnreliableGold = vs["m_iUnreliableGold"].(uint)
-
-		player.BuybackCooldownTime = vs["m_flBuybackCooldownTime"].(float32)
-		player.DenyCount = vs["m_iDenyCount"].(uint)
-		player.HasRandomed = vs["m_bHasRandomed"].(int) == 1
-		player.HasRepicked = vs["m_bHasRepicked"].(int) == 1
-		player.LastBuybackTime = vs["m_iLastBuybackTime"].(int)
-		player.LastHitCount = vs["m_iLastHitCount"].(uint)
-		if lastHitMultikill, found := vs["m_iLastHitMultikill"]; found {
-			player.LastHitMultikill = lastHitMultikill.(uint)
-		}
-		if lastHitStreak, found := vs["m_iLastHitStreak"]; found {
-			player.LastHitStreak = lastHitStreak.(uint)
-		}
-		player.PlayerNames = vs["m_iszPlayerNames"].(string)
-		player.PlayerSteamIDs = vs["m_iPlayerSteamIDs"].(uint64)
-		player.PlayerTeams = vs["m_iPlayerTeams"].(int)
-		player.PossibleHeroSelection = vs["m_nPossibleHeroSelection"].(int)
-		player.RespawnSeconds = vs["m_iRespawnSeconds"].(int)
-		player.SelectedHeroID = vs["m_nSelectedHeroID"].(int)
-		player.SelectedHero = vs["m_iszSelectedHero"].(string)
-		player.Streak = vs["m_iStreak"].(uint)
-		player.SuggestedHeroes = vs["m_nSuggestedHeroes"].(int)
-		player.UnitShareMasks = vs["m_UnitShareMasks"].(int)
-		player.VoiceChatBanned = vs["m_bVoiceChatBanned"].(int) == 1
-	}
-
-	for ability, _ := range p.Abilities {
-		player := players[ability.HeroHandle]
-		if player == nil {
-			// "courier_burst" the time when courier is upgraded?
-			spew.Println("cannot assign ability to player:")
-			spew.Dump(ability)
-		} else {
-			player.Abilities = append(player.Abilities, ability)
-		}
-	}
-
-	for lastHit, _ := range p.LastHits {
-		player := players[lastHit.HeroHandle]
-		if player == nil {
-			spew.Println("cannot assign lasthit to player:")
-			spew.Dump(lastHit)
-		} else {
-			player.LastHits = append(player.LastHits, lastHit)
-		}
-	}
-
-	for _, player := range players {
-		sort.Sort(player.Abilities)
-		sort.Sort(player.LastHits)
-	}
-
-	return players
 }
 
 func (p *Parser) ParsePacket(packet *parser.ParserBaseItem) {
@@ -472,33 +359,23 @@ func (p *Parser) processItems() {
 				// health : <*>type:4 val_short:31
 				// timestamp : <*>type:2 val_float:2166.2576
 				// targetsourcename : <*>type:4 val_short:74
-				/*
-					tick := item.Tick
-					table := 1
-					for _, s := range p.StringTables {
-						if s.GetTableName() == "CombatLogNames" {
-							table = s.GetItems()
-							for _, x := range table {
-								x.foo()
-							}
-						}
-					}
+				tick := item.Tick
+				table := p.Stsh.GetTableAtTick(tick, "CombatLogNames").Items
 
-					keys := value.GetKeys()
-					p.CombatLog = append(p.CombatLog, &CombatLogEntry{
-						Type:               dota.DOTA_COMBATLOG_TYPES(keys[0].GetValByte()).String()[15:],
-						SourceName:         p.GetStringTableEntry(tick, "CombatLogNames", int(keys[1].GetValShort())),
-						TargetName:         p.GetStringTableEntry(tick, "CombatLogNames", int(keys[2].GetValShort())),
-						AttackerName:       p.GetStringTableEntry(tick, "CombatLogNames", int(keys[3].GetValShort())),
-						InflictorName:      p.GetStringTableEntry(tick, "CombatLogNames", int(keys[4].GetValShort())),
-						AttackerIsIllusion: keys[5].GetValBool(),
-						TargetIsIllusion:   keys[6].GetValBool(),
-						Value:              keys[7].GetValShort(),
-						Health:             keys[8].GetValShort(),
-						Timestamp:          keys[9].GetValFloat(),
-						TargetSourceName:   p.GetStringTableEntry(tick, "CombatLogNames", int(keys[10].GetValShort())),
-					})
-				*/
+				keys := value.GetKeys()
+				p.CombatLog = append(p.CombatLog, &CombatLogEntry{
+					Type:               dota.DOTA_COMBATLOG_TYPES(keys[0].GetValByte()).String()[15:],
+					SourceName:         table[int(keys[1].GetValShort())].Str,
+					TargetName:         table[int(keys[2].GetValShort())].Str,
+					AttackerName:       table[int(keys[3].GetValShort())].Str,
+					InflictorName:      table[int(keys[4].GetValShort())].Str,
+					AttackerIsIllusion: keys[5].GetValBool(),
+					TargetIsIllusion:   keys[6].GetValBool(),
+					Value:              keys[7].GetValShort(),
+					Health:             keys[8].GetValShort(),
+					Timestamp:          keys[9].GetValFloat(),
+					TargetSourceName:   table[int(keys[10].GetValShort())].Str,
+				})
 			case "dota_chase_hero":
 				// target1 : <*>type:4 val_short:1418
 				// target2 : <*>type:4 val_short:0
@@ -682,7 +559,7 @@ func (p *Parser) CombatLogsCloseTo(now float32) (logs []*CombatLogEntry) {
 
 func (p *Parser) StringTablesAtTick(tick int) map[string]map[int]*string_tables.StringTableItem {
 	out := map[string]map[int]*string_tables.StringTableItem{}
-	for _, table := range p.Stsh.GetStateAtTick(int(p.FileInfo.GetPlaybackTicks())) {
+	for _, table := range p.Stsh.GetStateAtTick(tick) {
 		out[table.Name] = table.Items
 	}
 	return out

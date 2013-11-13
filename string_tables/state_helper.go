@@ -3,7 +3,6 @@ package string_tables
 import (
 	"io/ioutil"
 	"os"
-	"sort"
 
 	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/davecgh/go-spew/spew"
@@ -190,83 +189,17 @@ func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
 	return state
 }
 
-/*
-	index := -1
-	packets := parser.ParserBaseItems{}
-	for _, item := range helper.packets {
-		if item.Tick <= tick {
-			packets = append(packets, item)
-		}
-	}
-	sort.Sort(packets)
-
-	result := map[int]*StringTable{}
-
-	for _, item := range packets {
-		switch t := item.Object.(type) {
-		case *dota.CSVCMsg_CreateStringTable:
-			index++
-			st := &StringTable{
-				Index: index,
-				Name:  t.GetName(),
-				Tick:  item.Tick,
-				Items: Parse(
-					t.GetStringData(),
-					t.GetNumEntries(),
-					t.GetMaxEntries(),
-					t.GetUserDataFixedSize(),
-					t.GetUserDataSizeBits(),
-				),
-			}
-			result[index] = st
-		case *dota.CSVCMsg_UpdateStringTable:
-			stc := helper.metaTables[int(t.GetTableId())]
-			ustr := Parse(
-				t.GetStringData(),
-				t.GetNumChangedEntries(),
-				int32(stc.MaxEntries),
-				stc.IsFixedSize,
-				int32(stc.Bits),
-			)
-			for key, value := range ustr {
-				resItems := result[int(t.GetTableId())].Items
-				if innerItem, exists := resItems[key]; exists {
-					innerItem.Str = value.Str
-					innerItem.Data = value.Data
-				} else {
-					result[int(t.GetTableId())].Items[key] = value
+func (helper *StateHelper) GetTableAtTick(tick int, tableName string) (result *StringTable) {
+	for _, evo := range helper.evolution {
+		for _, table := range evo {
+			if table.Name == tableName {
+				if table.Tick > tick {
+					return result
 				}
+				result = table
 			}
-		default:
-			panic("this shouldn't be happening")
 		}
 	}
 
 	return result
-}
-*/
-
-// Not used anywhere atm
-func (helper *StateHelper) RepopulateCache() {
-	sortItems := parser.ParserBaseItems{}
-	for _, sortItem := range helper.packets {
-		sortItems = append(sortItems, sortItem)
-	}
-	sort.Sort(sortItems)
-
-	index := 0
-	helper.metaTables = map[int]*CacheItem{}
-
-	for _, sortItem := range sortItems {
-		switch item := sortItem.Object.(type) {
-		case *dota.CSVCMsg_CreateStringTable:
-			helper.metaTables[index] = &CacheItem{
-				Bits:        int(item.GetUserDataSizeBits()),
-				IsFixedSize: item.GetUserDataFixedSize(),
-				MaxEntries:  int(item.GetMaxEntries()),
-				Name:        item.GetName(),
-			}
-			index++
-		}
-	}
 }
