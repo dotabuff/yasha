@@ -3,10 +3,13 @@ package string_tables
 import (
 	"io/ioutil"
 	"os"
+	"strconv"
 
 	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/elobuff/d2rp/core/parser"
+	"github.com/elobuff/d2rp/core/send_tables"
+	"github.com/elobuff/d2rp/core/utils"
 	dota "github.com/elobuff/d2rp/dota"
 )
 
@@ -31,15 +34,23 @@ type StateHelper struct {
 	evolution map[int][]*StringTable
 	// every UST we get, we calculate the ST and put it in here.
 	current map[int]*StringTable
+
+	ClassInfosNameMapping map[int]string
+	Mapping               map[int][]*send_tables.SendProp
+	Multiples             map[int]map[string]int
+	Baseline              map[int]map[string]interface{}
+	pendingBaseline       []*StringTableItem
 }
 
 func NewStateHelper() *StateHelper {
 	return &StateHelper{
-		packets:    parser.ParserBaseItems{},
-		metaTables: map[int]*CacheItem{},
-		baseTables: map[int]*StringTable{},
-		evolution:  map[int][]*StringTable{},
-		current:    map[int]*StringTable{},
+		packets:         parser.ParserBaseItems{},
+		metaTables:      map[int]*CacheItem{},
+		baseTables:      map[int]*StringTable{},
+		evolution:       map[int][]*StringTable{},
+		current:         map[int]*StringTable{},
+		Baseline:        map[int]map[string]interface{}{},
+		pendingBaseline: []*StringTableItem{},
 	}
 }
 
@@ -105,8 +116,11 @@ func (helper *StateHelper) OnCST(tick int, obj *dota.CSVCMsg_CreateStringTable) 
 		),
 	}
 
-	if table.Name == "ActiveModifiers" {
+	switch table.Name {
+	case "ActiveModifiers":
 		parseActiveModifiers(table.Items)
+	case "instancebaseline":
+		helper.updateInstanceBaseline(table.Items)
 	}
 
 	// writeStringTables("CreateStringTable/"+table.Name, tick, spew.Sdump(table))
@@ -135,8 +149,11 @@ func (helper *StateHelper) OnUST(tick int, obj *dota.CSVCMsg_UpdateStringTable) 
 	)
 
 	current := helper.current[tableId]
-	if current.Name == "ActiveModifiers" {
+	switch current.Name {
+	case "ActiveModifiers":
 		parseActiveModifiers(update)
+	case "instancebaseline":
+		helper.updateInstanceBaseline(update)
 	}
 	// writeStringTables("UpdateStringTable/"+current.Name, tick, spew.Sdump(update))
 
@@ -156,6 +173,47 @@ func (helper *StateHelper) OnUST(tick int, obj *dota.CSVCMsg_UpdateStringTable) 
 	}
 
 	helper.evolution[tableId] = append(helper.evolution[tableId], stCopy)
+}
+
+func (helper *StateHelper) updateInstanceBaseline(update map[int]*StringTableItem) {
+	for _, item := range helper.pendingBaseline {
+		helper.updateInstanceBaselineItem(item)
+	}
+	for _, item := range update {
+		helper.updateInstanceBaselineItem(item)
+	}
+}
+
+func (helper *StateHelper) updateInstanceBaselineItem(item *StringTableItem) {
+	classId, err := strconv.Atoi(item.Str)
+	if err != nil {
+		panic(err)
+	}
+
+	className := helper.ClassInfosNameMapping[classId]
+	if className == "DT_DOTAPlayer" {
+		return
+	}
+
+	mapping := helper.Mapping[classId]
+	multiples := helper.Multiples[classId]
+	if len(mapping) < 1 || len(multiples) < 1 {
+		helper.pendingBaseline = append(helper.pendingBaseline, item)
+		return
+	}
+
+	baseline, found := helper.Baseline[classId]
+	if !found {
+		baseline = map[string]interface{}{}
+		helper.Baseline[classId] = baseline
+	}
+
+	br := utils.NewBitReader(item.Data)
+	indices := br.ReadPropertiesIndex()
+	baseValues := br.ReadPropertiesValues(mapping, multiples, indices)
+	for key, value := range baseValues {
+		baseline[key] = value
+	}
 }
 
 func parseActiveModifiers(entries map[int]*StringTableItem) {
@@ -179,7 +237,7 @@ func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
 
 	for _, evo := range helper.evolution {
 		for _, table := range evo {
-			if table.Tick > tick {
+			if table.Tick >= tick {
 				return state
 			}
 			state[table.Index] = table
@@ -193,7 +251,7 @@ func (helper *StateHelper) GetTableAtTick(tick int, tableName string) (result *S
 	for _, evo := range helper.evolution {
 		for _, table := range evo {
 			if table.Name == tableName {
-				if table.Tick > tick {
+				if table.Tick >= tick {
 					return result
 				}
 				result = table

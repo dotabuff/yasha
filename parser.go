@@ -3,7 +3,6 @@ package core
 import (
 	"io/ioutil"
 	"math"
-	"sort"
 	"strconv"
 
 	"code.google.com/p/gogoprotobuf/proto"
@@ -26,10 +25,12 @@ type Parser struct {
 	ClassInfosIdMapping   map[string]int
 	ClassInfosNameMapping map[int]string
 	CombatLog             []*CombatLogEntry
+	ConVars               map[string]interface{}
 	Entities              []*packet_entities.PacketEntity
 	EntityCreated         func(*packet_entities.PacketEntity)
 	EntityDeleted         func(*packet_entities.PacketEntity)
 	EntityPreserved       func(*packet_entities.PacketEntity, map[string]interface{})
+	FileHeader            *dota.CDemoFileHeader
 	FileInfo              *dota.CDemoFileInfo
 	GameEventMap          map[int32]*dota.CSVCMsg_GameEventListDescriptorT
 	ItemsOnGround         map[int]bool
@@ -42,6 +43,7 @@ type Parser struct {
 	PlayerIdClientId      map[int]int
 	PlayerResourceIndex   int
 	RawClicks             []*RawClick
+	ServerInfo            *dota.CSVCMsg_ServerInfo
 	StartTime             float64
 	Sth                   *send_tables.Helper
 	stringTableCache      map[string]map[int]string
@@ -49,6 +51,7 @@ type Parser struct {
 	TextMsg               []string
 	TickTime              map[int]float64
 	VoiceData             map[int][]byte
+	VoiceInit             *dota.CSVCMsg_VoiceInit
 }
 
 func ParserFromFile(path string) *Parser {
@@ -78,27 +81,8 @@ func NewParser(data []byte) *Parser {
 		TextMsg:               []string{},
 		TickTime:              map[int]float64{},
 		VoiceData:             map[int][]byte{},
+		ConVars:               map[string]interface{}{},
 	}
-}
-
-func (p *Parser) PicksBans() (picksbans []*PickBan, isCaptainsMode bool) {
-	gameInfo := p.FileInfo.GetGameInfo()
-	game := gameInfo.GetDota()
-
-	if game.GetGameMode() != 2 {
-		return nil, false
-	}
-
-	pbs := make([]*PickBan, 0, 10)
-	for _, pb := range game.GetPicksBans() {
-		pbs = append(pbs, &PickBan{
-			IsPick: pb.GetIsPick(),
-			Team:   int(pb.GetTeam() - 2),
-			HeroId: int(pb.GetHeroId()),
-		})
-	}
-
-	return pbs, true
 }
 
 func (p *Parser) Parse() {
@@ -107,13 +91,230 @@ func (p *Parser) Parse() {
 }
 
 func (p *Parser) ParseBaseline() {
-	p.Items = p.Parser.Parse(MessageFilter)
-	sort.Sort(p.Items)
-
+	sthItems := map[string]*dota.CSVCMsg_SendTable{}
+	p.Sth = send_tables.NewHelper(sthItems)
+	p.Stsh = string_tables.NewStateHelper()
 	p.Entities = make([]*packet_entities.PacketEntity, 2048)
 
-	p.processItems()
-	p.makeBaseline()
+	p.Parser.Analyze(func(item *parser.ParserBaseItem) {
+		switch obj := item.Object.(type) {
+		case *dota.CDemoFileHeader:
+			p.FileHeader = obj
+		case *dota.CSVCMsg_ServerInfo:
+			p.ServerInfo = obj
+			p.ClassIdNumBits = int(math.Log(float64(obj.GetMaxClasses()))/math.Log(2)) + 1
+		case *dota.CDemoClassInfo:
+			spew.Dump(obj)
+			p.onCDemoClassInfo(obj)
+			p.Stsh.ClassInfosNameMapping = p.ClassInfosNameMapping
+			p.Stsh.Mapping = p.Mapping
+			p.Stsh.Multiples = p.Multiples
+		case *dota.CSVCMsg_CreateStringTable, *dota.CSVCMsg_UpdateStringTable, *dota.CDemoStringTables:
+			p.Stsh.AppendPacket(item)
+		case *dota.CNETMsg_SignonState:
+			// we see signon_state:3|4|5 before the SyncTick
+			// (signon_state:3 spawn_count:2 num_server_players:0 )
+		case *dota.CDemoSyncTick:
+			// that's where the game timer starts?
+		case *dota.CNETMsg_SetConVar:
+			p.onSetConVar(obj)
+		case *dota.CNETMsg_Tick:
+			// no idea what this is good for, but there seems to be only one.
+			// (tick:109 host_frametime:0 host_frametime_std_deviation:0 )
+		case *dota.CSVCMsg_SendTable:
+			sthItems[obj.GetNetTableName()] = obj
+		case *dota.CSVCMsg_GameEventList:
+			for _, descriptor := range obj.GetDescriptors() {
+				p.GameEventMap[descriptor.GetEventid()] = descriptor
+			}
+		case *dota.CSVCMsg_PacketEntities:
+			// FIXME: if we ever want to be able to parse at a specific time, we need
+			//        to handle all.
+			if item.From == dota.EDemoCommands_DEM_Packet {
+				p.ParsePacket(item)
+			}
+		case *dota.CSVCMsg_ClassInfo:
+			// (create_on_client:true )
+		case *dota.CSVCMsg_VoiceInit:
+			p.VoiceInit = obj
+		case *dota.CSVCMsg_GameEvent:
+			p.onGameEvent(item.Tick, obj)
+		case *dota.CDOTAUserMsg_ChatEvent:
+			p.onChatEvent(item.Tick, obj)
+		default:
+			spew.Dump(obj)
+		}
+	})
+
+	// p.Items = p.Parser.Parse(MessageFilter)
+	// p.processItems()
+	// p.makeBaseline()
+}
+
+func (p *Parser) onSetConVar(obj *dota.CNETMsg_SetConVar) {
+	for _, cvar := range obj.GetConvars().GetCvars() {
+		p.ConVars[cvar.GetName()] = cvar.GetValue()
+	}
+}
+
+// http://www.cyborgmatt.com/2013/01/dota-2-replay-parser-bruno/#chatevents
+// they are displayed during game on the left side.
+//
+// just some:
+//
+// (type:CHAT_MESSAGE_AEGIS value:0 playerid_1:6 playerid_2:-1 )
+// (type:CHAT_MESSAGE_CONNECT value:0 playerid_1:0 playerid_2:-1 )
+// (type:CHAT_MESSAGE_DISCONNECT value:0 playerid_1:0 playerid_2:-1 )
+// (type:CHAT_MESSAGE_FIRSTBLOOD value:409 playerid_1:6 playerid_2:3 )
+// (type:CHAT_MESSAGE_GLYPH_USED value:0 playerid_1:2 playerid_2:-1 )
+// (type:CHAT_MESSAGE_HERO_DENY value:0 playerid_1:7 playerid_2:7 )
+// (type:CHAT_MESSAGE_HERO_KILL value:409 playerid_1:3 playerid_2:6 )
+// (type:CHAT_MESSAGE_ITEM_PURCHASE value:208 playerid_1:6 playerid_2:-1 )
+// (type:CHAT_MESSAGE_ITEM_PURCHASE value:92 playerid_1:2 playerid_2:-1 )
+// (type:CHAT_MESSAGE_ITEM_PURCHASE value:92 playerid_1:7 playerid_2:-1 )
+// (type:CHAT_MESSAGE_PAUSED value:0 playerid_1:4 playerid_2:-1 )
+// (type:CHAT_MESSAGE_RECONNECT value:0 playerid_1:10 playerid_2:-1 )
+// (type:CHAT_MESSAGE_ROSHAN_KILL value:200 playerid_1:3 playerid_2:-1 )
+// (type:CHAT_MESSAGE_RUNE_BOTTLE value:0 playerid_1:7 playerid_2:-1 )
+// (type:CHAT_MESSAGE_RUNE_BOTTLE value:1 playerid_1:7 playerid_2:-1 )
+// (type:CHAT_MESSAGE_RUNE_BOTTLE value:2 playerid_1:7 playerid_2:-1 )
+// (type:CHAT_MESSAGE_RUNE_BOTTLE value:3 playerid_1:7 playerid_2:-1 )
+// (type:CHAT_MESSAGE_RUNE_BOTTLE value:4 playerid_1:7 playerid_2:-1 )
+// (type:CHAT_MESSAGE_RUNE_PICKUP value:0 playerid_1:7 playerid_2:-1 )
+// (type:CHAT_MESSAGE_RUNE_PICKUP value:1 playerid_1:7 playerid_2:-1 )
+// (type:CHAT_MESSAGE_RUNE_PICKUP value:2 playerid_1:5 playerid_2:-1 )
+// (type:CHAT_MESSAGE_RUNE_PICKUP value:3 playerid_1:2 playerid_2:-1 )
+// (type:CHAT_MESSAGE_RUNE_PICKUP value:4 playerid_1:7 playerid_2:-1 )
+// (type:CHAT_MESSAGE_STREAK_KILL value:374 playerid_1:0 playerid_2:1 playerid_3:1 playerid_4:8 playerid_5:3 playerid_6:-1 )
+// (type:CHAT_MESSAGE_TOWER_KILL value:2 playerid_1:4 playerid_2:-1 )
+// (type:CHAT_MESSAGE_TOWER_KILL value:3 playerid_1:9 playerid_2:-1 )
+// (type:CHAT_MESSAGE_UNPAUSE_COUNTDOWN value:1 playerid_1:-1 playerid_2:-1 )
+// (type:CHAT_MESSAGE_UNPAUSE_COUNTDOWN value:2 playerid_1:-1 playerid_2:-1 )
+// (type:CHAT_MESSAGE_UNPAUSE_COUNTDOWN value:3 playerid_1:-1 playerid_2:-1 )
+// (type:CHAT_MESSAGE_UNPAUSED value:0 playerid_1:3 playerid_2:-1 )
+func (p *Parser) onChatEvent(tick int, obj *dota.CDOTAUserMsg_ChatEvent) {
+	// FIXME: forward that to the analyzer?
+	/*
+		switch obj.GetType() {
+		case dota.DOTA_CHAT_MESSAGE_CHAT_MESSAGE_DISCONNECT, dota.DOTA_CHAT_MESSAGE_CHAT_MESSAGE_DISCONNECT_WAIT_FOR_RECONNECT:
+			a.players[playersIndex(int(obj.GetPlayerid_1()))].disconnectTime = tick
+			a.chatLog = append(a.chatLog, &ChatMessage{Tick: tick, Playerid: obj.GetPlayerid_1(), Type: "disconnect"})
+		case dota.DOTA_CHAT_MESSAGE_CHAT_MESSAGE_RECONNECT:
+			dc := a.players[playersIndex(int(obj.GetPlayerid_1()))].disconnectTime
+			message := fmt.Sprintf("%f", float64(tick-dc)/30.0)
+			a.chatLog = append(a.chatLog, &ChatMessage{Tick: tick, Playerid: obj.GetPlayerid_1(), Type: "reconnect", Message: message})
+		case dota.DOTA_CHAT_MESSAGE_CHAT_MESSAGE_ABANDON:
+			a.chatLog = append(a.chatLog, &ChatMessage{Tick: tick, Playerid: obj.GetPlayerid_1(), Type: "abandon"})
+		case dota.DOTA_CHAT_MESSAGE_CHAT_MESSAGE_PAUSED:
+			a.pauseTick = tick
+			a.chatLog = append(a.chatLog, &ChatMessage{Tick: tick, Playerid: obj.GetPlayerid_1(), Type: "pause"})
+		case dota.DOTA_CHAT_MESSAGE_CHAT_MESSAGE_UNPAUSED:
+			message := fmt.Sprintf("%f", float32(tick-a.pauseTick)/30.0)
+			a.chatLog = append(a.chatLog, &ChatMessage{Tick: tick, Playerid: obj.GetPlayerid_1(), Type: "unpause", Message: message})
+		case dota.DOTA_CHAT_MESSAGE_CHAT_MESSAGE_SAFE_TO_LEAVE_ABANDONER_EARLY:
+			a.chatLog = append(a.chatLog, &ChatMessage{Tick: tick, Playerid: obj.GetPlayerid_1(), Type: "abandon"})
+			a.significant = false
+		case dota.DOTA_CHAT_MESSAGE_CHAT_MESSAGE_TOWER_DENY:
+			a.chatLog = append(a.chatLog, &ChatMessage{Tick: tick, Playerid: obj.GetPlayerid_1(), Type: "tower_deny"})
+		case dota.DOTA_CHAT_MESSAGE_CHAT_MESSAGE_RUNE_BOTTLE:
+			r := RUNE_NAMES[obj.GetValue()]
+			a.chatLog = append(a.chatLog, &ChatMessage{Tick: tick, Playerid: obj.GetPlayerid_1(), Type: "rune_bottle", Message: r})
+		default:
+			spew.Dump(obj)
+		}
+	*/
+}
+
+func (p *Parser) onGameEvent(tick int, obj *dota.CSVCMsg_GameEvent) {
+	desc := p.GameEventMap[obj.GetEventid()]
+	dName := desc.GetName()
+
+	switch dName {
+	case "hltv_versioninfo":
+		// version : <*>type:5 val_byte:1
+	case "hltv_message":
+		// text : <*>type:1 val_string:"Please wait for broadcast to start ..."
+	case "hltv_status":
+		// clients : <*>type:3 val_long:523
+		// slots : <*>type:3 val_long:3840
+		// proxies : <*>type:4 val_short:59
+		// master : <*>type:1 val_string:"146.66.152.49:28027"
+	case "dota_combatlog":
+		// even though it looks that way, we cannot process the combat log here
+		// since the string table isn't updated in time.
+		keys := obj.GetKeys()
+		table := p.Stsh.GetTableAtTick(tick, "CombatLogNames").Items
+
+		log := &CombatLogEntry{
+			Type:               dota.DOTA_COMBATLOG_TYPES(keys[0].GetValByte()).String()[15:],
+			AttackerIsIllusion: keys[5].GetValBool(),
+			TargetIsIllusion:   keys[6].GetValBool(),
+			Value:              keys[7].GetValShort(),
+			Health:             keys[8].GetValShort(),
+			Timestamp:          keys[9].GetValFloat(),
+		}
+
+		if k := table[int(keys[1].GetValShort())]; k != nil {
+			log.SourceName = k.Str
+		}
+		if k := table[int(keys[2].GetValShort())]; k != nil {
+			log.TargetName = k.Str
+		}
+		if k := table[int(keys[3].GetValShort())]; k != nil {
+			log.AttackerName = k.Str
+		}
+		if k := table[int(keys[4].GetValShort())]; k != nil {
+			log.InflictorName = k.Str
+		}
+		if k := table[int(keys[10].GetValShort())]; k != nil {
+			log.TargetSourceName = k.Str
+		}
+
+		if log.Type == "MODIFIER_ADD" || log.Type == "MODIFIER_REMOVE" {
+			spew.Dump(tick)
+			// spew.Dump(table)
+			spew.Dump(obj)
+			spew.Dump(log)
+		}
+
+		p.CombatLog = append(p.CombatLog, log)
+	case "dota_chase_hero":
+		// target1 : <*>type:4 val_short:1418
+		// target2 : <*>type:4 val_short:0
+		// type : <*>type:5 val_byte:0
+		// priority : <*>type:4 val_short:15
+		// gametime : <*>type:2 val_float:2710.3667
+		// highlight : <*>type:6 val_bool:false
+		// target1playerid : <*>type:5 val_byte:1
+		// target2playerid : <*>type:5 val_byte:32
+		// eventtype : <*>type:4 val_short:1
+	case "dota_tournament_item_event":
+		// event_type : <*>type:4 val_short:0  => witness first blood
+		// event_type : <*>type:4 val_short:1  => witness killing spree
+		// event_type : <*>type:4 val_short:3  => witness hero deny
+	default:
+		dKeys := desc.GetKeys()
+		spew.Println(dName)
+		for n, key := range obj.GetKeys() {
+			spew.Println(dKeys[n].GetName(), ":", key)
+		}
+	}
+}
+
+func (p *Parser) onCDemoClassInfo(cdci *dota.CDemoClassInfo) {
+	for _, class := range cdci.GetClasses() {
+		id, name := int(class.GetClassId()), class.GetTableName()
+		p.ClassInfosNameMapping[id] = name
+		p.ClassInfosIdMapping[name] = id
+		props := p.Sth.LoadSendTable(name)
+		multiples := map[string]int{}
+		for _, prop := range props {
+			key := prop.DtName + "." + prop.VarName
+			multiples[key] += 1
+		}
+		p.Multiples[id] = multiples
+		p.Mapping[id] = props
+	}
 }
 
 func (p *Parser) ParsePackets() {
@@ -265,12 +466,6 @@ func MessageFilter(msg proto.Message) bool {
 		// (entindex:1409 cooldown:17 name_index:14 )
 		// (entindex:1409 cooldown:0.5 name_index:19 )
 		// (entindex:1283 cooldown:5 name_index:3 )
-	case *dota.CDOTAUserMsg_ParticleManager:
-		// http://www.cyborgmatt.com/2013/01/dota-2-replay-parser-bruno/#cdotausermsg-particlemanager
-		// this might be useful, just gotta find out for what :)
-		// (type:DOTA_PARTICLE_MANAGER_EVENT_CREATE index:6636 create_particle:<particle_name_index:2146 attach_type:1 entity_handle:510877 > )
-		// (type:DOTA_PARTICLE_MANAGER_EVENT_RELEASE index:6636 )
-		// (type:DOTA_PARTICLE_MANAGER_EVENT_UPDATE_ENT index:6637 update_particle_ent:<control_point:0 entity_handle:1078463 attach_type:5 attachment:3 > )
 	case *dota.CDOTAUserMsg_OverheadEvent:
 		// http://www.cyborgmatt.com/2013/01/dota-2-replay-parser-bruno/#cdotausermsg-overheadevent
 		//
@@ -284,6 +479,7 @@ func MessageFilter(msg proto.Message) bool {
 		// OVERHEAD_ALERT_HEAL
 		// OVERHEAD_ALERT_MANA_ADD
 		// OVERHEAD_ALERT_MISS
+		return true
 	case *dota.CSVCMsg_TempEntities:
 		// Temporary entities are used by the server to create short-lived or
 		// one-off effects on clients. They are different to standard entities in
@@ -293,12 +489,16 @@ func MessageFilter(msg proto.Message) bool {
 		//
 		// TEs are unreliable and get dropped if too many are created at once.
 		// The maximum per update is 32 in multiplayer and 255 in single player.
+		return true
 	case *dota.CDOTAUserMsg_CreateLinearProjectile:
 		// (origin:<x:-849.5365 y:-2277 z:127.99994 > velocity:<x:687.15155 y:-1458.2067 > entindex:743 particle_index:1998 handle:70 )
+		return true
 	case *dota.CDOTAUserMsg_DestroyLinearProjectile:
 		// (handle:70 )
+		return true
 	case *dota.CDOTAUserMsg_DodgeTrackingProjectiles:
 		// (entindex:743 )
+		return true
 	default:
 		return true
 	}
@@ -306,13 +506,51 @@ func MessageFilter(msg proto.Message) bool {
 	return false
 }
 
-func (p *Parser) processItems() {
-	var serverInfo *dota.CSVCMsg_ServerInfo
-	sthItems := map[string]*dota.CSVCMsg_SendTable{}
-	p.Sth = send_tables.NewHelper(sthItems)
-	p.Stsh = string_tables.NewStateHelper()
+func (p *Parser) PicksBans() (picksbans []*PickBan, isCaptainsMode bool) {
+	gameInfo := p.FileInfo.GetGameInfo()
+	game := gameInfo.GetDota()
 
-	for _, item := range p.Items {
+	if game.GetGameMode() != 2 {
+		return nil, false
+	}
+
+	pbs := make([]*PickBan, 0, 10)
+	for _, pb := range game.GetPicksBans() {
+		pbs = append(pbs, &PickBan{
+			IsPick: pb.GetIsPick(),
+			Team:   int(pb.GetTeam() - 2),
+			HeroId: int(pb.GetHeroId()),
+		})
+	}
+
+	return pbs, true
+}
+
+func (p *Parser) processItems() {
+	/*
+		var serverInfo *dota.CSVCMsg_ServerInfo
+		sthItems := map[string]*dota.CSVCMsg_SendTable{}
+		p.Sth = send_tables.NewHelper(sthItems)
+		p.Stsh = string_tables.NewStateHelper()
+
+		tick := 0
+		buffer := parser.ParserItems{}
+
+		for _, item := range p.Items {
+			if item.Tick > tick {
+				tick = item.Tick
+				p.processItemsBuffer(&buffer)
+			} else {
+				buffer = append(buffer, item)
+			}
+		}
+	*/
+}
+
+func (p *Parser) processItemsBuffer(*parser.ParserItems) {
+}
+
+/*
 		switch value := item.Object.(type) {
 		case *dota.CSVCMsg_PacketEntities:
 			if item.From == dota.EDemoCommands_DEM_Packet {
@@ -348,6 +586,8 @@ func (p *Parser) processItems() {
 				// proxies : <*>type:4 val_short:59
 				// master : <*>type:1 val_string:"146.66.152.49:28027"
 			case "dota_combatlog":
+				// even though it looks that way, we cannot process the combat log here
+				// since the string table isn't updated in time.
 				keys := value.GetKeys()
 				table := p.Stsh.GetTableAtTick(item.Tick, "CombatLogNames").Items
 
@@ -374,6 +614,13 @@ func (p *Parser) processItems() {
 				}
 				if k := table[int(keys[10].GetValShort())]; k != nil {
 					log.TargetSourceName = k.Str
+				}
+
+				if log.Type == "MODIFIER_ADD" || log.Type == "MODIFIER_REMOVE" {
+					spew.Dump(item.Tick)
+					// spew.Dump(table)
+					spew.Dump(value)
+					spew.Dump(log)
 				}
 
 				p.CombatLog = append(p.CombatLog, log)
@@ -475,7 +722,13 @@ func (p *Parser) processItems() {
 				Type:   int(value.GetOrderType()),
 				Target: int(value.GetTargetIndex()),
 			})
-		case *dota.CNETMsg_Tick:
+		case *dota.CNETMsg_Tick,
+			*dota.CDOTAUserMsg_ParticleManager,
+			*dota.CSVCMsg_TempEntities,
+			*dota.CDOTAUserMsg_OverheadEvent,
+			*dota.CDOTAUserMsg_DestroyLinearProjectile,
+			*dota.CDOTAUserMsg_CreateLinearProjectile,
+			*dota.CDOTAUserMsg_DodgeTrackingProjectiles:
 			// don't print
 		default:
 			spew.Dump(value)
@@ -486,6 +739,7 @@ func (p *Parser) processItems() {
 	p.ClassIdNumBits = int(math.Log(float64(serverInfo.GetMaxClasses()))/math.Log(2)) + 1
 	return
 }
+*/
 
 func (p *Parser) makeBaseline() {
 	for _, class := range p.ClassInfos.GetClasses() {

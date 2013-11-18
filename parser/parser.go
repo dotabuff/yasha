@@ -1,18 +1,16 @@
 package parser
 
 import (
-	"sort"
-
-	"code.google.com/p/gogoprotobuf/proto"
+	// "code.google.com/p/gogoprotobuf/proto"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/elobuff/d2rp/core/utils"
 	dota "github.com/elobuff/d2rp/dota"
 )
 
-func foo() { spew.Dump("hi") }
+func p() { spew.Dump("hi") }
 
 type Parser struct {
-	*ParserBase
+	reader   *utils.BytesReader
 	Sequence int64
 	Items    map[int64]*ParserItem
 }
@@ -22,15 +20,34 @@ func ParserFromFile(path string) *Parser {
 }
 
 func NewParser(data []byte) *Parser {
-	parser := &Parser{ParserBase: NewParserBase(data)}
-	parser.Analyze()
-	return parser
+	if len(data) < headerLength {
+		panic("File too small.")
+	}
+
+	magic := ReadStringZ(data, 0)
+	if magic != headerMagic {
+		panic("demofilestamp doesn't match, was: " + magic)
+	}
+
+	totalLength := len(data) - headerLength
+	if totalLength < 1 {
+		panic("couldn't open file")
+	}
+
+	buffer := data[headerLength:(headerLength + totalLength)]
+	return &Parser{reader: utils.NewBytesReader(buffer)}
 }
 
-func (p *Parser) Analyze() {
+func (p *Parser) readEDemoCommands() (dota.EDemoCommands, bool) {
+	command := dota.EDemoCommands(p.reader.ReadVarInt32())
+	compressed := (command & dota.EDemoCommands_DEM_IsCompressed) == dota.EDemoCommands_DEM_IsCompressed
+	command = command & ^dota.EDemoCommands_DEM_IsCompressed
+	return command, compressed
+}
+
+func (p *Parser) Analyze(callback func(*ParserBaseItem)) {
 	p.Sequence = 1
-	p.Items = map[int64]*ParserItem{}
-	command, compressed := p.ReadEDemoCommands()
+	command, compressed := p.readEDemoCommands()
 	if command == dota.EDemoCommands_DEM_Error {
 		panic(command)
 	}
@@ -54,33 +71,34 @@ func (p *Parser) Analyze() {
 			case *SignonPacket:
 				full := &dota.CDemoPacket{}
 				ProtoUnmarshal(item.Data, full)
-				p.AnalyzePacket(dota.EDemoCommands_DEM_SignonPacket, tick, full.GetData())
+				p.AnalyzePacket(callback, dota.EDemoCommands_DEM_SignonPacket, tick, full.GetData())
 			case *dota.CDemoPacket:
 				ProtoUnmarshal(item.Data, o)
-				p.AnalyzePacket(dota.EDemoCommands_DEM_Packet, tick, o.GetData())
+				p.AnalyzePacket(callback, dota.EDemoCommands_DEM_Packet, tick, o.GetData())
 			case *dota.CDemoFullPacket:
 				ProtoUnmarshal(item.Data, o)
 				item.From = dota.EDemoCommands_DEM_FullPacket
 				item.Data = nil
 				item.Object = o.GetStringTable()
-				p.Items[item.Sequence] = item
-				p.AnalyzePacket(dota.EDemoCommands_DEM_FullPacket, tick, o.GetPacket().GetData())
+				callback(parseOne(item))
+				p.AnalyzePacket(callback, dota.EDemoCommands_DEM_FullPacket, tick, o.GetPacket().GetData())
 			case *dota.CDemoSendTables:
 				ProtoUnmarshal(item.Data, o)
-				p.AnalyzePacket(dota.EDemoCommands_DEM_SendTables, tick, o.GetData())
+				p.AnalyzePacket(callback, dota.EDemoCommands_DEM_SendTables, tick, o.GetData())
 			default:
-				p.Items[item.Sequence] = item
+				callback(parseOne(item))
 			}
 		} else {
 			p.reader.Skip(length)
 		}
-		command, compressed = p.ReadEDemoCommands()
+		command, compressed = p.readEDemoCommands()
 		if command == dota.EDemoCommands_DEM_Error {
 			panic(command)
 		}
 	}
 }
-func (p *Parser) AnalyzePacket(fromEvent dota.EDemoCommands, tick int, data []byte) {
+
+func (p *Parser) AnalyzePacket(callback func(*ParserBaseItem), fromEvent dota.EDemoCommands, tick int, data []byte) {
 	reader := utils.NewBytesReader(data)
 	for reader.CanRead() {
 		iType := int(reader.ReadVarInt32())
@@ -106,27 +124,13 @@ func (p *Parser) AnalyzePacket(fromEvent dota.EDemoCommands, tick int, data []by
 				if err == nil {
 					item.Object = um
 					item.Data = message.GetMsgData()
-					p.Items[item.Sequence] = item
+					callback(parseOne(item))
 				}
 			default:
-				p.Items[item.Sequence] = item
+				callback(parseOne(item))
 			}
 		}
 	}
-}
-
-func (p *Parser) Parse(check func(proto.Message) bool) (items ParserBaseItems) {
-	for _, item := range p.Items {
-		if item.Data == nil {
-			continue
-		}
-		if !check(item.Object) {
-			continue
-		}
-		items = append(items, parseOne(item))
-	}
-	sort.Sort(items)
-	return items
 }
 
 func parseOne(item *ParserItem) *ParserBaseItem {
