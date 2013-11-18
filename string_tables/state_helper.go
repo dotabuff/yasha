@@ -261,3 +261,13 @@ func (helper *StateHelper) GetTableAtTick(tick int, tableName string) (result *S
 
 	return result
 }
+
+func (helper *StateHelper) GetTableNow(tableName string) (result *StringTable) {
+	for _, table := range helper.current {
+		if table.Name == tableName {
+			return table
+		}
+	}
+
+	return
+}
