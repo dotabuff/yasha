@@ -11,18 +11,7 @@ import (
 	"github.com/elobuff/d2rp/core/send_tables"
 )
 
-var debug = false
-
-func dump(args ...interface{}) {
-	if debug {
-		spew.Dump(args...)
-	}
-}
-func printLn(args ...interface{}) {
-	if debug {
-		spew.Println(args...)
-	}
-}
+func p(o ...interface{}) { spew.Dump(o...) }
 
 const (
 	CoordIntegerBits    = 14

@@ -65,12 +65,16 @@ type Helper struct {
 	excludedSendProp []*SendProp
 }
 
-func NewHelper(sendTables map[string]*dota.CSVCMsg_SendTable) *Helper {
+func NewHelper() *Helper {
 	return &Helper{
-		sendTables:       sendTables,
+		sendTables:       map[string]*dota.CSVCMsg_SendTable{},
 		flatSendTable:    []*SendProp{},
 		excludedSendProp: []*SendProp{},
 	}
+}
+
+func (sth *Helper) SetSendTable(name string, table *dota.CSVCMsg_SendTable) {
+	sth.sendTables[name] = table
 }
 
 func (sth *Helper) LoadSendTable(sendTableName string) []*SendProp {

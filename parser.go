@@ -5,7 +5,6 @@ import (
 	"math"
 	"strconv"
 
-	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/elobuff/d2rp/core/packet_entities"
 	"github.com/elobuff/d2rp/core/parser"
@@ -17,7 +16,6 @@ import (
 
 type Parser struct {
 	Parser                *parser.Parser
-	Abilities             map[*AbilityTracker]bool
 	AllChat               []*dota.CUserMsg_SayText2
 	Baseline              map[int]map[string]interface{}
 	ClassIdNumBits        int
@@ -33,23 +31,15 @@ type Parser struct {
 	FileHeader            *dota.CDemoFileHeader
 	FileInfo              *dota.CDemoFileInfo
 	GameEventMap          map[int32]*dota.CSVCMsg_GameEventListDescriptorT
-	ItemsOnGround         map[int]bool
-	Items                 parser.ParserBaseItems
 	LastHitMinutes        int
-	LastHits              map[*LastHitTracker]bool
 	Mapping               map[int][]*send_tables.SendProp
 	Multiples             map[int]map[string]int
-	Packets               parser.ParserBaseItems
-	PlayerIdClientId      map[int]int
 	PlayerResourceIndex   int
 	RawClicks             []*RawClick
 	ServerInfo            *dota.CSVCMsg_ServerInfo
 	StartTime             float64
 	Sth                   *send_tables.Helper
-	stringTableCache      map[string]map[int]string
 	Stsh                  *string_tables.StateHelper
-	TextMsg               []string
-	TickTime              map[int]float64
 	VoiceData             map[int][]byte
 	VoiceInit             *dota.CSVCMsg_VoiceInit
 }
@@ -61,38 +51,58 @@ func ParserFromFile(path string) *Parser {
 func NewParser(data []byte) *Parser {
 	return &Parser{
 		Parser:                parser.NewParser(data),
-		Abilities:             map[*AbilityTracker]bool{},
 		AllChat:               []*dota.CUserMsg_SayText2{},
 		Baseline:              map[int]map[string]interface{}{},
 		ClassInfosIdMapping:   map[string]int{},
 		ClassInfosNameMapping: map[int]string{},
 		CombatLog:             []*CombatLogEntry{},
 		GameEventMap:          map[int32]*dota.CSVCMsg_GameEventListDescriptorT{},
-		ItemsOnGround:         map[int]bool{},
-		Items:                 []*parser.ParserBaseItem{},
-		LastHits:              map[*LastHitTracker]bool{},
 		Mapping:               map[int][]*send_tables.SendProp{},
 		Multiples:             map[int]map[string]int{},
-		Packets:               []*parser.ParserBaseItem{},
-		PlayerIdClientId:      map[int]int{},
 		PlayerResourceIndex:   -1,
 		RawClicks:             []*RawClick{},
-		stringTableCache:      map[string]map[int]string{},
-		TextMsg:               []string{},
-		TickTime:              map[int]float64{},
 		VoiceData:             map[int][]byte{},
 		ConVars:               map[string]interface{}{},
 	}
 }
 
 func (p *Parser) Parse() {
-	sthItems := map[string]*dota.CSVCMsg_SendTable{}
-	p.Sth = send_tables.NewHelper(sthItems)
+	p.Sth = send_tables.NewHelper()
 	p.Stsh = string_tables.NewStateHelper()
 	p.Entities = make([]*packet_entities.PacketEntity, 2048)
 
+	// in order to successfully process data every tick, we need to maintain
+	// order.  First of all the string and send tables for the tick have to be
+	// done, then everything else.  But to also maintain streaming behaviour, we
+	// simply stuff all data for one tick into a buffer, and iterate it twice.
+	//
+	// A bit of a waste of iterations because it still needs an expensive type
+	// switch, but less overhead than doing a sort instead.
+
+	currentTick := 0
+	buffer := []*parser.ParserBaseItem{}
+
 	p.Parser.Analyze(func(item *parser.ParserBaseItem) {
+		// we got a new tick, process the previous items
+		if item.Tick > currentTick {
+			p.processTick(buffer)
+			buffer = make([]*parser.ParserBaseItem, 1, len(buffer))
+			buffer[0] = item
+			currentTick = item.Tick
+		} else {
+			// tick is ongoing
+			buffer = append(buffer, item)
+		}
+	})
+}
+
+func (p *Parser) processTick(items []*parser.ParserBaseItem) {
+	for _, item := range items {
 		switch obj := item.Object.(type) {
+		case *dota.CSVCMsg_SendTable:
+			p.Sth.SetSendTable(obj.GetNetTableName(), obj)
+		case *dota.CSVCMsg_CreateStringTable, *dota.CSVCMsg_UpdateStringTable, *dota.CDemoStringTables:
+			p.Stsh.AppendPacket(item)
 		case *dota.CDemoFileHeader:
 			// (demo_file_stamp:"PBUFDEM\000" network_protocol:40 server_name:"Valve Dota 2 Server #8 (srcds038)" client_name:"SourceTV Demo" map_name:"dota" game_directory:"dota" fullpackets_version:2 allow_clientside_entities:true allow_clientside_particles:true )
 			p.FileHeader = obj
@@ -101,19 +111,27 @@ func (p *Parser) Parse() {
 			p.ClassIdNumBits = int(math.Log(float64(obj.GetMaxClasses()))/math.Log(2)) + 1
 		case *dota.CDemoClassInfo:
 			p.onCDemoClassInfo(obj)
-			p.Stsh.ClassInfosNameMapping = p.ClassInfosNameMapping
-			p.Stsh.Mapping = p.Mapping
-			p.Stsh.Multiples = p.Multiples
-		case *dota.CSVCMsg_CreateStringTable, *dota.CSVCMsg_UpdateStringTable, *dota.CDemoStringTables:
-			p.Stsh.AppendPacket(item)
+		case *dota.CSVCMsg_GameEventList:
+			for _, descriptor := range obj.GetDescriptors() {
+				p.GameEventMap[descriptor.GetEventid()] = descriptor
+			}
+		}
+	}
+
+	for _, item := range items {
+		switch obj := item.Object.(type) {
+		case *dota.CSVCMsg_CreateStringTable, *dota.CSVCMsg_UpdateStringTable,
+			*dota.CDemoStringTables, *dota.CDemoFileHeader, *dota.CSVCMsg_ServerInfo,
+			*dota.CDemoClassInfo, *dota.CSVCMsg_SendTable,
+			*dota.CSVCMsg_GameEventList:
+		case *dota.CNETMsg_SetConVar:
+			// (convars:<cvars:<name:"sv_consistency" value:"0" > cvars:<name:"sv_skyname" value:"sky_dotasky_01" > cvars:<name:"tv_transmitall" value:"1" > cvars:<name:"steamworks_sessionid_server" value:"21537759004" > cvars:<name:"think_limit" value:"0" > cvars:<name:"tv_transmitall" value:"1" > > )
+			p.onSetConVar(obj)
 		case *dota.CNETMsg_SignonState:
 			// we see signon_state:3|4|5 before the SyncTick
 			// (signon_state:3 spawn_count:2 num_server_players:0 )
 		case *dota.CDemoSyncTick:
 			// that's where the game timer starts?
-		case *dota.CNETMsg_SetConVar:
-			// (convars:<cvars:<name:"sv_consistency" value:"0" > cvars:<name:"sv_skyname" value:"sky_dotasky_01" > cvars:<name:"tv_transmitall" value:"1" > cvars:<name:"steamworks_sessionid_server" value:"21537759004" > cvars:<name:"think_limit" value:"0" > cvars:<name:"tv_transmitall" value:"1" > > )
-			p.onSetConVar(obj)
 		case *dota.CNETMsg_Tick:
 			// no idea what this is good for, but there seems to be only one.
 			// (tick:109 host_frametime:0 host_frametime_std_deviation:0 )
@@ -121,19 +139,13 @@ func (p *Parser) Parse() {
 			// unfortunately no clue wtf this means.
 			// (entity_index:1 )
 			// (entity_index:2 )
-		case *dota.CSVCMsg_SendTable:
-			sthItems[obj.GetNetTableName()] = obj
-		case *dota.CSVCMsg_GameEventList:
-			for _, descriptor := range obj.GetDescriptors() {
-				p.GameEventMap[descriptor.GetEventid()] = descriptor
-			}
 		case *dota.CSVCMsg_GameEvent:
 			p.onGameEvent(item.Tick, obj)
 		case *dota.CSVCMsg_PacketEntities:
 			// FIXME: if we ever want to be able to parse at a specific time, we need
 			//        to handle all.
 			if item.From == dota.EDemoCommands_DEM_Packet {
-				p.ParsePacket(item)
+				p.ParsePacket(item.Tick, obj)
 			}
 		case *dota.CSVCMsg_ClassInfo:
 			// (create_on_client:true )
@@ -272,11 +284,7 @@ func (p *Parser) Parse() {
 		default:
 			spew.Dump(obj)
 		}
-	})
-
-	// p.Items = p.Parser.Parse(MessageFilter)
-	// p.processItems()
-	// p.makeBaseline()
+	}
 }
 
 func (p *Parser) onSetConVar(obj *dota.CNETMsg_SetConVar) {
@@ -451,10 +459,13 @@ func (p *Parser) onCDemoClassInfo(cdci *dota.CDemoClassInfo) {
 		p.Multiples[id] = multiples
 		p.Mapping[id] = props
 	}
+
+	p.Stsh.ClassInfosNameMapping = p.ClassInfosNameMapping
+	p.Stsh.Mapping = p.Mapping
+	p.Stsh.Multiples = p.Multiples
 }
 
-func (p *Parser) ParsePacket(packet *parser.ParserBaseItem) {
-	pe := (packet.Object).(*dota.CSVCMsg_PacketEntities)
+func (p *Parser) ParsePacket(tick int, pe *dota.CSVCMsg_PacketEntities) {
 	br := utils.NewBitReader(pe.GetEntityData())
 	currentIndex := -1
 	for i := 0; i < int(pe.GetUpdatedEntries()); i++ {
@@ -462,11 +473,11 @@ func (p *Parser) ParsePacket(packet *parser.ParserBaseItem) {
 		uType := packet_entities.ReadUpdateType(br)
 		switch uType {
 		case packet_entities.Preserve:
-			p.EntityPreserve(br, currentIndex, packet.Tick)
+			p.EntityPreserve(br, currentIndex, tick)
 		case packet_entities.Create:
-			p.EntityCreate(br, currentIndex, packet.Tick)
+			p.EntityCreate(br, currentIndex, tick)
 		case packet_entities.Delete:
-			p.EntityDelete(br, currentIndex, packet.Tick)
+			p.EntityDelete(br, currentIndex, tick)
 		}
 	}
 }
@@ -537,16 +548,6 @@ func (p *Parser) EntityDelete(br *utils.BitReader, currentIndex, tick int) {
 	}
 }
 
-// we ignore whatever we don't care about or understand yet, this helps speed up parsing a bit.
-func MessageFilter(msg proto.Message) bool {
-	switch msg.(type) {
-	default:
-		return true
-	}
-
-	return false
-}
-
 func (p *Parser) PicksBans() (picksbans []*PickBan, isCaptainsMode bool) {
 	gameInfo := p.FileInfo.GetGameInfo()
 	game := gameInfo.GetDota()
@@ -567,62 +568,6 @@ func (p *Parser) PicksBans() (picksbans []*PickBan, isCaptainsMode bool) {
 	return pbs, true
 }
 
-func (p *Parser) processItemsBuffer(*parser.ParserItems) {
-}
-
-func (p *Parser) makeBaseline() {
-	for _, class := range p.ClassInfos.GetClasses() {
-		id, name := int(class.GetClassId()), class.GetTableName()
-		p.ClassInfosNameMapping[id] = name
-		p.ClassInfosIdMapping[name] = id
-		props := p.Sth.LoadSendTable(name)
-		multiples := map[string]int{}
-		for _, prop := range props {
-			key := prop.DtName + "." + prop.VarName
-			multiples[key] += 1
-		}
-		p.Multiples[id] = multiples
-		p.Mapping[id] = props
-	}
-
-	stringTables := p.Stsh.GetStateAtTick(int(p.FileInfo.GetPlaybackTicks()))
-	var instanceBaseline *string_tables.StringTable
-	for _, value := range stringTables {
-		if value.Name == "instancebaseline" {
-			instanceBaseline = value
-			break
-		}
-	}
-
-	if instanceBaseline == nil {
-		panic("no instanceBaseline")
-	}
-
-	for _, item := range instanceBaseline.Items {
-		classId, err := strconv.Atoi(item.Str)
-		if err != nil {
-			panic(err)
-		}
-		className := p.ClassInfosNameMapping[classId]
-		if className != "DT_DOTAPlayer" {
-			br := utils.NewBitReader(item.Data)
-			indices := br.ReadPropertiesIndex()
-			mapping := p.Mapping[classId]
-			multiples := p.Multiples[classId]
-			baseValues := br.ReadPropertiesValues(mapping, multiples, indices)
-			p.Baseline[classId] = baseValues
-		}
-	}
-}
-
-func (p *Parser) WriteVoiceData(dir string) {
-	for client, voice := range p.VoiceData {
-		oga := dir + "/voice_" + strconv.Itoa(client) + ".oga"
-		spew.Println("writing", oga, "...")
-		ioutil.WriteFile(oga, voice, 0644)
-	}
-}
-
 // logs chronologically close to this event (usually within 1-2 ticks).
 func (p *Parser) CombatLogsCloseTo(now float32) (logs []*CombatLogEntry) {
 	closestDelta := 0.5 // be generous and look around ±0.5 second
@@ -640,33 +585,21 @@ func (p *Parser) CombatLogsCloseTo(now float32) (logs []*CombatLogEntry) {
 	return logs
 }
 
-func (p *Parser) StringTablesAtTick(tick int) map[string]map[int]*string_tables.StringTableItem {
-	out := map[string]map[int]*string_tables.StringTableItem{}
-	for _, table := range p.Stsh.GetStateAtTick(tick) {
-		out[table.Name] = table.Items
+// just for debugging, i haven't found a way to actually play these files yet,
+// they might need some sort of header.
+func (p *Parser) WriteVoiceData(dir string) {
+	for client, voice := range p.VoiceData {
+		oga := dir + "/voice_" + strconv.Itoa(client) + ".oga"
+		spew.Println("writing", oga, "...")
+		ioutil.WriteFile(oga, voice, 0644)
 	}
-	return out
 }
 
-func (p *Parser) GetStringTableEntry(tick int, tableName string, key int) string {
-	if table, found := p.stringTableCache[tableName]; found {
-		if item, found := table[key]; found {
-			return item
-		}
-	} else {
-		p.stringTableCache[tableName] = map[int]string{}
-	}
-	tables := p.StringTablesAtTick(tick)
-	item := tables[tableName][key].Str
-	p.stringTableCache[tableName][key] = item
-	return item
-}
-
+// just for debugging
 func (p *Parser) WriteStringTables(dir string) {
-	for name, items := range p.StringTablesAtTick(int(p.FileInfo.GetPlaybackTicks())) {
-		prefix := dir + "/" + name
-		if len(items) > 0 {
-			err := ioutil.WriteFile(prefix+".txt", []byte(spew.Sdump(items)), 0644)
+	for _, table := range p.Stsh.GetStateAtTick(int(p.FileInfo.GetPlaybackTicks())) {
+		if len(table.Items) > 0 {
+			err := ioutil.WriteFile(dir+"/"+table.Name+".txt", []byte(spew.Sdump(table.Items)), 0644)
 			if err != nil {
 				panic(err)
 			}
