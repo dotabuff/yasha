@@ -14,9 +14,7 @@ import (
 
 type Parser struct {
 	Parser                *parser.Parser
-	Baseline              map[int]map[string]interface{}
 	ClassIdNumBits        int
-	ClassInfos            *dota.CDemoClassInfo
 	ClassInfosIdMapping   map[string]int
 	ClassInfosNameMapping map[int]string
 	Entities              []*packet_entities.PacketEntity
@@ -25,11 +23,9 @@ type Parser struct {
 	GameEventMap          map[int32]*dota.CSVCMsg_GameEventListDescriptorT
 	Mapping               map[int][]*send_tables.SendProp
 	Multiples             map[int]map[string]int
-	PlayerResourceIndex   int
 	ServerInfo            *dota.CSVCMsg_ServerInfo
 	Sth                   *send_tables.Helper
 	Stsh                  *string_tables.StateHelper
-	VoiceData             map[int][]byte
 	VoiceInit             *dota.CSVCMsg_VoiceInit
 
 	OnEntityCreated        func(*packet_entities.PacketEntity)
@@ -42,6 +38,7 @@ type Parser struct {
 	OnOverheadEvent        func(tick int, obj *dota.CDOTAUserMsg_OverheadEvent)
 	OnChatEvent            func(tick int, obj *dota.CDOTAUserMsg_ChatEvent)
 	OnCombatLog            func(log *CombatLogEntry)
+	OnTablename            func(name string)
 }
 
 func ParserFromFile(path string) *Parser {
@@ -49,23 +46,18 @@ func ParserFromFile(path string) *Parser {
 }
 
 func NewParser(data []byte) *Parser {
-	return &Parser{
-		Parser:                parser.NewParser(data),
-		Baseline:              map[int]map[string]interface{}{},
-		ClassInfosIdMapping:   map[string]int{},
-		ClassInfosNameMapping: map[int]string{},
-		GameEventMap:          map[int32]*dota.CSVCMsg_GameEventListDescriptorT{},
-		Mapping:               map[int][]*send_tables.SendProp{},
-		Multiples:             map[int]map[string]int{},
-		PlayerResourceIndex:   -1,
-		VoiceData:             map[int][]byte{},
-	}
+	return &Parser{Parser: parser.NewParser(data)}
 }
 
 func (p *Parser) Parse() {
 	p.Sth = send_tables.NewHelper()
 	p.Stsh = string_tables.NewStateHelper()
 	p.Entities = make([]*packet_entities.PacketEntity, 2048)
+	p.ClassInfosIdMapping = map[string]int{}
+	p.ClassInfosNameMapping = map[int]string{}
+	p.GameEventMap = map[int32]*dota.CSVCMsg_GameEventListDescriptorT{}
+	p.Mapping = map[int][]*send_tables.SendProp{}
+	p.Multiples = map[int]map[string]int{}
 
 	// in order to successfully process data every tick, we need to maintain
 	// order.  First of all the string and send tables for the tick have to be
@@ -97,17 +89,23 @@ func (p *Parser) Parse() {
 
 func (p *Parser) processTick(items []*parser.ParserBaseItem) {
 	for _, item := range items {
+		// spew.Dump(item)
 		switch obj := item.Object.(type) {
 		case *dota.CSVCMsg_SendTable:
 			p.Sth.SetSendTable(obj.GetNetTableName(), obj)
+		case *dota.CSVCMsg_ServerInfo:
+			p.ServerInfo = obj
+			p.ClassIdNumBits = int(math.Log(float64(obj.GetMaxClasses()))/math.Log(2)) + 1
+		}
+	}
+
+	for _, item := range items {
+		switch obj := item.Object.(type) {
 		case *dota.CSVCMsg_CreateStringTable, *dota.CSVCMsg_UpdateStringTable, *dota.CDemoStringTables:
 			p.Stsh.AppendPacket(item)
 		case *dota.CDemoFileHeader:
 			// (demo_file_stamp:"PBUFDEM\000" network_protocol:40 server_name:"Valve Dota 2 Server #8 (srcds038)" client_name:"SourceTV Demo" map_name:"dota" game_directory:"dota" fullpackets_version:2 allow_clientside_entities:true allow_clientside_particles:true )
 			p.FileHeader = obj
-		case *dota.CSVCMsg_ServerInfo:
-			p.ServerInfo = obj
-			p.ClassIdNumBits = int(math.Log(float64(obj.GetMaxClasses()))/math.Log(2)) + 1
 		case *dota.CDemoClassInfo:
 			p.onCDemoClassInfo(obj)
 		case *dota.CSVCMsg_GameEventList:
@@ -169,17 +167,29 @@ func (p *Parser) processTick(items []*parser.ParserBaseItem) {
 		case *dota.CSVCMsg_GameEvent:
 			p.onGameEvent(item.Tick, obj)
 		case *dota.CDOTAUserMsg_ChatEvent:
-			p.OnChatEvent(item.Tick, obj)
+			if p.OnChatEvent != nil {
+				p.OnChatEvent(item.Tick, obj)
+			}
 		case *dota.CDOTAUserMsg_OverheadEvent:
-			p.OnOverheadEvent(item.Tick, obj)
+			if p.OnOverheadEvent != nil {
+				p.OnOverheadEvent(item.Tick, obj)
+			}
 		case *dota.CDOTAUserMsg_SpectatorPlayerClick:
-			p.OnSpectatorPlayerClick(item.Tick, obj)
+			if p.OnSpectatorPlayerClick != nil {
+				p.OnSpectatorPlayerClick(item.Tick, obj)
+			}
 		case *dota.CUserMsg_SayText2:
-			p.OnSayText2(item.Tick, obj)
+			if p.OnSayText2 != nil {
+				p.OnSayText2(item.Tick, obj)
+			}
 		case *dota.CSVCMsg_VoiceData:
-			p.OnVoiceData(obj)
+			if p.OnVoiceData != nil {
+				p.OnVoiceData(obj)
+			}
 		case *dota.CNETMsg_SetConVar:
-			p.OnSetConVar(obj)
+			if p.OnSetConVar != nil {
+				p.OnSetConVar(obj)
+			}
 		default:
 			spew.Dump(obj)
 		}
@@ -229,7 +239,9 @@ func (p *Parser) onGameEvent(tick int, obj *dota.CSVCMsg_GameEvent) {
 			log.TargetSourceName = k.Str
 		}
 
-		p.OnCombatLog(log)
+		if p.OnCombatLog != nil {
+			p.OnCombatLog(log)
+		}
 	case "dota_chase_hero":
 		// target1 : <*>type:4 val_short:1418
 		// target2 : <*>type:4 val_short:0
@@ -256,8 +268,9 @@ func (p *Parser) onGameEvent(tick int, obj *dota.CSVCMsg_GameEvent) {
 func (p *Parser) onCDemoClassInfo(cdci *dota.CDemoClassInfo) {
 	for _, class := range cdci.GetClasses() {
 		id, name := int(class.GetClassId()), class.GetTableName()
-		p.ClassInfosNameMapping[id] = name
 		p.ClassInfosIdMapping[name] = id
+		p.ClassInfosNameMapping[id] = name
+
 		props := p.Sth.LoadSendTable(name)
 		multiples := map[string]int{}
 		for _, prop := range props {
@@ -266,6 +279,10 @@ func (p *Parser) onCDemoClassInfo(cdci *dota.CDemoClassInfo) {
 		}
 		p.Multiples[id] = multiples
 		p.Mapping[id] = props
+
+		if p.OnTablename != nil {
+			p.OnTablename(name)
+		}
 	}
 
 	p.Stsh.ClassInfosNameMapping = p.ClassInfosNameMapping
@@ -286,10 +303,6 @@ func (p *Parser) ParsePacket(tick int, pe *dota.CSVCMsg_PacketEntities) {
 			p.EntityPreserve(br, currentIndex, tick)
 		case packet_entities.Delete:
 			p.EntityDelete(br, currentIndex, tick)
-		case packet_entities.Leave:
-			// TODO: figure out what this is good for.
-		default:
-			panic("new meta!")
 		}
 	}
 }
@@ -310,25 +323,17 @@ func (p *Parser) EntityCreate(br *utils.BitReader, currentIndex, tick int) {
 	pMultiples := p.Multiples[pe.ClassId]
 	values := br.ReadPropertiesValues(pMapping, pMultiples, indices)
 
-	baseline, foundBaseline := p.Baseline[pe.ClassId]
+	baseline, foundBaseline := p.Stsh.Baseline[pe.ClassId]
 	if foundBaseline {
-		for key, baseValue := range baseline {
-			if subValue, ok := values[key]; ok {
-				pe.Values[key] = subValue
-			} else {
-				pe.Values[key] = baseValue
-			}
-		}
-	} else {
-		for key, value := range values {
+		for key, value := range baseline {
 			pe.Values[key] = value
 		}
 	}
+	for key, value := range values {
+		pe.Values[key] = value
+	}
 
 	p.Entities[pe.Index] = pe
-	if p.PlayerResourceIndex == -1 && pe.Name == "DT_DOTA_PlayerResource" {
-		p.PlayerResourceIndex = pe.Index
-	}
 
 	if p.OnEntityCreated != nil {
 		p.OnEntityCreated(pe)

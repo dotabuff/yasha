@@ -1,7 +1,10 @@
 package string_tables
 
 import (
+	"bytes"
+	"encoding/binary"
 	"io/ioutil"
+
 	"os"
 	"strconv"
 
@@ -121,6 +124,8 @@ func (helper *StateHelper) OnCST(tick int, obj *dota.CSVCMsg_CreateStringTable) 
 		parseActiveModifiers(table.Items)
 	case "instancebaseline":
 		helper.updateInstanceBaseline(table.Items)
+	case "userinfo":
+		parseUserinfo(table.Items)
 	}
 
 	// writeStringTables("CreateStringTable/"+table.Name, tick, spew.Sdump(table))
@@ -152,6 +157,8 @@ func (helper *StateHelper) OnUST(tick int, obj *dota.CSVCMsg_UpdateStringTable) 
 	switch current.Name {
 	case "ActiveModifiers":
 		parseActiveModifiers(update)
+	case "userinfo":
+		parseUserinfo(update)
 	case "instancebaseline":
 		helper.updateInstanceBaseline(update)
 	}
@@ -197,7 +204,7 @@ func (helper *StateHelper) updateInstanceBaselineItem(item *StringTableItem) {
 
 	mapping := helper.Mapping[classId]
 	multiples := helper.Multiples[classId]
-	if len(mapping) < 1 || len(multiples) < 1 {
+	if len(mapping) == 0 || len(multiples) == 0 {
 		helper.pendingBaseline = append(helper.pendingBaseline, item)
 		return
 	}
@@ -270,4 +277,97 @@ func (helper *StateHelper) GetTableNow(tableName string) (result *StringTable) {
 	}
 
 	return
+}
+
+const (
+	MAX_PLAYER_NAME_LENGTH = 32
+	MAX_CUSTOM_FILES       = 4  // max 4 files
+	SIGNED_GUID_LEN        = 32 // Hashed CD Key (32 hex alphabetic chars + 0 terminator )
+)
+
+type rawUserinfo struct {
+	Xuid        uint64
+	Name        [MAX_PLAYER_NAME_LENGTH]byte
+	UserID      int32
+	Guid        [SIGNED_GUID_LEN + 1]byte
+	FriendsID   uint32
+	FriendsName [MAX_PLAYER_NAME_LENGTH]byte
+	Fakeplayer  int32
+	Ishltv      int32
+	/*
+		#if defined( REPLAY_ENABLED )
+			true if player is the Replay proxy
+			bool			isreplay;
+		#endif
+			// custom files CRC for this player
+			CRC32_t			customFiles[MAX_CUSTOM_FILES];
+			// this counter increases each time the server downloaded a new file
+			unsigned char	filesDownloaded;
+	*/
+}
+
+type Userinfo struct {
+	XUID         uint64 // network xuid
+	Name         string // scoreboard information
+	UserID       int    // local server user ID, unique while server is running
+	GUID         string // global unique player identifer
+	FriendsID    uint   // friends identification number
+	FriendsName  string // friends name
+	IsFakeplayer bool   // true, if player is a bot controlled by game.dll
+	IsHLTV       bool   // true if player is the HLTV proxy
+}
+
+func parseUserinfo(entries map[int]*StringTableItem) {
+	for _, e := range entries {
+		if len(e.Data) == 0 {
+			continue
+		}
+		spew.Dump(e)
+
+		raw := &rawUserinfo{}
+		buf := bytes.NewBuffer(e.Data)
+		err := binary.Read(buf, binary.LittleEndian, raw)
+
+		spew.Dump(raw)
+
+		info := Userinfo{}
+		info.XUID = raw.Xuid
+		info.UserID = int(raw.UserID)
+		info.FriendsID = uint(raw.FriendsID)
+		info.IsFakeplayer = raw.Fakeplayer == 1
+		info.IsHLTV = raw.Ishltv == 1
+
+		friendsName := []byte{}
+		for _, b := range raw.FriendsName {
+			if b == 0 {
+				break
+			}
+			friendsName = append(friendsName, b)
+		}
+		info.FriendsName = string(friendsName)
+
+		name := []byte{}
+		for _, b := range raw.Name {
+			if b == 0 {
+				break
+			}
+			name = append(name, b)
+		}
+		info.Name = string(name)
+
+		guid := []byte{}
+		for _, b := range raw.Guid {
+			if b == 0 {
+				break
+			}
+			guid = append(guid, b)
+		}
+		info.GUID = string(guid)
+
+		spew.Dump(info)
+
+		if err != nil {
+			panic(err)
+		}
+	}
 }
