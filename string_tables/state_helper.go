@@ -322,13 +322,10 @@ func parseUserinfo(entries map[int]*StringTableItem) {
 		if len(e.Data) == 0 {
 			continue
 		}
-		spew.Dump(e)
 
 		raw := &rawUserinfo{}
 		buf := bytes.NewBuffer(e.Data)
 		err := binary.Read(buf, binary.LittleEndian, raw)
-
-		spew.Dump(raw)
 
 		info := Userinfo{}
 		info.XUID = raw.Xuid
@@ -363,8 +360,6 @@ func parseUserinfo(entries map[int]*StringTableItem) {
 			guid = append(guid, b)
 		}
 		info.GUID = string(guid)
-
-		spew.Dump(info)
 
 		if err != nil {
 			panic(err)
