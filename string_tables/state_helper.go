@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io/ioutil"
-
 	"os"
+	"regexp"
 	"strconv"
 
 	"code.google.com/p/gogoprotobuf/proto"
@@ -221,6 +221,7 @@ func (helper *StateHelper) updateInstanceBaselineItem(item *StringTableItem) {
 	for key, value := range baseValues {
 		baseline[key] = value
 	}
+	helper.Baseline[classId] = baseline
 }
 
 func parseActiveModifiers(entries map[int]*StringTableItem) {
@@ -279,44 +280,6 @@ func (helper *StateHelper) GetTableNow(tableName string) (result *StringTable) {
 	return
 }
 
-const (
-	MAX_PLAYER_NAME_LENGTH = 32
-	MAX_CUSTOM_FILES       = 4  // max 4 files
-	SIGNED_GUID_LEN        = 32 // Hashed CD Key (32 hex alphabetic chars + 0 terminator )
-)
-
-type rawUserinfo struct {
-	Xuid        uint64
-	Name        [MAX_PLAYER_NAME_LENGTH]byte
-	UserID      int32
-	Guid        [SIGNED_GUID_LEN + 1]byte
-	FriendsID   uint32
-	FriendsName [MAX_PLAYER_NAME_LENGTH]byte
-	Fakeplayer  int32
-	Ishltv      int32
-	/*
-		#if defined( REPLAY_ENABLED )
-			true if player is the Replay proxy
-			bool			isreplay;
-		#endif
-			// custom files CRC for this player
-			CRC32_t			customFiles[MAX_CUSTOM_FILES];
-			// this counter increases each time the server downloaded a new file
-			unsigned char	filesDownloaded;
-	*/
-}
-
-type Userinfo struct {
-	XUID         uint64 // network xuid
-	Name         string // scoreboard information
-	UserID       int    // local server user ID, unique while server is running
-	GUID         string // global unique player identifer
-	FriendsID    uint   // friends identification number
-	FriendsName  string // friends name
-	IsFakeplayer bool   // true, if player is a bot controlled by game.dll
-	IsHLTV       bool   // true if player is the HLTV proxy
-}
-
 func parseUserinfo(entries map[int]*StringTableItem) {
 	for _, e := range entries {
 		if len(e.Data) == 0 {
@@ -327,12 +290,10 @@ func parseUserinfo(entries map[int]*StringTableItem) {
 		buf := bytes.NewBuffer(e.Data)
 		err := binary.Read(buf, binary.LittleEndian, raw)
 
-		info := Userinfo{}
+		info := &Userinfo{}
 		info.XUID = raw.Xuid
 		info.UserID = int(raw.UserID)
 		info.FriendsID = uint(raw.FriendsID)
-		info.IsFakeplayer = raw.Fakeplayer == 1
-		info.IsHLTV = raw.Ishltv == 1
 
 		friendsName := []byte{}
 		for _, b := range raw.FriendsName {
@@ -360,9 +321,30 @@ func parseUserinfo(entries map[int]*StringTableItem) {
 			guid = append(guid, b)
 		}
 		info.GUID = string(guid)
+		info.SteamID = guidToCommunityID(info.GUID)
 
 		if err != nil {
 			panic(err)
 		}
+
+		e.Userinfo = info
+		e.Data = e.Data[:0]
 	}
+}
+
+var (
+	guidPatter                 = regexp.MustCompile(`STEAM_(\d+):(\d+):(\d+)`)
+	steamID64Identifier uint64 = 0x0110000100000000
+)
+
+// https://developer.valvesoftware.com/wiki/SteamID
+func guidToCommunityID(guid string) uint64 {
+	matches := guidPatter.FindStringSubmatch(guid)
+	if len(matches) != 4 {
+		return 0
+	}
+	// x, _ := strconv.Atoi(matches[1])
+	y, _ := strconv.Atoi(matches[2])
+	z, _ := strconv.Atoi(matches[3])
+	return (uint64(z) * 2) + steamID64Identifier + uint64(y)
 }

@@ -96,6 +96,8 @@ func (p *Parser) processTick(items []*parser.ParserBaseItem) {
 		case *dota.CSVCMsg_ServerInfo:
 			p.ServerInfo = obj
 			p.ClassIdNumBits = int(math.Log(float64(obj.GetMaxClasses()))/math.Log(2)) + 1
+		case *dota.CDemoClassInfo:
+			p.onCDemoClassInfo(obj)
 		}
 	}
 
@@ -106,8 +108,6 @@ func (p *Parser) processTick(items []*parser.ParserBaseItem) {
 		case *dota.CDemoFileHeader:
 			// (demo_file_stamp:"PBUFDEM\000" network_protocol:40 server_name:"Valve Dota 2 Server #8 (srcds038)" client_name:"SourceTV Demo" map_name:"dota" game_directory:"dota" fullpackets_version:2 allow_clientside_entities:true allow_clientside_particles:true )
 			p.FileHeader = obj
-		case *dota.CDemoClassInfo:
-			p.onCDemoClassInfo(obj)
 		case *dota.CSVCMsg_GameEventList:
 			for _, descriptor := range obj.GetDescriptors() {
 				p.GameEventMap[descriptor.GetEventid()] = descriptor
