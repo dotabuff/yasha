@@ -211,6 +211,9 @@ func (p *Parser) onGameEvent(tick int, obj *dota.CSVCMsg_GameEvent) {
 		// proxies : <*>type:4 val_short:59
 		// master : <*>type:1 val_string:"146.66.152.49:28027"
 	case "dota_combatlog":
+		if p.OnCombatLog == nil {
+			return
+		}
 		keys := obj.GetKeys()
 		table := p.Stsh.GetTableNow("CombatLogNames").Items
 
@@ -239,9 +242,7 @@ func (p *Parser) onGameEvent(tick int, obj *dota.CSVCMsg_GameEvent) {
 			log.TargetSourceName = k.Str
 		}
 
-		if p.OnCombatLog != nil {
-			p.OnCombatLog(log)
-		}
+		p.OnCombatLog(log)
 	case "dota_chase_hero":
 		// target1 : <*>type:4 val_short:1418
 		// target2 : <*>type:4 val_short:0
