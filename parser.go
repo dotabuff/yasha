@@ -17,7 +17,6 @@ type Parser struct {
 	ClassIdNumBits        int
 	ClassInfosIdMapping   map[string]int
 	ClassInfosNameMapping map[int]string
-	Entities              []*packet_entities.PacketEntity
 	FileHeader            *dota.CDemoFileHeader
 	FileInfo              *dota.CDemoFileInfo
 	GameEventMap          map[int32]*dota.CSVCMsg_GameEventListDescriptorT
@@ -27,6 +26,9 @@ type Parser struct {
 	Sth                   *send_tables.Helper
 	Stsh                  *string_tables.StateHelper
 	VoiceInit             *dota.CSVCMsg_VoiceInit
+
+	Entities []*packet_entities.PacketEntity
+	ByHandle map[int]*packet_entities.PacketEntity
 
 	OnEntityCreated        func(*packet_entities.PacketEntity)
 	OnEntityDeleted        func(*packet_entities.PacketEntity)
@@ -58,6 +60,7 @@ func (p *Parser) Parse() {
 	p.GameEventMap = map[int32]*dota.CSVCMsg_GameEventListDescriptorT{}
 	p.Mapping = map[int][]*send_tables.SendProp{}
 	p.Multiples = map[int]map[string]int{}
+	p.ByHandle = map[int]*packet_entities.PacketEntity{}
 
 	// in order to successfully process data every tick, we need to maintain
 	// order.  First of all the string and send tables for the tick have to be
@@ -89,7 +92,6 @@ func (p *Parser) Parse() {
 
 func (p *Parser) processTick(items []*parser.ParserBaseItem) {
 	for _, item := range items {
-		// spew.Dump(item)
 		switch obj := item.Object.(type) {
 		case *dota.CSVCMsg_SendTable:
 			p.Sth.SetSendTable(obj.GetNetTableName(), obj)
@@ -106,7 +108,6 @@ func (p *Parser) processTick(items []*parser.ParserBaseItem) {
 		case *dota.CSVCMsg_CreateStringTable, *dota.CSVCMsg_UpdateStringTable, *dota.CDemoStringTables:
 			p.Stsh.AppendPacket(item)
 		case *dota.CDemoFileHeader:
-			// (demo_file_stamp:"PBUFDEM\000" network_protocol:40 server_name:"Valve Dota 2 Server #8 (srcds038)" client_name:"SourceTV Demo" map_name:"dota" game_directory:"dota" fullpackets_version:2 allow_clientside_entities:true allow_clientside_particles:true )
 			p.FileHeader = obj
 		case *dota.CSVCMsg_GameEventList:
 			for _, descriptor := range obj.GetDescriptors() {
@@ -317,6 +318,7 @@ func (p *Parser) EntityCreate(br *utils.BitReader, currentIndex, tick int) {
 		Type:      packet_entities.Create,
 		Values:    map[string]interface{}{},
 	}
+	pe.EntityHandle = pe.Handle()
 	pe.Name = p.ClassInfosNameMapping[pe.ClassId]
 
 	indices := br.ReadPropertiesIndex()
@@ -335,6 +337,7 @@ func (p *Parser) EntityCreate(br *utils.BitReader, currentIndex, tick int) {
 	}
 
 	p.Entities[pe.Index] = pe
+	p.ByHandle[pe.Handle()] = pe
 
 	if p.OnEntityCreated != nil {
 		p.OnEntityCreated(pe)
@@ -360,6 +363,8 @@ func (p *Parser) EntityPreserve(br *utils.BitReader, currentIndex, tick int) {
 
 func (p *Parser) EntityDelete(br *utils.BitReader, currentIndex, tick int) {
 	pe := p.Entities[currentIndex]
+
+	delete(p.ByHandle, pe.Handle())
 
 	if p.OnEntityDeleted != nil {
 		p.OnEntityDeleted(pe)
