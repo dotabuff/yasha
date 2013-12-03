@@ -10,6 +10,7 @@ import (
 	"github.com/elobuff/d2rp/core/string_tables"
 	"github.com/elobuff/d2rp/core/utils"
 	dota "github.com/elobuff/d2rp/dota"
+	"sort"
 )
 
 type Parser struct {
@@ -26,13 +27,14 @@ type Parser struct {
 	Sth                   *send_tables.Helper
 	Stsh                  *string_tables.StateHelper
 	VoiceInit             *dota.CSVCMsg_VoiceInit
+	ActiveModifiers       map[int]*dota.CDOTAModifierBuffTableEntry
 
 	Entities []*packet_entities.PacketEntity
 	ByHandle map[int]*packet_entities.PacketEntity
 
 	OnEntityCreated        func(*packet_entities.PacketEntity)
 	OnEntityDeleted        func(*packet_entities.PacketEntity)
-	OnEntityPreserved      func(*packet_entities.PacketEntity, map[string]interface{})
+	OnEntityPreserved      func(*packet_entities.PacketEntity)
 	OnVoiceData            func(obj *dota.CSVCMsg_VoiceData)
 	OnSpectatorPlayerClick func(tick int, obj *dota.CDOTAUserMsg_SpectatorPlayerClick)
 	OnSetConVar            func(obj *dota.CNETMsg_SetConVar)
@@ -61,6 +63,7 @@ func (p *Parser) Parse() {
 	p.Mapping = map[int][]*send_tables.SendProp{}
 	p.Multiples = map[int]map[string]int{}
 	p.ByHandle = map[int]*packet_entities.PacketEntity{}
+	p.ActiveModifiers = map[int]*dota.CDOTAModifierBuffTableEntry{}
 
 	// in order to successfully process data every tick, we need to maintain
 	// order.  First of all the string and send tables for the tick have to be
@@ -91,6 +94,8 @@ func (p *Parser) Parse() {
 }
 
 func (p *Parser) processTick(items []*parser.ParserBaseItem) {
+	p.Stsh.ActiveModifierDelta = string_tables.ModifierBuffs{}
+
 	for _, item := range items {
 		switch obj := item.Object.(type) {
 		case *dota.CSVCMsg_SendTable:
@@ -195,6 +200,81 @@ func (p *Parser) processTick(items []*parser.ParserBaseItem) {
 			spew.Dump(obj)
 		}
 	}
+
+	sort.Sort(p.Stsh.ActiveModifierDelta)
+	/*
+		if len(p.Stsh.ActiveModifierDelta) > 0 {
+			sort.Sort(p.Stsh.ActiveModifierDelta)
+			modNames := p.Stsh.GetTableNow("ModifierNames").Items
+			for _, buff := range p.Stsh.ActiveModifierDelta {
+				switch buff.GetEntryType() {
+				case dota.DOTA_MODIFIER_ENTRY_TYPE_DOTA_MODIFIER_ENTRY_TYPE_ACTIVE:
+					p.ActiveModifiers[int(buff.GetIndex())] = buff
+					modName := modNames[int(buff.GetModifierClass())].Str
+
+					switch modName {
+					case "modifier_kill":
+							// spew.Dump(modName)
+							// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+							// spew.Dump(p.ByHandle[int(buff.GetAbility())].Name)
+							// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
+					case "modifier_item_mekansm":
+					case "modifier_enigma_black_hole_pull":
+					case "modifier_enigma_black_hole_thinker":
+					case "modifier_rune_regen":
+						spew.Dump(modName)
+						spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+					case "modifier_smoke_of_deceit":
+						spew.Dump(modName)
+						spew.Dump(p.ByHandle[int(buff.GetCaster())])
+						spew.Dump(p.ByHandle[int(buff.GetParent())])
+					case "modifier_item_dustofappearance":
+						// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:951211 index:4 serial_num:604 modifier_class:67 ability_level:1 creation_time:1061.2625 duration:12 caster:64700 ability:1995890 aura:false )
+
+						spew.Dump(modName)
+						spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+						spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
+
+					case "modifier_truesight":
+						// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:177062 index:2 serial_num:6100 modifier_class:912 creation_time:2245.6614 duration:0.5 caster:265746 aura:true )
+
+						spew.Dump(modName)
+						spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+						// spew.Dump(p.ByHandle[int(buff.GetAbility())].Name)
+						spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
+					case "modifier_item_buff_ward":
+						// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:324575 index:1 serial_num:1110 modifier_class:68 creation_time:1175.0347 duration:240 caster:324575 aura:false )
+						spew.Dump(modName)
+						spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+						// spew.Dump(p.ByHandle[int(buff.GetAbility())].Name)
+						spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
+					case "modifier_item_ward_true_sight":
+						// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:324575 index:2 serial_num:1111 modifier_class:71 creation_time:1175.0347 duration:240 caster:324575 aura:false range:800 )
+						spew.Dump(modName)
+						spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+						// spew.Dump(p.ByHandle[int(buff.GetAbility())].Name)
+						spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
+					case "modifier_item_sentry_ward":
+						// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:1146009 index:33 serial_num:1121 modifier_class:70 ability_level:1 creation_time:1177.3341 caster:1146009 ability:779306 aura:false )
+						spew.Dump(modName)
+						spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+						spew.Dump(p.ByHandle[int(buff.GetAbility())].Name)
+						spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
+					case "modifier_item_gem_of_true_sight":
+						spew.Dump(modName)
+						spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+						spew.Dump(p.ByHandle[int(buff.GetAbility())])
+						spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
+					default:
+						spew.Dump(modName)
+						spew.Dump(buff)
+					}
+				case dota.DOTA_MODIFIER_ENTRY_TYPE_DOTA_MODIFIER_ENTRY_TYPE_REMOVED:
+					delete(p.ActiveModifiers, int(buff.GetIndex()))
+				}
+			}
+		}
+	*/
 }
 
 func (p *Parser) onGameEvent(tick int, obj *dota.CSVCMsg_GameEvent) {
@@ -292,24 +372,66 @@ func (p *Parser) onCDemoClassInfo(cdci *dota.CDemoClassInfo) {
 	p.Stsh.Multiples = p.Multiples
 }
 
+type packet struct {
+	br          *utils.BitReader
+	index, tick int
+}
+
 func (p *Parser) ParsePacket(tick int, pe *dota.CSVCMsg_PacketEntities) {
 	br := utils.NewBitReader(pe.GetEntityData())
 	currentIndex := -1
+
+	createPackets := []*packet_entities.PacketEntity{}
+	preservePackets := []*packet_entities.PacketEntity{}
+	deletePackets := []*packet_entities.PacketEntity{}
+
 	for i := 0; i < int(pe.GetUpdatedEntries()); i++ {
 		currentIndex = br.ReadNextEntityIndex(currentIndex)
 		uType := packet_entities.ReadUpdateType(br)
+
 		switch uType {
 		case packet_entities.Create:
-			p.EntityCreate(br, currentIndex, tick)
+			createPackets = append(createPackets, p.entityCreate(br, currentIndex, tick))
 		case packet_entities.Preserve:
-			p.EntityPreserve(br, currentIndex, tick)
+			preservePackets = append(preservePackets, p.entityPreserve(br, currentIndex, tick))
 		case packet_entities.Delete:
-			p.EntityDelete(br, currentIndex, tick)
+			deletePackets = append(deletePackets, p.entityDelete(br, currentIndex, tick))
 		}
+	}
+
+	/*
+		if pe.EntityHandle == 445806 {
+			spew.Dump("tick:", tick)
+			spew.Dump(pe)
+		}
+
+		if p.OnEntityCreated != nil {
+			p.OnEntityCreated(pe)
+		}
+	*/
+
+	for _, pe := range createPackets {
+		p.Entities[pe.Index] = pe
+		p.ByHandle[pe.Handle()] = pe
+		if p.OnEntityCreated != nil {
+			p.OnEntityCreated(pe)
+		}
+	}
+
+	for _, pe := range preservePackets {
+		p.OnEntityPreserved(pe)
+	}
+
+	for _, pe := range deletePackets {
+		if p.OnEntityDeleted != nil {
+			p.OnEntityDeleted(pe)
+		}
+		p.Entities[pe.Index] = nil
+		delete(p.ByHandle, pe.Handle())
 	}
 }
 
-func (p *Parser) EntityCreate(br *utils.BitReader, currentIndex, tick int) {
+func (p *Parser) entityCreate(br *utils.BitReader, currentIndex, tick int) *packet_entities.PacketEntity {
 	pe := &packet_entities.PacketEntity{
 		Tick:      tick,
 		ClassId:   int(br.ReadUBits(p.ClassIdNumBits)),
@@ -336,39 +458,26 @@ func (p *Parser) EntityCreate(br *utils.BitReader, currentIndex, tick int) {
 		pe.Values[key] = value
 	}
 
-	p.Entities[pe.Index] = pe
-	p.ByHandle[pe.Handle()] = pe
-
-	if p.OnEntityCreated != nil {
-		p.OnEntityCreated(pe)
-	}
+	return pe
 }
 
-func (p *Parser) EntityPreserve(br *utils.BitReader, currentIndex, tick int) {
+func (p *Parser) entityPreserve(br *utils.BitReader, currentIndex, tick int) *packet_entities.PacketEntity {
 	pe := p.Entities[currentIndex]
 	pe.Tick = tick
 	pe.Type = packet_entities.Preserve
 	indices := br.ReadPropertiesIndex()
 	classId := p.ClassInfosIdMapping[pe.Name]
-	values := br.ReadPropertiesValues(p.Mapping[classId], p.Multiples[classId], indices)
+	pe.Delta = br.ReadPropertiesValues(p.Mapping[classId], p.Multiples[classId], indices)
 
-	for key, value := range values {
+	for key, value := range pe.Delta {
 		pe.Values[key] = value
 	}
 
-	if p.OnEntityPreserved != nil {
-		p.OnEntityPreserved(pe, values)
-	}
+	return pe
 }
 
-func (p *Parser) EntityDelete(br *utils.BitReader, currentIndex, tick int) {
-	pe := p.Entities[currentIndex]
-
-	delete(p.ByHandle, pe.Handle())
-
-	if p.OnEntityDeleted != nil {
-		p.OnEntityDeleted(pe)
-	}
+func (p *Parser) entityDelete(br *utils.BitReader, currentIndex, tick int) *packet_entities.PacketEntity {
+	return p.Entities[currentIndex]
 }
 
 /*

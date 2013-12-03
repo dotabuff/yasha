@@ -25,6 +25,12 @@ type CacheItem struct {
 	Name        string
 }
 
+type ModifierBuffs []*dota.CDOTAModifierBuffTableEntry
+
+func (m ModifierBuffs) Len() int           { return len(m) }
+func (m ModifierBuffs) Less(i, j int) bool { return m[i].GetSerialNum() < m[j].GetSerialNum() }
+func (m ModifierBuffs) Swap(i, j int)      { m[i], m[j] = m[j], m[i] }
+
 type StateHelper struct {
 	packets parser.ParserBaseItems
 
@@ -39,6 +45,7 @@ type StateHelper struct {
 	current map[int]*StringTable
 
 	ClassInfosNameMapping map[int]string
+	ActiveModifierDelta   ModifierBuffs
 	Mapping               map[int][]*send_tables.SendProp
 	Multiples             map[int]map[string]int
 	Baseline              map[int]map[string]interface{}
@@ -121,7 +128,7 @@ func (helper *StateHelper) OnCST(tick int, obj *dota.CSVCMsg_CreateStringTable) 
 
 	switch table.Name {
 	case "ActiveModifiers":
-		parseActiveModifiers(table.Items)
+		helper.parseActiveModifiers(table.Items)
 	case "instancebaseline":
 		helper.updateInstanceBaseline(table.Items)
 	case "userinfo":
@@ -156,7 +163,7 @@ func (helper *StateHelper) OnUST(tick int, obj *dota.CSVCMsg_UpdateStringTable) 
 	current := helper.current[tableId]
 	switch current.Name {
 	case "ActiveModifiers":
-		parseActiveModifiers(update)
+		helper.parseActiveModifiers(update)
 	case "userinfo":
 		parseUserinfo(update)
 	case "instancebaseline":
@@ -224,7 +231,7 @@ func (helper *StateHelper) updateInstanceBaselineItem(item *StringTableItem) {
 	helper.Baseline[classId] = baseline
 }
 
-func parseActiveModifiers(entries map[int]*StringTableItem) {
+func (helper *StateHelper) parseActiveModifiers(entries map[int]*StringTableItem) {
 	for _, e := range entries {
 		if len(e.Data) > 0 {
 			o := &dota.CDOTAModifierBuffTableEntry{}
@@ -234,8 +241,7 @@ func parseActiveModifiers(entries map[int]*StringTableItem) {
 			}
 			e.Data = e.Data[:0]
 			e.ModifierBuff = o
-		} else {
-			// spew.Dump(e)
+			helper.ActiveModifierDelta = append(helper.ActiveModifierDelta, o)
 		}
 	}
 }
