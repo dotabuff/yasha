@@ -27,10 +27,10 @@ type Parser struct {
 	Sth                   *send_tables.Helper
 	Stsh                  *string_tables.StateHelper
 	VoiceInit             *dota.CSVCMsg_VoiceInit
-	ActiveModifiers       map[int]*dota.CDOTAModifierBuffTableEntry
 
-	Entities []*packet_entities.PacketEntity
-	ByHandle map[int]*packet_entities.PacketEntity
+	ActiveModifiers map[int]*dota.CDOTAModifierBuffTableEntry
+	Entities        []*packet_entities.PacketEntity
+	ByHandle        map[int]*packet_entities.PacketEntity
 
 	OnEntityCreated        func(*packet_entities.PacketEntity)
 	OnEntityDeleted        func(*packet_entities.PacketEntity)
@@ -201,80 +201,81 @@ func (p *Parser) processTick(items []*parser.ParserBaseItem) {
 		}
 	}
 
-	sort.Sort(p.Stsh.ActiveModifierDelta)
-	/*
-		if len(p.Stsh.ActiveModifierDelta) > 0 {
-			sort.Sort(p.Stsh.ActiveModifierDelta)
-			modNames := p.Stsh.GetTableNow("ModifierNames").Items
-			for _, buff := range p.Stsh.ActiveModifierDelta {
-				switch buff.GetEntryType() {
-				case dota.DOTA_MODIFIER_ENTRY_TYPE_DOTA_MODIFIER_ENTRY_TYPE_ACTIVE:
-					p.ActiveModifiers[int(buff.GetIndex())] = buff
-					modName := modNames[int(buff.GetModifierClass())].Str
+	// sort.Sort(p.Stsh.ActiveModifierDelta)
+	if len(p.Stsh.ActiveModifierDelta) > 0 {
+		sort.Sort(p.Stsh.ActiveModifierDelta)
+		modNames := p.Stsh.GetTableNow("ModifierNames").Items
+		for _, buff := range p.Stsh.ActiveModifierDelta {
+			switch buff.GetEntryType() {
+			case dota.DOTA_MODIFIER_ENTRY_TYPE_DOTA_MODIFIER_ENTRY_TYPE_ACTIVE:
+				p.ActiveModifiers[int(buff.GetIndex())] = buff
+				modName := modNames[int(buff.GetModifierClass())].Str
 
-					switch modName {
-					case "modifier_kill":
-							// spew.Dump(modName)
-							// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-							// spew.Dump(p.ByHandle[int(buff.GetAbility())].Name)
-							// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
-					case "modifier_item_mekansm":
-					case "modifier_enigma_black_hole_pull":
-					case "modifier_enigma_black_hole_thinker":
-					case "modifier_rune_regen":
-						spew.Dump(modName)
-						spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-					case "modifier_smoke_of_deceit":
-						spew.Dump(modName)
-						spew.Dump(p.ByHandle[int(buff.GetCaster())])
-						spew.Dump(p.ByHandle[int(buff.GetParent())])
-					case "modifier_item_dustofappearance":
-						// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:951211 index:4 serial_num:604 modifier_class:67 ability_level:1 creation_time:1061.2625 duration:12 caster:64700 ability:1995890 aura:false )
-
-						spew.Dump(modName)
-						spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-						spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
-
-					case "modifier_truesight":
-						// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:177062 index:2 serial_num:6100 modifier_class:912 creation_time:2245.6614 duration:0.5 caster:265746 aura:true )
-
-						spew.Dump(modName)
-						spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-						// spew.Dump(p.ByHandle[int(buff.GetAbility())].Name)
-						spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
-					case "modifier_item_buff_ward":
-						// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:324575 index:1 serial_num:1110 modifier_class:68 creation_time:1175.0347 duration:240 caster:324575 aura:false )
-						spew.Dump(modName)
-						spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-						// spew.Dump(p.ByHandle[int(buff.GetAbility())].Name)
-						spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
-					case "modifier_item_ward_true_sight":
-						// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:324575 index:2 serial_num:1111 modifier_class:71 creation_time:1175.0347 duration:240 caster:324575 aura:false range:800 )
-						spew.Dump(modName)
-						spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-						// spew.Dump(p.ByHandle[int(buff.GetAbility())].Name)
-						spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
-					case "modifier_item_sentry_ward":
-						// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:1146009 index:33 serial_num:1121 modifier_class:70 ability_level:1 creation_time:1177.3341 caster:1146009 ability:779306 aura:false )
-						spew.Dump(modName)
-						spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-						spew.Dump(p.ByHandle[int(buff.GetAbility())].Name)
-						spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
-					case "modifier_item_gem_of_true_sight":
-						spew.Dump(modName)
-						spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-						spew.Dump(p.ByHandle[int(buff.GetAbility())])
-						spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
-					default:
-						spew.Dump(modName)
-						spew.Dump(buff)
-					}
-				case dota.DOTA_MODIFIER_ENTRY_TYPE_DOTA_MODIFIER_ENTRY_TYPE_REMOVED:
-					delete(p.ActiveModifiers, int(buff.GetIndex()))
+				switch modName {
+				case "modifier_kill":
+					// spew.Dump(modName)
+					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+					// spew.Dump(p.ByHandle[int(buff.GetAbility())].Name)
+					// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
+				case "modifier_item_mekansm":
+				case "modifier_enigma_black_hole_pull":
+				case "modifier_enigma_black_hole_thinker":
+				case "modifier_rune_regen":
+					// spew.Dump(modName)
+					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+				case "modifier_smoke_of_deceit":
+					// spew.Dump(modName)
+					// spew.Dump(p.ByHandle[int(buff.GetCaster())])
+					// spew.Dump(p.ByHandle[int(buff.GetParent())])
+				case "modifier_item_dustofappearance":
+					// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:951211 index:4 serial_num:604 modifier_class:67 ability_level:1 creation_time:1061.2625 duration:12 caster:64700 ability:1995890 aura:false )
+					// spew.Dump(modName)
+					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+					// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
+				case "modifier_truesight":
+					// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:177062 index:2 serial_num:6100 modifier_class:912 creation_time:2245.6614 duration:0.5 caster:265746 aura:true )
+					// spew.Dump(modName)
+					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+					// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
+				case "modifier_item_buff_ward":
+					// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:324575 index:1 serial_num:1110 modifier_class:68 creation_time:1175.0347 duration:240 caster:324575 aura:false )
+					// spew.Dump(modName)
+					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+					// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
+				case "modifier_item_ward_true_sight":
+					// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:324575 index:2 serial_num:1111 modifier_class:71 creation_time:1175.0347 duration:240 caster:324575 aura:false range:800 )
+					// spew.Dump(modName)
+					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+					// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
+				case "modifier_item_sentry_ward":
+					// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:1146009 index:33 serial_num:1121 modifier_class:70 ability_level:1 creation_time:1177.3341 caster:1146009 ability:779306 aura:false )
+					// spew.Dump(modName)
+					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+					// spew.Dump(p.ByHandle[int(buff.GetAbility())].Name)
+					// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
+				case "modifier_item_gem_of_true_sight":
+					// spew.Dump("add")
+					// spew.Dump(modName)
+					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
+					// spew.Dump(p.ByHandle[int(buff.GetAbility())].Values["DT_BaseEntity.m_iName"])
+					// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
+				default:
+					// spew.Dump("add " + modName)
+					// spew.Dump(buff)
 				}
+			case dota.DOTA_MODIFIER_ENTRY_TYPE_DOTA_MODIFIER_ENTRY_TYPE_REMOVED:
+				mod := p.ActiveModifiers[int(buff.GetIndex())]
+				modName := modNames[int(mod.GetModifierClass())].Str
+				// spew.Dump("remove " + modName)
+				switch modName {
+				case "modifier_item_gem_of_true_sight":
+					// spew.Dump(mod)
+					// spew.Dump(p.ByHandle[int(mod.GetCaster())].Name)
+				}
+				delete(p.ActiveModifiers, int(buff.GetIndex()))
 			}
 		}
-	*/
+	}
 }
 
 func (p *Parser) onGameEvent(tick int, obj *dota.CSVCMsg_GameEvent) {
@@ -468,8 +469,10 @@ func (p *Parser) entityPreserve(br *utils.BitReader, currentIndex, tick int) *pa
 	indices := br.ReadPropertiesIndex()
 	classId := p.ClassInfosIdMapping[pe.Name]
 	pe.Delta = br.ReadPropertiesValues(p.Mapping[classId], p.Multiples[classId], indices)
+	pe.OldDelta = map[string]interface{}{}
 
 	for key, value := range pe.Delta {
+		pe.OldDelta[key] = pe.Values[key]
 		pe.Values[key] = value
 	}
 

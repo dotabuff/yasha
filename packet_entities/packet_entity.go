@@ -14,6 +14,7 @@ type PacketEntity struct {
 	Type         UpdateType
 	Values       map[string]interface{}
 	Delta        map[string]interface{}
+	OldDelta     map[string]interface{}
 }
 
 func (pe *PacketEntity) Handle() int {
