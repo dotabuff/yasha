@@ -424,22 +424,3 @@ func (p *Parser) entityPreserve(br *utils.BitReader, currentIndex, tick int) *pa
 func (p *Parser) entityDelete(br *utils.BitReader, currentIndex, tick int) *packet_entities.PacketEntity {
 	return p.Entities[currentIndex]
 }
-
-/*
-// logs chronologically close to this event (usually within 1-2 ticks).
-func (p *Parser) CombatLogsCloseTo(now float32) (logs []*CombatLogEntry) {
-	closestDelta := 0.5 // be generous and look around ±0.5 second
-
-	for _, log := range p.CombatLog {
-		if log.Type == "DEATH" && log.TargetName == "npc_dota_observer_wards" {
-			logDelta := math.Abs(float64(now - log.Timestamp))
-			if closestDelta > logDelta {
-				logs = append(logs, log)
-				closestDelta = logDelta
-			}
-		}
-	}
-
-	return logs
-}
-*/
