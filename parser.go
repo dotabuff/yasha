@@ -9,7 +9,7 @@ import (
 	"github.com/elobuff/d2rp/core/send_tables"
 	"github.com/elobuff/d2rp/core/string_tables"
 	"github.com/elobuff/d2rp/core/utils"
-	dota "github.com/elobuff/d2rp/dota"
+	"github.com/elobuff/d2rp/dota"
 	"sort"
 )
 
@@ -43,6 +43,9 @@ type Parser struct {
 	OnChatEvent            func(tick int, obj *dota.CDOTAUserMsg_ChatEvent)
 	OnCombatLog            func(log *CombatLogEntry)
 	OnTablename            func(name string)
+	OnActiveModifierDelta  func(map[int]*string_tables.StringTableItem, string_tables.ModifierBuffs)
+	BeforeTick             func(tick int)
+	AfterTick              func(tick int)
 }
 
 func ParserFromFile(path string) *Parser {
@@ -63,7 +66,6 @@ func (p *Parser) Parse() {
 	p.Mapping = map[int][]*send_tables.SendProp{}
 	p.Multiples = map[int]map[string]int{}
 	p.ByHandle = map[int]*packet_entities.PacketEntity{}
-	p.ActiveModifiers = map[int]*dota.CDOTAModifierBuffTableEntry{}
 
 	// in order to successfully process data every tick, we need to maintain
 	// order.  First of all the string and send tables for the tick have to be
@@ -79,7 +81,7 @@ func (p *Parser) Parse() {
 	p.Parser.Analyze(func(item *parser.ParserBaseItem) {
 		// we got a new tick, process the previous items
 		if item.Tick > currentTick {
-			p.processTick(buffer)
+			p.processTick(currentTick, buffer)
 			buffer = make([]*parser.ParserBaseItem, 1, len(buffer))
 			buffer[0] = item
 			currentTick = item.Tick
@@ -90,11 +92,16 @@ func (p *Parser) Parse() {
 	})
 
 	// and process all remaining in the last tick
-	p.processTick(buffer)
+	currentTick++
+	p.processTick(currentTick, buffer)
 }
 
-func (p *Parser) processTick(items []*parser.ParserBaseItem) {
+func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 	p.Stsh.ActiveModifierDelta = string_tables.ModifierBuffs{}
+
+	if p.BeforeTick != nil {
+		p.BeforeTick(tick)
+	}
 
 	for _, item := range items {
 		switch obj := item.Object.(type) {
@@ -201,80 +208,15 @@ func (p *Parser) processTick(items []*parser.ParserBaseItem) {
 		}
 	}
 
-	// sort.Sort(p.Stsh.ActiveModifierDelta)
-	if len(p.Stsh.ActiveModifierDelta) > 0 {
-		sort.Sort(p.Stsh.ActiveModifierDelta)
-		modNames := p.Stsh.GetTableNow("ModifierNames").Items
-		for _, buff := range p.Stsh.ActiveModifierDelta {
-			switch buff.GetEntryType() {
-			case dota.DOTA_MODIFIER_ENTRY_TYPE_DOTA_MODIFIER_ENTRY_TYPE_ACTIVE:
-				p.ActiveModifiers[int(buff.GetIndex())] = buff
-				modName := modNames[int(buff.GetModifierClass())].Str
-
-				switch modName {
-				case "modifier_kill":
-					// spew.Dump(modName)
-					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-					// spew.Dump(p.ByHandle[int(buff.GetAbility())].Name)
-					// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
-				case "modifier_item_mekansm":
-				case "modifier_enigma_black_hole_pull":
-				case "modifier_enigma_black_hole_thinker":
-				case "modifier_rune_regen":
-					// spew.Dump(modName)
-					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-				case "modifier_smoke_of_deceit":
-					// spew.Dump(modName)
-					// spew.Dump(p.ByHandle[int(buff.GetCaster())])
-					// spew.Dump(p.ByHandle[int(buff.GetParent())])
-				case "modifier_item_dustofappearance":
-					// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:951211 index:4 serial_num:604 modifier_class:67 ability_level:1 creation_time:1061.2625 duration:12 caster:64700 ability:1995890 aura:false )
-					// spew.Dump(modName)
-					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-					// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
-				case "modifier_truesight":
-					// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:177062 index:2 serial_num:6100 modifier_class:912 creation_time:2245.6614 duration:0.5 caster:265746 aura:true )
-					// spew.Dump(modName)
-					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-					// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
-				case "modifier_item_buff_ward":
-					// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:324575 index:1 serial_num:1110 modifier_class:68 creation_time:1175.0347 duration:240 caster:324575 aura:false )
-					// spew.Dump(modName)
-					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-					// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
-				case "modifier_item_ward_true_sight":
-					// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:324575 index:2 serial_num:1111 modifier_class:71 creation_time:1175.0347 duration:240 caster:324575 aura:false range:800 )
-					// spew.Dump(modName)
-					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-					// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
-				case "modifier_item_sentry_ward":
-					// (entry_type:DOTA_MODIFIER_ENTRY_TYPE_ACTIVE parent:1146009 index:33 serial_num:1121 modifier_class:70 ability_level:1 creation_time:1177.3341 caster:1146009 ability:779306 aura:false )
-					// spew.Dump(modName)
-					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-					// spew.Dump(p.ByHandle[int(buff.GetAbility())].Name)
-					// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
-				case "modifier_item_gem_of_true_sight":
-					// spew.Dump("add")
-					// spew.Dump(modName)
-					// spew.Dump(p.ByHandle[int(buff.GetCaster())].Name)
-					// spew.Dump(p.ByHandle[int(buff.GetAbility())].Values["DT_BaseEntity.m_iName"])
-					// spew.Dump(p.ByHandle[int(buff.GetParent())].Name)
-				default:
-					// spew.Dump("add " + modName)
-					// spew.Dump(buff)
-				}
-			case dota.DOTA_MODIFIER_ENTRY_TYPE_DOTA_MODIFIER_ENTRY_TYPE_REMOVED:
-				mod := p.ActiveModifiers[int(buff.GetIndex())]
-				modName := modNames[int(mod.GetModifierClass())].Str
-				// spew.Dump("remove " + modName)
-				switch modName {
-				case "modifier_item_gem_of_true_sight":
-					// spew.Dump(mod)
-					// spew.Dump(p.ByHandle[int(mod.GetCaster())].Name)
-				}
-				delete(p.ActiveModifiers, int(buff.GetIndex()))
-			}
+	if p.OnActiveModifierDelta != nil {
+		if len(p.Stsh.ActiveModifierDelta) > 0 {
+			sort.Sort(p.Stsh.ActiveModifierDelta)
+			p.OnActiveModifierDelta(p.Stsh.GetTableNow("ModifierNames").Items, p.Stsh.ActiveModifierDelta)
 		}
+	}
+
+	if p.AfterTick != nil {
+		p.AfterTick(tick)
 	}
 }
 
