@@ -342,17 +342,6 @@ func (p *Parser) ParsePacket(tick int, pe *dota.CSVCMsg_PacketEntities) {
 		}
 	}
 
-	/*
-		if pe.EntityHandle == 445806 {
-			spew.Dump("tick:", tick)
-			spew.Dump(pe)
-		}
-
-		if p.OnEntityCreated != nil {
-			p.OnEntityCreated(pe)
-		}
-	*/
-
 	for _, pe := range createPackets {
 		p.Entities[pe.Index] = pe
 		p.ByHandle[pe.Handle()] = pe
