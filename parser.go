@@ -32,20 +32,27 @@ type Parser struct {
 	Entities        []*packet_entities.PacketEntity
 	ByHandle        map[int]*packet_entities.PacketEntity
 
-	OnEntityCreated        func(*packet_entities.PacketEntity)
-	OnEntityDeleted        func(*packet_entities.PacketEntity)
-	OnEntityPreserved      func(*packet_entities.PacketEntity)
-	OnVoiceData            func(obj *dota.CSVCMsg_VoiceData)
-	OnSpectatorPlayerClick func(tick int, obj *dota.CDOTAUserMsg_SpectatorPlayerClick)
-	OnSetConVar            func(obj *dota.CNETMsg_SetConVar)
-	OnSayText2             func(tick int, obj *dota.CUserMsg_SayText2)
-	OnOverheadEvent        func(tick int, obj *dota.CDOTAUserMsg_OverheadEvent)
+	OnEntityCreated   func(*packet_entities.PacketEntity)
+	OnEntityDeleted   func(*packet_entities.PacketEntity)
+	OnEntityPreserved func(*packet_entities.PacketEntity)
+
+	OnActiveModifierDelta func(map[int]*string_tables.StringTableItem, string_tables.ModifierBuffs)
+
 	OnChatEvent            func(tick int, obj *dota.CDOTAUserMsg_ChatEvent)
-	OnCombatLog            func(log *CombatLogEntry)
-	OnTablename            func(name string)
-	OnActiveModifierDelta  func(map[int]*string_tables.StringTableItem, string_tables.ModifierBuffs)
-	BeforeTick             func(tick int)
-	AfterTick              func(tick int)
+	OnOverheadEvent        func(tick int, obj *dota.CDOTAUserMsg_OverheadEvent)
+	OnSayText2             func(tick int, obj *dota.CUserMsg_SayText2)
+	OnSounds               func(tick int, obj *dota.CSVCMsg_Sounds)
+	OnSpectatorPlayerClick func(tick int, obj *dota.CDOTAUserMsg_SpectatorPlayerClick)
+
+	OnSetConVar func(obj *dota.CNETMsg_SetConVar)
+	OnVoiceData func(obj *dota.CSVCMsg_VoiceData)
+
+	OnCombatLog func(log *CombatLogEntry)
+
+	OnTablename func(name string)
+
+	BeforeTick func(tick int)
+	AfterTick  func(tick int)
 }
 
 func ParserFromFile(path string) *Parser {
@@ -162,7 +169,6 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 			*dota.CNETMsg_Tick,
 			*dota.CSVCMsg_ClassInfo,
 			*dota.CSVCMsg_SetView,
-			*dota.CSVCMsg_Sounds,
 			*dota.CSVCMsg_TempEntities,
 			*dota.CUserMsg_SendAudio,
 			*dota.CUserMsg_TextMsg,
@@ -194,6 +200,10 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 		case *dota.CUserMsg_SayText2:
 			if p.OnSayText2 != nil {
 				p.OnSayText2(item.Tick, obj)
+			}
+		case *dota.CSVCMsg_Sounds:
+			if p.OnSounds != nil {
+				p.OnSounds(item.Tick, obj)
 			}
 		case *dota.CSVCMsg_VoiceData:
 			if p.OnVoiceData != nil {
