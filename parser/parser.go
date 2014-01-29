@@ -1,13 +1,12 @@
 package parser
 
 import (
-	// "code.google.com/p/gogoprotobuf/proto"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/elobuff/d2rp/core/utils"
-	dota "github.com/elobuff/d2rp/dota"
+	"github.com/elobuff/d2rp/dota"
 )
 
-func p() { spew.Dump("hi") }
+var p = spew.Dump
 
 type Parser struct {
 	reader   *utils.BytesReader
@@ -26,7 +25,7 @@ func NewParser(data []byte) *Parser {
 
 	magic := ReadStringZ(data, 0)
 	if magic != headerMagic {
-		panic("demofilestamp doesn't match, was: " + magic)
+		panic("demofilestamp doesn't match, was: " + spew.Sdump(magic))
 	}
 
 	totalLength := len(data) - headerLength
