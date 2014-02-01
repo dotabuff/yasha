@@ -78,19 +78,6 @@ type Player struct {
 	VoiceChatBanned         bool
 }
 
-type PickBan struct {
-	IsPick bool
-	Team   int
-	HeroId int
-}
-
-type RawClick struct {
-	Tick   int
-	Entity int
-	Type   int
-	Target int
-}
-
 type CombatLogEntry struct {
 	Type               string
 	SourceName         string

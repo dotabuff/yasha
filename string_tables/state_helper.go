@@ -1,13 +1,19 @@
 package string_tables
 
 import (
+	"bytes"
+	"encoding/binary"
 	"io/ioutil"
 	"os"
+	"regexp"
+	"strconv"
 
 	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/dotabuff/d2rp/core/parser"
-	dota "github.com/dotabuff/d2rp/dota"
+	"github.com/dotabuff/d2rp/core/send_tables"
+	"github.com/dotabuff/d2rp/core/utils"
+	"github.com/dotabuff/d2rp/dota"
 )
 
 func p(v ...interface{}) { spew.Dump(v...) }
@@ -18,6 +24,12 @@ type CacheItem struct {
 	MaxEntries  int
 	Name        string
 }
+
+type ModifierBuffs []*dota.CDOTAModifierBuffTableEntry
+
+func (m ModifierBuffs) Len() int           { return len(m) }
+func (m ModifierBuffs) Less(i, j int) bool { return m[i].GetSerialNum() < m[j].GetSerialNum() }
+func (m ModifierBuffs) Swap(i, j int)      { m[i], m[j] = m[j], m[i] }
 
 type StateHelper struct {
 	packets parser.ParserBaseItems
@@ -31,15 +43,24 @@ type StateHelper struct {
 	evolution map[int][]*StringTable
 	// every UST we get, we calculate the ST and put it in here.
 	current map[int]*StringTable
+
+	ClassInfosNameMapping map[int]string
+	ActiveModifierDelta   ModifierBuffs
+	Mapping               map[int][]*send_tables.SendProp
+	Multiples             map[int]map[string]int
+	Baseline              map[int]map[string]interface{}
+	pendingBaseline       []*StringTableItem
 }
 
 func NewStateHelper() *StateHelper {
 	return &StateHelper{
-		packets:    parser.ParserBaseItems{},
-		metaTables: map[int]*CacheItem{},
-		baseTables: map[int]*StringTable{},
-		evolution:  map[int][]*StringTable{},
-		current:    map[int]*StringTable{},
+		packets:         parser.ParserBaseItems{},
+		metaTables:      map[int]*CacheItem{},
+		baseTables:      map[int]*StringTable{},
+		evolution:       map[int][]*StringTable{},
+		current:         map[int]*StringTable{},
+		Baseline:        map[int]map[string]interface{}{},
+		pendingBaseline: []*StringTableItem{},
 	}
 }
 
@@ -105,8 +126,13 @@ func (helper *StateHelper) OnCST(tick int, obj *dota.CSVCMsg_CreateStringTable) 
 		),
 	}
 
-	if table.Name == "ActiveModifiers" {
-		parseActiveModifiers(table.Items)
+	switch table.Name {
+	case "ActiveModifiers":
+		helper.parseActiveModifiers(table.Items)
+	case "instancebaseline":
+		helper.updateInstanceBaseline(table.Items)
+	case "userinfo":
+		parseUserinfo(table.Items)
 	}
 
 	// writeStringTables("CreateStringTable/"+table.Name, tick, spew.Sdump(table))
@@ -135,8 +161,13 @@ func (helper *StateHelper) OnUST(tick int, obj *dota.CSVCMsg_UpdateStringTable) 
 	)
 
 	current := helper.current[tableId]
-	if current.Name == "ActiveModifiers" {
-		parseActiveModifiers(update)
+	switch current.Name {
+	case "ActiveModifiers":
+		helper.parseActiveModifiers(update)
+	case "userinfo":
+		parseUserinfo(update)
+	case "instancebaseline":
+		helper.updateInstanceBaseline(update)
 	}
 	// writeStringTables("UpdateStringTable/"+current.Name, tick, spew.Sdump(update))
 
@@ -158,7 +189,49 @@ func (helper *StateHelper) OnUST(tick int, obj *dota.CSVCMsg_UpdateStringTable) 
 	helper.evolution[tableId] = append(helper.evolution[tableId], stCopy)
 }
 
-func parseActiveModifiers(entries map[int]*StringTableItem) {
+func (helper *StateHelper) updateInstanceBaseline(update map[int]*StringTableItem) {
+	for _, item := range helper.pendingBaseline {
+		helper.updateInstanceBaselineItem(item)
+	}
+	for _, item := range update {
+		helper.updateInstanceBaselineItem(item)
+	}
+}
+
+func (helper *StateHelper) updateInstanceBaselineItem(item *StringTableItem) {
+	classId, err := strconv.Atoi(item.Str)
+	if err != nil {
+		panic(err)
+	}
+
+	className := helper.ClassInfosNameMapping[classId]
+	if className == "DT_DOTAPlayer" {
+		return
+	}
+
+	mapping := helper.Mapping[classId]
+	multiples := helper.Multiples[classId]
+	if len(mapping) == 0 || len(multiples) == 0 {
+		helper.pendingBaseline = append(helper.pendingBaseline, item)
+		return
+	}
+
+	baseline, found := helper.Baseline[classId]
+	if !found {
+		baseline = map[string]interface{}{}
+		helper.Baseline[classId] = baseline
+	}
+
+	br := utils.NewBitReader(item.Data)
+	indices := br.ReadPropertiesIndex()
+	baseValues := br.ReadPropertiesValues(mapping, multiples, indices)
+	for key, value := range baseValues {
+		baseline[key] = value
+	}
+	helper.Baseline[classId] = baseline
+}
+
+func (helper *StateHelper) parseActiveModifiers(entries map[int]*StringTableItem) {
 	for _, e := range entries {
 		if len(e.Data) > 0 {
 			o := &dota.CDOTAModifierBuffTableEntry{}
@@ -168,8 +241,7 @@ func parseActiveModifiers(entries map[int]*StringTableItem) {
 			}
 			e.Data = e.Data[:0]
 			e.ModifierBuff = o
-		} else {
-			// spew.Dump(e)
+			helper.ActiveModifierDelta = append(helper.ActiveModifierDelta, o)
 		}
 	}
 }
@@ -179,7 +251,7 @@ func (helper *StateHelper) GetStateAtTick(tick int) map[int]*StringTable {
 
 	for _, evo := range helper.evolution {
 		for _, table := range evo {
-			if table.Tick > tick {
+			if table.Tick >= tick {
 				return state
 			}
 			state[table.Index] = table
@@ -193,7 +265,7 @@ func (helper *StateHelper) GetTableAtTick(tick int, tableName string) (result *S
 	for _, evo := range helper.evolution {
 		for _, table := range evo {
 			if table.Name == tableName {
-				if table.Tick > tick {
+				if table.Tick >= tick {
 					return result
 				}
 				result = table
@@ -202,4 +274,83 @@ func (helper *StateHelper) GetTableAtTick(tick int, tableName string) (result *S
 	}
 
 	return result
+}
+
+func (helper *StateHelper) GetTableNow(tableName string) (result *StringTable) {
+	for _, table := range helper.current {
+		if table.Name == tableName {
+			return table
+		}
+	}
+
+	return
+}
+
+func parseUserinfo(entries map[int]*StringTableItem) {
+	for _, e := range entries {
+		if len(e.Data) == 0 {
+			continue
+		}
+
+		raw := &rawUserinfo{}
+		buf := bytes.NewBuffer(e.Data)
+		err := binary.Read(buf, binary.LittleEndian, raw)
+
+		info := &Userinfo{}
+		info.XUID = raw.Xuid
+		info.UserID = int(raw.UserID)
+		info.FriendsID = uint(raw.FriendsID)
+
+		friendsName := []byte{}
+		for _, b := range raw.FriendsName {
+			if b == 0 {
+				break
+			}
+			friendsName = append(friendsName, b)
+		}
+		info.FriendsName = string(friendsName)
+
+		name := []byte{}
+		for _, b := range raw.Name {
+			if b == 0 {
+				break
+			}
+			name = append(name, b)
+		}
+		info.Name = string(name)
+
+		guid := []byte{}
+		for _, b := range raw.Guid {
+			if b == 0 {
+				break
+			}
+			guid = append(guid, b)
+		}
+		info.GUID = string(guid)
+		info.SteamID = guidToCommunityID(info.GUID)
+
+		if err != nil {
+			panic(err)
+		}
+
+		e.Userinfo = info
+		e.Data = e.Data[:0]
+	}
+}
+
+var (
+	guidPatter                 = regexp.MustCompile(`STEAM_(\d+):(\d+):(\d+)`)
+	steamID64Identifier uint64 = 0x0110000100000000
+)
+
+// https://developer.valvesoftware.com/wiki/SteamID
+func guidToCommunityID(guid string) uint64 {
+	matches := guidPatter.FindStringSubmatch(guid)
+	if len(matches) != 4 {
+		return 0
+	}
+	// x, _ := strconv.Atoi(matches[1])
+	y, _ := strconv.Atoi(matches[2])
+	z, _ := strconv.Atoi(matches[3])
+	return (uint64(z) * 2) + steamID64Identifier + uint64(y)
 }

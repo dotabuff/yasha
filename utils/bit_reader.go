@@ -11,18 +11,7 @@ import (
 	"github.com/dotabuff/d2rp/core/send_tables"
 )
 
-var debug = false
-
-func dump(args ...interface{}) {
-	if debug {
-		spew.Dump(args...)
-	}
-}
-func printLn(args ...interface{}) {
-	if debug {
-		spew.Println(args...)
-	}
-}
+func p(o ...interface{}) { spew.Dump(o...) }
 
 const (
 	CoordIntegerBits    = 14
@@ -54,7 +43,7 @@ func (br *BitReader) BitsLeft() int    { return (len(br.buffer) * 8) - br.curren
 func (br *BitReader) BytesLeft() int   { return len(br.buffer) - (br.currentBit * 8) }
 
 type Vector3 struct {
-	X, Y, Z float32
+	X, Y, Z float64
 }
 
 func (v Vector3) String() string {
@@ -62,7 +51,7 @@ func (v Vector3) String() string {
 }
 
 type Vector2 struct {
-	X, Y float32
+	X, Y float64
 }
 
 func (v Vector2) String() string {
@@ -260,14 +249,15 @@ func (br *BitReader) ReadString() string {
 	return string(bs)
 }
 
-func (br *BitReader) ReadFloat(prop *send_tables.SendProp) float32 {
+func (br *BitReader) ReadFloat(prop *send_tables.SendProp) float64 {
 	if result, ok := br.ReadSpecialFloat(prop); ok {
-		return result
+		return float64(result)
 	}
-	dwInterp := uint(br.ReadUBits(prop.NumBits))
-	result := float32(dwInterp) / float32((uint(1)<<uint(prop.NumBits))-1)
-	result = float32(prop.LowValue+(prop.HighValue-prop.LowValue)) * result
-	return result
+	dividend := float64(br.ReadUBits(prop.NumBits))
+	divisor := (1 << uint(prop.NumBits)) - 1
+	f := dividend / float64(divisor)
+	r := prop.HighValue - prop.LowValue
+	return f*r + prop.LowValue
 }
 
 func (br *BitReader) ReadLengthPrefixedString() string {
@@ -289,7 +279,7 @@ func (br *BitReader) ReadVector(prop *send_tables.SendProp) *Vector3 {
 		signbit := br.ReadBoolean()
 		v0v0v1v1 := float64(result.X*result.X + result.Y*result.Y)
 		if v0v0v1v1 < 1.0 {
-			result.Z = float32(math.Sqrt(1.0 - v0v0v1v1))
+			result.Z = float64(math.Sqrt(1.0 - v0v0v1v1))
 		} else {
 			result.Z = 0.0
 		}
