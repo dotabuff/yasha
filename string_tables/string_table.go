@@ -1,7 +1,7 @@
 package string_tables
 
 import (
-	dota "github.com/elobuff/d2rp/dota"
+	dota "github.com/dotabuff/d2rp/dota"
 )
 
 type StringTable struct {

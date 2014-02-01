@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/elobuff/d2rp/core/send_tables"
+	"github.com/dotabuff/d2rp/core/send_tables"
 )
 
 var debug = false

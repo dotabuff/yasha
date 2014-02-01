@@ -1,7 +1,7 @@
 package packet_entities
 
 import (
-	"github.com/elobuff/d2rp/core/utils"
+	"github.com/dotabuff/d2rp/core/utils"
 )
 
 func ReadUpdateType(br *utils.BitReader) UpdateType {

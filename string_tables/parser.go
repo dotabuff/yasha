@@ -3,7 +3,7 @@ package string_tables
 import (
 	"math"
 
-	"github.com/elobuff/d2rp/core/utils"
+	"github.com/dotabuff/d2rp/core/utils"
 )
 
 func Parse(bytes []byte, numEntries, maxEntries int32, isFixedSize bool, numBits int32) map[int]*StringTableItem {

@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"github.com/davecgh/go-spew/spew"
-	dota "github.com/elobuff/d2rp/dota"
+	dota "github.com/dotabuff/d2rp/dota"
 )
 
 func foo() { spew.Dump("hi") }

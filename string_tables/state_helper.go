@@ -6,8 +6,8 @@ import (
 
 	"code.google.com/p/gogoprotobuf/proto"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/elobuff/d2rp/core/parser"
-	dota "github.com/elobuff/d2rp/dota"
+	"github.com/dotabuff/d2rp/core/parser"
+	dota "github.com/dotabuff/d2rp/dota"
 )
 
 func p(v ...interface{}) { spew.Dump(v...) }
