@@ -5,10 +5,10 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/elobuff/d2rp/core/parser"
-	"github.com/elobuff/d2rp/core/send_tables"
-	"github.com/elobuff/d2rp/core/utils"
-	dota "github.com/elobuff/d2rp/dota"
+	"github.com/dotabuff/d2rp/core/parser"
+	"github.com/dotabuff/d2rp/core/send_tables"
+	"github.com/dotabuff/d2rp/core/utils"
+	dota "github.com/dotabuff/d2rp/dota"
 )
 
 type Parser struct {

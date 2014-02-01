@@ -5,7 +5,7 @@ import (
 
 	"code.google.com/p/gogoprotobuf/proto"
 	"code.google.com/p/snappy-go/snappy"
-	dota "github.com/elobuff/d2rp/dota"
+	dota "github.com/dotabuff/d2rp/dota"
 )
 
 func SnappyUncompress(compressed []byte) []byte {

@@ -4,12 +4,12 @@ import (
 	"math"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/elobuff/d2rp/core/packet_entities"
-	"github.com/elobuff/d2rp/core/parser"
-	"github.com/elobuff/d2rp/core/send_tables"
-	"github.com/elobuff/d2rp/core/string_tables"
-	"github.com/elobuff/d2rp/core/utils"
-	"github.com/elobuff/d2rp/dota"
+	"github.com/dotabuff/d2rp/core/packet_entities"
+	"github.com/dotabuff/d2rp/core/parser"
+	"github.com/dotabuff/d2rp/core/send_tables"
+	"github.com/dotabuff/d2rp/core/string_tables"
+	"github.com/dotabuff/d2rp/core/utils"
+	"github.com/dotabuff/d2rp/dota"
 	"sort"
 )
 
