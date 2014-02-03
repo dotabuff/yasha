@@ -59,3 +59,13 @@ type ParserBaseItems []*ParserBaseItem
 func (p ParserBaseItems) Len() int           { return len(p) }
 func (p ParserBaseItems) Less(i, j int) bool { return p[i].Sequence < p[j].Sequence }
 func (p ParserBaseItems) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+type Error string
+
+func (e Error) Error() string { return string(e) }
+
+type SignonPacket struct{}
+
+func (s SignonPacket) ProtoMessage()  {}
+func (s SignonPacket) Reset()         {}
+func (s SignonPacket) String() string { return "" }
