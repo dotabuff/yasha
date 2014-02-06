@@ -5,6 +5,7 @@ import (
 	"sort"
 
 	"github.com/davecgh/go-spew/spew"
+
 	"github.com/dotabuff/d2rp/core/packet_entities"
 	"github.com/dotabuff/d2rp/core/parser"
 	"github.com/dotabuff/d2rp/core/send_tables"
