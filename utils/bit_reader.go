@@ -272,26 +272,27 @@ func (br *BitReader) ReadLengthPrefixedString() string {
 }
 
 func (br *BitReader) ReadVector(prop *send_tables.SendProp) *Vector3 {
-  result := &Vector3{
-    X: br.ReadFloat(prop),
-    Y: br.ReadFloat(prop),
-  }
+  var x, y, z float64
+  x = br.ReadFloat(prop)
+  y = br.ReadFloat(prop)
+
   if prop.Flags&send_tables.SPROP_NORMAL == 0 {
-    result.Z = br.ReadFloat(prop)
+    z = br.ReadFloat(prop)
   } else {
-    signbit := br.ReadBoolean()
-    v0v0v1v1 := float64(result.X*result.X + result.Y*result.Y)
-    if v0v0v1v1 < 1.0 {
-      result.Z = float64(math.Sqrt(1.0 - v0v0v1v1))
+    f := float64(x*x + y*y)
+    if 1.0 >= f {
+      z = 0
     } else {
-      result.Z = 0.0
+      z = float64(math.Sqrt(1.0 - f))
     }
-    if signbit {
-      result.Z *= -1.0
+    if signbit := br.ReadBoolean(); signbit {
+      z = -z
     }
   }
 
-  return result
+  return &Vector3{
+    X: x, Y: y, Z: z,
+  }
 }
 
 func (br *BitReader) ReadVectorXY(prop *send_tables.SendProp) *Vector2 {
