@@ -117,7 +117,6 @@ func (sth *Helper) buildHierarchy(sendTableName string) {
   sth.buildHierarchyIterateProps(sendTableName, &result)
   sth.flatSendTable = append(sth.flatSendTable, result...)
 }
-
 func (sth *Helper) buildHierarchyIterateProps(sendTableName string, result *[]*SendProp) {
   pTable := sth.sendTables[sendTableName]
   for _, pProp := range pTable.GetProps() {

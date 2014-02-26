@@ -381,6 +381,10 @@ func (br *BitReader) ReadPropertiesIndex() []int {
   return props
 }
 
+// FIXME:
+// Rememver that our PE decoder is wrong, it needs to construct key names recursively.
+// https://github.com/spheenik/clarity/tree/master/src/main/java/clarity/decoder/SendTableFlattener.java
+// https://gist.githubusercontent.com/onethirtyfive/07899a78622dc18679c3/raw/19d411910016170e4c4ee2782fd4a987e9ce2afc/gistfile1.txt
 func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multiples map[string]int, indices []int) map[string]interface{} {
   values := map[string]interface{}{}
 
