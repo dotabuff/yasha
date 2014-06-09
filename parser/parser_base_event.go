@@ -36,6 +36,8 @@ func (p *Parser) AsBaseEvent(commandName string) (proto.Message, error) {
 		return &dota.CDemoUserCmd{}, nil
 	case "DEM_FullPacket":
 		return &dota.CDemoFullPacket{}, nil
+	case "DEM_SaveGame":
+		return &dota.CDemoSaveGame{}, nil
 	case "net_NOP":
 		return &dota.CNETMsg_NOP{}, nil
 	case "net_Disconnect":
@@ -258,6 +260,26 @@ func (p *Parser) AsBaseEvent(commandName string) (proto.Message, error) {
 		return &dota.CDOTAUserMsg_CoachHUDPing{}, nil
 	case "DOTA_UM_ClientLoadGridNav":
 		return &dota.CDOTAUserMsg_ClientLoadGridNav{}, nil
+	case "DOTA_UM_AbilityPing":
+		return &dota.CDOTAUserMsg_AbilityPing{}, nil
+	case "DOTA_UM_ShowGenericPopup":
+		return &dota.CDOTAUserMsg_ShowGenericPopup{}, nil
+	case "DOTA_UM_VoteStart":
+		return &dota.CDOTAUserMsg_VoteStart{}, nil
+	case "DOTA_UM_VoteUpdate":
+		return &dota.CDOTAUserMsg_VoteUpdate{}, nil
+	case "DOTA_UM_VoteEnd":
+		return &dota.CDOTAUserMsg_VoteEnd{}, nil
+	case "DOTA_UM_BoosterState":
+		return &dota.CDOTAUserMsg_BoosterState{}, nil
+	case "DOTA_UM_WillPurchaseAlert":
+		return &dota.CDOTAUserMsg_WillPurchaseAlert{}, nil
+	case "DOTA_UM_TutorialMinimapPosition":
+		return &dota.CDOTAUserMsg_TutorialMinimapPosition{}, nil
+	case "DOTA_UM_PlayerMMR":
+		return &dota.CDOTAUserMsg_PlayerMMR{}, nil
+	case "DOTA_UM_AbilitySteal":
+		return &dota.CDOTAUserMsg_AbilitySteal{}, nil
 	}
 	return nil, Error("Type not found: " + commandName)
 }
@@ -490,6 +512,26 @@ func (p *Parser) AsBaseEventBUMDUM(value int) (proto.Message, error) {
 		return &dota.CDOTAUserMsg_CoachHUDPing{}, nil
 	case 117:
 		return &dota.CDOTAUserMsg_ClientLoadGridNav{}, nil
+	case 118:
+		return &dota.CDOTAUserMsg_AbilityPing{}, nil
+	case 119:
+		return &dota.CDOTAUserMsg_ShowGenericPopup{}, nil
+	case 120:
+		return &dota.CDOTAUserMsg_VoteStart{}, nil
+	case 121:
+		return &dota.CDOTAUserMsg_VoteUpdate{}, nil
+	case 122:
+		return &dota.CDOTAUserMsg_VoteEnd{}, nil
+	case 123:
+		return &dota.CDOTAUserMsg_BoosterState{}, nil
+	case 124:
+		return &dota.CDOTAUserMsg_WillPurchaseAlert{}, nil
+	case 125:
+		return &dota.CDOTAUserMsg_TutorialMinimapPosition{}, nil
+	case 126:
+		return &dota.CDOTAUserMsg_PlayerMMR{}, nil
+	case 127:
+		return &dota.CDOTAUserMsg_AbilitySteal{}, nil
 	}
 	return nil, Error("Unknown BUMDUM")
 }
