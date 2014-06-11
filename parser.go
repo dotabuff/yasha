@@ -214,6 +214,23 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 			if p.OnSetConVar != nil {
 				p.OnSetConVar(obj)
 			}
+		case *dota.CDOTAUserMsg_AbilitySteal:
+			/*
+				(player_id:0 ability_id:412 ability_level:4 )
+				(player_id:0 ability_id:305 ability_level:4 )
+				(player_id:0 ability_id:117 ability_level:4 )
+				(player_id:0 ability_id:131 ability_level:4 )
+				(player_id:0 ability_id:413 ability_level:2 )
+				(player_id:0 ability_id:413 ability_level:2 )
+				(player_id:0 ability_id:275 ability_level:4 )
+				(player_id:0 ability_id:411 ability_level:4 )
+				(player_id:0 ability_id:131 ability_level:4 )
+				(player_id:0 ability_id:305 ability_level:4 )
+				(player_id:0 ability_id:412 ability_level:4 )
+				(player_id:0 ability_id:132 ability_level:4 )
+			*/
+		case *dota.CDemoSaveGame:
+			// this is not VDF... some new fun stuff instead.
 		default:
 			spew.Dump(obj)
 		}
