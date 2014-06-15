@@ -222,8 +222,6 @@ func (p *Parser) AsBaseEvent(commandName string) (proto.Message, error) {
 		return &dota.CDOTAUserMsg_SwapVerify{}, nil
 	case "DOTA_UM_WorldLine":
 		return &dota.CDOTAUserMsg_WorldLine{}, nil
-	case "DOTA_UM_TournamentDrop":
-		return &dota.CDOTAUserMsg_TournamentDrop{}, nil
 	case "DOTA_UM_ItemAlert":
 		return &dota.CDOTAUserMsg_ItemAlert{}, nil
 	case "DOTA_UM_HalloweenDrops":
@@ -474,8 +472,6 @@ func (p *Parser) AsBaseEventBUMDUM(value int) (proto.Message, error) {
 		return &dota.CDOTAUserMsg_SwapVerify{}, nil
 	case 97:
 		return &dota.CDOTAUserMsg_WorldLine{}, nil
-	case 98:
-		return &dota.CDOTAUserMsg_TournamentDrop{}, nil
 	case 99:
 		return &dota.CDOTAUserMsg_ItemAlert{}, nil
 	case 100:
