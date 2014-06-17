@@ -149,6 +149,7 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 			// those have been handled above, please keep in sync.
 		case *dota.CDemoStop,
 			*dota.CDemoSyncTick,
+			*dota.CDOTAUserMsg_BoosterState,
 			*dota.CDOTAUserMsg_CreateLinearProjectile,
 			*dota.CDOTAUserMsg_DestroyLinearProjectile,
 			*dota.CDOTAUserMsg_DodgeTrackingProjectiles,
