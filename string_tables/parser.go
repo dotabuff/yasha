@@ -14,7 +14,6 @@ func Parse(bytes []byte, numEntries, maxEntries int32, isFixedSize bool, numBits
 
 	br := utils.NewBitReader(bytes)
 	isOption := br.ReadBoolean()
-	bitsPerIndex := int(math.Log(float64(maxEntries)) / math.Log(2))
 
 	// br.SeekBits(1, utils.Begin)
 
@@ -22,28 +21,21 @@ func Parse(bytes []byte, numEntries, maxEntries int32, isFixedSize bool, numBits
 		item := &StringTableItem{}
 		entryIndex := lastEntry + 1
 
-		if br.ReadBoolean() {
-			entryIndex = int(br.ReadUBits(bitsPerIndex))
-		} else {
-			entryIndex++
+		if !br.ReadBoolean() {
+			entryIndex = int(br.ReadUBits(int(math.Log(float64(maxEntries)) / math.Log(2))))
 		}
 
 		lastEntry = entryIndex
 
 		if br.ReadBoolean() {
 			value := ""
-			if isOption && br.ReadBoolean() {
+			substringcheck := br.ReadBoolean()
+			if isOption && substringcheck {
 				panic("this is... wrong?")
-			}
-
-			if br.ReadBoolean() {
+			} else if substringcheck {
 				index := int(br.ReadUBits(5))
 				bytestocopy := int(br.ReadUBits(5))
-				if index > len(history) {
-					value = br.ReadString()
-				} else {
-					value = history[index][0:bytestocopy] + br.ReadString()
-				}
+				value = history[index][0:bytestocopy] + br.ReadString()
 			} else {
 				value = br.ReadString()
 			}
@@ -52,13 +44,12 @@ func Parse(bytes []byte, numEntries, maxEntries int32, isFixedSize bool, numBits
 		}
 
 		if br.ReadBoolean() {
-			length := 0
 			if isFixedSize {
-				length = int(numBits)
+				item.Data = []byte{byte(br.ReadBits(int(numBits)))}
 			} else {
-				length = int(br.ReadUBits(14) * 8)
+				length := int(br.ReadUBits(14))
+				item.Data = br.ReadBytes(length)
 			}
-			item.Data = br.ReadBytes(length)
 		}
 		if len(history) > 32 {
 			history = history[1:]

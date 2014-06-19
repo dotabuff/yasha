@@ -3,11 +3,15 @@ package utils
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"math"
 	"strconv"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/dotabuff/d2rp/core/send_tables"
 )
+
+var p = spew.Dump
 
 const (
 	CoordIntegerBits    = 14
@@ -21,27 +25,38 @@ const (
 )
 
 type BitReader struct {
-	buffer []byte
-	pos    int
+	buffer     []byte
+	currentBit int
 }
 
 func NewBitReader(buffer []byte) *BitReader {
 	if len(buffer) == 0 {
-		panic("empty buffer!")
+		panic("empty buffer?")
 	}
-	if len(buffer) > (2 << 15) {
-		panic("buffer too large")
-	}
-	return &BitReader{
-		buffer: append(buffer, 0),
-	}
+	return &BitReader{buffer: buffer}
 }
 
 func (br *BitReader) Length() int      { return len(br.buffer) }
-func (br *BitReader) Pos() int         { return br.pos }
-func (br *BitReader) CurrentByte() int { return br.pos / 8 }
-func (br *BitReader) BitsLeft() int    { return (len(br.buffer) * 8) - br.pos }
-func (br *BitReader) BytesLeft() int   { return len(br.buffer) - (br.pos * 8) }
+func (br *BitReader) CurrentBit() int  { return br.currentBit }
+func (br *BitReader) CurrentByte() int { return br.currentBit / 8 }
+func (br *BitReader) BitsLeft() int    { return (len(br.buffer) * 8) - br.currentBit }
+func (br *BitReader) BytesLeft() int   { return len(br.buffer) - (br.currentBit * 8) }
+
+type Vector3 struct {
+	X, Y, Z float64
+}
+
+func (v Vector3) String() string {
+	return fmt.Sprintf("{{ x: %f, y: %f, z: %f }}", v.X, v.Y, v.Z)
+}
+
+type Vector2 struct {
+	X, Y float64
+}
+
+func (v Vector2) String() string {
+	return fmt.Sprintf("{{ x: %f, y: %f }}", v.X, v.Y)
+}
 
 type SeekOrigin int
 
@@ -53,13 +68,13 @@ const (
 
 func (br *BitReader) SeekBits(offset int, origin SeekOrigin) {
 	if origin == Current {
-		br.pos += offset
+		br.currentBit += offset
 	} else if origin == Begin {
-		br.pos = offset
+		br.currentBit = offset
 	} else if origin == End {
-		br.pos = (len(br.buffer) * 8) - offset
+		br.currentBit = (len(br.buffer) * 8) - offset
 	}
-	if br.pos < 0 || br.pos > (len(br.buffer)*8) {
+	if br.currentBit < 0 || br.currentBit > (len(br.buffer)*8) {
 		panic("out of range")
 	}
 }
@@ -69,20 +84,20 @@ func (br *BitReader) ReadUBitsByteAligned(nBits int) uint {
 		panic("Must be multple of 8")
 	}
 
-	if br.pos%8 != 0 {
+	if br.currentBit%8 != 0 {
 		panic("Current bit is not byte-aligned")
 	}
 
 	var result uint
 	for i := 0; i < nBits/8; i++ {
 		result += uint(br.buffer[br.CurrentByte()] << (uint(i) * 8))
-		br.pos += 8
+		br.currentBit += 8
 	}
 	return result
 }
 
 func (br *BitReader) ReadUBitsNotByteAligned(nBits int) uint {
-	bitOffset := br.pos % 8
+	bitOffset := br.currentBit % 8
 	nBitsToRead := bitOffset + nBits
 	nBytesToRead := nBitsToRead / 8
 	if nBitsToRead%8 != 0 {
@@ -96,7 +111,7 @@ func (br *BitReader) ReadUBitsNotByteAligned(nBits int) uint {
 	}
 	currentValue >>= uint(bitOffset)
 	currentValue &= ((1 << uint64(nBits)) - 1)
-	br.pos += nBits
+	br.currentBit += nBits
 	return uint(currentValue)
 }
 
@@ -127,10 +142,10 @@ func (br *BitReader) ReadUBits(nBits int) uint {
 	if nBits <= 0 || nBits > 32 {
 		panic("Value must be a positive integer between 1 and 32 inclusive.")
 	}
-	if (br.pos + nBits) > (len(br.buffer) * 8) {
+	if (br.currentBit + nBits) > (len(br.buffer) * 8) {
 		panic("Out of range")
 	}
-	if br.pos%8 == 0 && nBits%8 == 0 {
+	if br.currentBit%8 == 0 && nBits%8 == 0 {
 		return br.ReadUBitsByteAligned(nBits)
 	}
 	return br.ReadUBitsNotByteAligned(nBits)
@@ -145,13 +160,13 @@ func (br *BitReader) ReadBits(nBits int) int {
 }
 
 func (br *BitReader) ReadBoolean() bool {
-	if br.pos+1 > br.Length()*8 {
+	if br.CurrentBit()+1 > br.Length()*8 {
 		panic("Out of range")
 	}
-	currentByte := br.pos / 8
-	bitOffset := br.pos % 8
+	currentByte := br.currentBit / 8
+	bitOffset := br.currentBit % 8
 	result := br.buffer[currentByte]&(1<<uint(bitOffset)) != 0
-	br.pos++
+	br.currentBit++
 	return result
 }
 
