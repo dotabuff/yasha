@@ -271,7 +271,7 @@ func (p *Parser) onGameEvent(tick int, obj *dota.CSVCMsg_GameEvent) {
 		table := p.Stsh.GetTableNow("CombatLogNames").Items
 
 		log := &CombatLogEntry{
-			Type:               dota.DOTA_COMBATLOG_TYPES(keys[0].GetValByte()).String()[15:],
+			Type:               dota.DOTA_COMBATLOG_TYPES(keys[0].GetValByte()),
 			AttackerIsIllusion: keys[5].GetValBool(),
 			TargetIsIllusion:   keys[6].GetValBool(),
 			Value:              keys[7].GetValShort(),

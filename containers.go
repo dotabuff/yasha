@@ -1,5 +1,7 @@
 package core
 
+import "github.com/dotabuff/d2rp/dota"
+
 type AbilityTracker struct {
 	HeroHandle int
 	Level      int
@@ -79,7 +81,7 @@ type Player struct {
 }
 
 type CombatLogEntry struct {
-	Type               string
+	Type               dota.DOTA_COMBATLOG_TYPES
 	SourceName         string
 	TargetName         string
 	AttackerName       string
