@@ -151,6 +151,21 @@ func (br *BitReader) ReadUBits(nBits int) uint {
 	return br.ReadUBitsNotByteAligned(nBits)
 }
 
+func (br *BitReader) ReadBitsAsBytes(n int) []byte {
+	result := make([]byte, (n+7)/8)
+	i := 0
+	for n > 7 {
+		n -= 8
+		result[i] = byte(br.ReadUBits(8))
+		i++
+	}
+	if n != 0 {
+		result[i] = byte(br.ReadUBits(n))
+	}
+
+	return result
+}
+
 func (br *BitReader) ReadBits(nBits int) int {
 	result := br.ReadUBits(nBits - 1)
 	if br.ReadBoolean() {
@@ -172,10 +187,6 @@ func (br *BitReader) ReadBoolean() bool {
 
 func (br *BitReader) ReadByte() byte {
 	return byte(br.ReadUBits(8))
-}
-
-func (br *BitReader) ReadSByte() int8 {
-	return int8(br.ReadBits(8))
 }
 
 func (br *BitReader) ReadBytes(nBytes int) []byte {
@@ -250,6 +261,19 @@ func (br *BitReader) ReadString() string {
 		bs = append(bs, b)
 	}
 	return string(bs)
+}
+
+func (br *BitReader) ReadStringN(n int) string {
+	buf := []byte{}
+	for n > 0 {
+		c := br.ReadByte()
+		if c == 0 {
+			break
+		}
+		buf = append(buf, c)
+		n--
+	}
+	return string(buf)
 }
 
 func (br *BitReader) ReadFloat(prop *send_tables.SendProp) float64 {

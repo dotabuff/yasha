@@ -16,8 +16,6 @@ import (
 	"github.com/dotabuff/d2rp/dota"
 )
 
-func p(v ...interface{}) { spew.Dump(v...) }
-
 type CacheItem struct {
 	Bits        int
 	IsFixedSize bool
@@ -117,13 +115,7 @@ func (helper *StateHelper) OnCST(tick int, obj *dota.CSVCMsg_CreateStringTable) 
 		Index: helper.lastCreateIndex,
 		Name:  obj.GetName(),
 		Tick:  tick,
-		Items: Parse(
-			obj.GetStringData(),
-			obj.GetNumEntries(),
-			obj.GetMaxEntries(),
-			obj.GetUserDataFixedSize(),
-			obj.GetUserDataSizeBits(),
-		),
+		Items: ParseCST(obj),
 	}
 
 	switch table.Name {
@@ -154,13 +146,7 @@ func (helper *StateHelper) OnUST(tick int, obj *dota.CSVCMsg_UpdateStringTable) 
 	tableId := int(obj.GetTableId())
 
 	meta := helper.metaTables[tableId]
-	update := Parse(
-		obj.GetStringData(),
-		obj.GetNumChangedEntries(),
-		int32(meta.MaxEntries),
-		meta.IsFixedSize,
-		int32(meta.Bits),
-	)
+	update := ParseUST(obj, meta)
 
 	current := helper.current[tableId]
 	switch current.Name {

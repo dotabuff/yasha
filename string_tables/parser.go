@@ -3,44 +3,128 @@ package string_tables
 import (
 	"math"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/dotabuff/d2rp/core/utils"
 )
 
-func Parse(bytes []byte, numEntries, maxEntries int32, isFixedSize bool, numBits int32) map[int]*StringTableItem {
+const (
+	MaxNameLength  = 0x400
+	KeyHistorySize = 32
+)
+
+type CSTObject interface {
+	GetStringData() []byte
+	GetNumEntries() int32
+	GetMaxEntries() int32
+	GetUserDataFixedSize() bool
+	GetUserDataSizeBits() int32
+}
+
+type USTObject interface {
+	GetStringData() []byte
+	GetNumChangedEntries() int32
+}
+
+func ParseCST(obj CSTObject) map[int]*StringTableItem {
+	return Parse(
+		obj.GetStringData(),
+		int(obj.GetNumEntries()),
+		int(obj.GetMaxEntries()),
+		int(obj.GetUserDataSizeBits()),
+		obj.GetUserDataFixedSize(),
+	)
+}
+
+func ParseUST(obj USTObject, meta *CacheItem) map[int]*StringTableItem {
+	return Parse(
+		obj.GetStringData(),
+		int(obj.GetNumChangedEntries()),
+		meta.MaxEntries,
+		meta.Bits,
+		meta.IsFixedSize,
+	)
+}
+
+func Parse(data []byte, numEntries, maxEntries, dataSizeBits int, dataFixedSize bool) map[int]*StringTableItem {
+	br := utils.NewBitReader(data)
+
+	bitsPerIndex := int(math.Log(float64(maxEntries)) / math.Log(2))
+	keyHistory := make([]string, 0, KeyHistorySize)
 	result := map[int]*StringTableItem{}
+	mysteryFlag := br.ReadBoolean()
+	index := -1
+	nameBuf := ""
 
-	lastEntry := -1
-	history := make([]string, 0, 33)
+	for len(result) < numEntries {
+		if br.ReadBoolean() {
+			index++
+		} else {
+			index = int(br.ReadUBits(bitsPerIndex))
+		}
+		nameBuf = ""
+		if br.ReadBoolean() {
+			if mysteryFlag && br.ReadBoolean() {
+				panic("mysteryFlag assertion failed!")
+			}
+			if br.ReadBoolean() {
+				basis := br.ReadUBits(5)
+				length := br.ReadUBits(5)
+				if int(basis) > len(keyHistory) {
+					spew.Dump("Ignoring invalid history index...", keyHistory, basis, length)
+					nameBuf += br.ReadStringN(MaxNameLength)
+				} else {
+					nameBuf += keyHistory[basis][0:length] + br.ReadStringN(int(MaxNameLength-length))
+				}
+			} else {
+				nameBuf += br.ReadStringN(MaxNameLength)
+			}
+			if len(keyHistory) >= KeyHistorySize {
+				copy(keyHistory[0:], keyHistory[1:])
+				keyHistory[len(keyHistory)-1] = "" // or the zero value of T
+				keyHistory = keyHistory[:len(keyHistory)-1]
+			}
+			keyHistory = append(keyHistory, nameBuf)
+		}
+		value := []byte{}
+		if br.ReadBoolean() {
+			bitLength := 0
+			if dataFixedSize {
+				bitLength = dataSizeBits
+			} else {
+				bitLength = int(br.ReadUBits(14) * 8)
+			}
+			value = append(value, br.ReadBitsAsBytes(bitLength)...)
+		}
+		result[index] = &StringTableItem{Str: nameBuf, Data: value}
+	}
 
-	br := utils.NewBitReader(bytes)
-	isOption := br.ReadBoolean()
+	return result
+}
 
-	// br.SeekBits(1, utils.Begin)
-
-	for i := int32(0); i < numEntries; i++ {
+/*
 		item := &StringTableItem{}
-		entryIndex := lastEntry + 1
+		entryIndex := index + 1
 
 		if !br.ReadBoolean() {
-			entryIndex = int(br.ReadUBits(int(math.Log(float64(maxEntries)) / math.Log(2))))
+			entryIndex = int(br.ReadUBits(bitsPerIndex))
 		}
 
-		lastEntry = entryIndex
+		index = entryIndex
 
 		if br.ReadBoolean() {
 			value := ""
 			substringcheck := br.ReadBoolean()
-			if isOption && substringcheck {
-				panic("this is... wrong?")
+			if mysteryFlag && substringcheck {
+				panic("substringcheck and mysteryFlag are true! Whatever shall we do?")
 			} else if substringcheck {
 				index := int(br.ReadUBits(5))
 				bytestocopy := int(br.ReadUBits(5))
-				value = history[index][0:bytestocopy] + br.ReadString()
+				value = keyHistory[index][0:bytestocopy] + br.ReadString()
 			} else {
 				value = br.ReadString()
 			}
 			item.Str = value
-			history = append(history, value)
+			keyHistory = append(keyHistory, value)
 		}
 
 		if br.ReadBoolean() {
@@ -51,10 +135,11 @@ func Parse(bytes []byte, numEntries, maxEntries int32, isFixedSize bool, numBits
 				item.Data = br.ReadBytes(length)
 			}
 		}
-		if len(history) > 32 {
-			history = history[1:]
+		if len(keyHistory) > 32 {
+			keyHistory = keyHistory[1:]
 		}
 		result[entryIndex] = item
 	}
 	return result
 }
+*/
