@@ -69,11 +69,17 @@ func Parse(data []byte, numEntries, maxEntries, dataSizeBits int, dataFixedSize 
 			if br.ReadBoolean() {
 				basis := br.ReadUBits(5)
 				length := br.ReadUBits(5)
-				if int(basis) > len(keyHistory) {
-					spew.Dump("Ignoring invalid history index...", keyHistory, basis, length)
+				if int(basis) >= len(keyHistory) {
+					// spew.Dump("Ignoring invalid history index...", keyHistory, basis, length)
 					nameBuf += br.ReadStringN(MaxNameLength)
 				} else {
-					nameBuf += keyHistory[basis][0:length] + br.ReadStringN(int(MaxNameLength-length))
+					s := keyHistory[basis]
+					if int(length) > len(s) {
+						spew.Dump(s, length)
+						nameBuf += s[0:length] + br.ReadStringN(int(MaxNameLength-length))
+					} else {
+						nameBuf += s[0:length] + br.ReadStringN(int(MaxNameLength-length))
+					}
 				}
 			} else {
 				nameBuf += br.ReadStringN(MaxNameLength)
