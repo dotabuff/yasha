@@ -102,6 +102,8 @@ func (p *Parser) AsBaseEvent(commandName string) (proto.Message, error) {
 		return &dota.CSVCMsg_GetCvarValue{}, nil
 	case "svc_PacketReliable":
 		return &dota.CSVCMsg_PacketReliable{}, nil
+	case "svc_FullFrameSplit":
+		return &dota.CSVCMsg_FullFrameSplit{}, nil
 	case "UM_AchievementEvent":
 		return &dota.CUserMsg_AchievementEvent{}, nil
 	case "UM_CloseCaption":
@@ -160,6 +162,8 @@ func (p *Parser) AsBaseEvent(commandName string) (proto.Message, error) {
 		return &dota.CUserMsg_VoiceSubtitle{}, nil
 	case "UM_SendAudio":
 		return &dota.CUserMsg_SendAudio{}, nil
+	case "UM_CameraTransition":
+		return &dota.CUserMsg_CameraTransition{}, nil
 	case "DOTA_UM_AIDebugLine":
 		return &dota.CDOTAUserMsg_AIDebugLine{}, nil
 	case "DOTA_UM_ChatEvent":
@@ -278,6 +282,8 @@ func (p *Parser) AsBaseEvent(commandName string) (proto.Message, error) {
 		return &dota.CDOTAUserMsg_PlayerMMR{}, nil
 	case "DOTA_UM_AbilitySteal":
 		return &dota.CDOTAUserMsg_AbilitySteal{}, nil
+	case "DOTA_UM_CourierKilledAlert":
+		return &dota.CDOTAUserMsg_CourierKilledAlert{}, nil
 	}
 	return nil, Error("Type not found: " + commandName)
 }
@@ -347,6 +353,8 @@ func (p *Parser) AsBaseEventNETSVC(value int) (proto.Message, error) {
 		return &dota.CSVCMsg_GetCvarValue{}, nil
 	case 32:
 		return &dota.CSVCMsg_PacketReliable{}, nil
+	case 33:
+		return &dota.CSVCMsg_FullFrameSplit{}, nil
 	}
 	return nil, Error("not found")
 }
@@ -410,6 +418,8 @@ func (p *Parser) AsBaseEventBUMDUM(value int) (proto.Message, error) {
 		return &dota.CUserMsg_VoiceSubtitle{}, nil
 	case 30:
 		return &dota.CUserMsg_SendAudio{}, nil
+	case 31:
+		return &dota.CUserMsg_CameraTransition{}, nil
 	case 65:
 		return &dota.CDOTAUserMsg_AIDebugLine{}, nil
 	case 66:
@@ -528,6 +538,8 @@ func (p *Parser) AsBaseEventBUMDUM(value int) (proto.Message, error) {
 		return &dota.CDOTAUserMsg_PlayerMMR{}, nil
 	case 127:
 		return &dota.CDOTAUserMsg_AbilitySteal{}, nil
+	case 128:
+		return &dota.CDOTAUserMsg_CourierKilledAlert{}, nil
 	}
 	return nil, Error("Unknown BUMDUM")
 }
