@@ -20,7 +20,6 @@ type Parser struct {
 	ClassInfosIdMapping   map[string]int
 	ClassInfosNameMapping map[int]string
 	FileHeader            *dota.CDemoFileHeader
-	FileInfo              *dota.CDemoFileInfo
 	GameEventMap          map[int32]*dota.CSVCMsg_GameEventListDescriptorT
 	Mapping               map[int][]*send_tables.SendProp
 	Multiples             map[int]map[string]int
