@@ -45,6 +45,7 @@ type Parser struct {
 	OnSounds               func(tick int, obj *dota.CSVCMsg_Sounds)
 	OnSpectatorPlayerClick func(tick int, obj *dota.CDOTAUserMsg_SpectatorPlayerClick)
 
+	OnFileInfo  func(obj *dota.CDemoFileInfo)
 	OnSetConVar func(obj *dota.CNETMsg_SetConVar)
 	OnVoiceData func(obj *dota.CSVCMsg_VoiceData)
 
@@ -182,7 +183,9 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 				p.ParsePacket(item.Tick, obj)
 			}
 		case *dota.CDemoFileInfo:
-			p.FileInfo = obj
+			if p.OnFileInfo != nil {
+				p.OnFileInfo(obj)
+			}
 		case *dota.CSVCMsg_VoiceInit:
 			p.VoiceInit = obj
 		case *dota.CSVCMsg_GameEvent:
