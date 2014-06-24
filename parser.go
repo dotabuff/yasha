@@ -391,8 +391,8 @@ func (p *Parser) ParsePacket(tick int, pe *dota.CSVCMsg_PacketEntities) {
 		if p.OnEntityDeleted != nil {
 			p.OnEntityDeleted(pe)
 		}
-		p.Entities[pe.Index] = nil
-		delete(p.ByHandle, pe.Handle())
+		// p.Entities[pe.Index] = nil
+		// delete(p.ByHandle, pe.Handle())
 	}
 }
 
