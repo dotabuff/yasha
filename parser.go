@@ -16,6 +16,7 @@ import (
 
 type Parser struct {
 	Parser                *parser.Parser
+	combatLogParser       *combatLogParser
 	ClassIdNumBits        int
 	ClassInfosIdMapping   map[string]int
 	ClassInfosNameMapping map[int]string
@@ -48,7 +49,7 @@ type Parser struct {
 	OnSetConVar func(obj *dota.CNETMsg_SetConVar)
 	OnVoiceData func(obj *dota.CSVCMsg_VoiceData)
 
-	OnCombatLog func(log *CombatLogEntry)
+	OnCombatLog func(log CombatLogEntry)
 
 	OnTablename func(name string)
 
@@ -74,6 +75,10 @@ func (p *Parser) Parse() {
 	p.Mapping = map[int][]*send_tables.SendProp{}
 	p.Multiples = map[int]map[string]int{}
 	p.ByHandle = map[int]*packet_entities.PacketEntity{}
+	p.combatLogParser = &combatLogParser{
+		stsh:     p.Stsh,
+		distinct: map[dota.DOTA_COMBATLOG_TYPES][]map[interface{}]bool{},
+	}
 
 	// in order to successfully process data every tick, we need to maintain
 	// order.  First of all the string and send tables for the tick have to be
@@ -102,6 +107,18 @@ func (p *Parser) Parse() {
 	// and process all remaining in the last tick
 	currentTick++
 	p.processTick(currentTick, buffer)
+}
+
+func (p *Parser) PrintDistinctCombatLogTypes() {
+	for k, v := range p.combatLogParser.distinct {
+		spew.Println(k)
+		for kk, vv := range v {
+			if len(vv) > 1 {
+				spew.Println(kk)
+				pp(vv)
+			}
+		}
+	}
 }
 
 func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
@@ -266,38 +283,11 @@ func (p *Parser) onGameEvent(tick int, obj *dota.CSVCMsg_GameEvent) {
 		// proxies : <*>type:4 val_short:59
 		// master : <*>type:1 val_string:"146.66.152.49:28027"
 	case "dota_combatlog":
-		if p.OnCombatLog == nil {
-			return
+		if p.OnCombatLog != nil {
+			if log := p.combatLogParser.parse(obj); log != nil {
+				p.OnCombatLog(log)
+			}
 		}
-		keys := obj.GetKeys()
-		table := p.Stsh.GetTableNow("CombatLogNames").Items
-
-		log := &CombatLogEntry{
-			Type:               dota.DOTA_COMBATLOG_TYPES(keys[0].GetValByte()),
-			AttackerIsIllusion: keys[5].GetValBool(),
-			TargetIsIllusion:   keys[6].GetValBool(),
-			Value:              keys[7].GetValShort(),
-			Health:             keys[8].GetValShort(),
-			Timestamp:          keys[9].GetValFloat(),
-		}
-
-		if k := table[int(keys[1].GetValShort())]; k != nil {
-			log.SourceName = k.Str
-		}
-		if k := table[int(keys[2].GetValShort())]; k != nil {
-			log.TargetName = k.Str
-		}
-		if k := table[int(keys[3].GetValShort())]; k != nil {
-			log.AttackerName = k.Str
-		}
-		if k := table[int(keys[4].GetValShort())]; k != nil {
-			log.InflictorName = k.Str
-		}
-		if k := table[int(keys[10].GetValShort())]; k != nil {
-			log.TargetSourceName = k.Str
-		}
-
-		p.OnCombatLog(log)
 	case "dota_chase_hero":
 		// target1 : <*>type:4 val_short:1418
 		// target2 : <*>type:4 val_short:0
@@ -344,11 +334,6 @@ func (p *Parser) onCDemoClassInfo(cdci *dota.CDemoClassInfo) {
 	p.Stsh.ClassInfosNameMapping = p.ClassInfosNameMapping
 	p.Stsh.Mapping = p.Mapping
 	p.Stsh.Multiples = p.Multiples
-}
-
-type packet struct {
-	br          *utils.BitReader
-	index, tick int
 }
 
 func (p *Parser) ParsePacket(tick int, pe *dota.CSVCMsg_PacketEntities) {

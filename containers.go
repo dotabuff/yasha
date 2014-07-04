@@ -1,6 +1,8 @@
 package core
 
-import "github.com/dotabuff/d2rp/dota"
+import "github.com/davecgh/go-spew/spew"
+
+var pp = spew.Dump
 
 type AbilityTracker struct {
 	HeroHandle int
@@ -26,70 +28,3 @@ type LastHits []*LastHitTracker
 func (p LastHits) Len() int           { return len(p) }
 func (p LastHits) Less(i, j int) bool { return p[i].Tick < p[j].Tick }
 func (p LastHits) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-
-type Dotabuff struct {
-	Players []*Player
-}
-
-type Player struct {
-	Abilities               Abilities
-	LastHits                LastHits
-	HeroHandle              int
-	AFK                     bool
-	Assists                 uint
-	BattleBonusActive       bool
-	BattleBonusRate         int
-	BroadcasterChannel      int
-	BroadcasterChannelSlot  int
-	BroadcasterLanguage     int
-	BuybackCooldownTime     float32
-	ConnectionState         int
-	Deaths                  uint
-	DenyCount               uint
-	FakeClient              bool
-	FullyJoinedServer       bool
-	HasRandomed             bool
-	HasRepicked             bool
-	IsBroadcaster           bool
-	Kills                   uint
-	LastBuybackTime         int
-	LastHitCount            uint
-	LastHitMultikill        uint
-	LastHitStreak           uint
-	Level                   int
-	MetaExperienceAwarded   int
-	MetaExperienceBonusRate int
-	MetaExperience          int
-	MetaLevel               int
-	PlayerNames             string
-	PlayerSteamIDs          uint64
-	PlayerTeams             int
-	PossibleHeroSelection   int
-	ReliableGold            uint
-	RespawnSeconds          int
-	SelectedHeroID          int
-	SelectedHero            string
-	Streak                  uint
-	SuggestedHeroes         int
-	TimedRewardCrates       int
-	TimedRewardDrops        int
-	TotalEarnedGold         uint
-	TotalEarnedXP           uint
-	UnitShareMasks          int
-	UnreliableGold          uint
-	VoiceChatBanned         bool
-}
-
-type CombatLogEntry struct {
-	Type               dota.DOTA_COMBATLOG_TYPES
-	SourceName         string
-	TargetName         string
-	AttackerName       string
-	InflictorName      string
-	AttackerIsIllusion bool
-	TargetIsIllusion   bool
-	Value              int32
-	Health             int32
-	Timestamp          float32
-	TargetSourceName   string
-}
