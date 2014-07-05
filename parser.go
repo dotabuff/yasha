@@ -175,6 +175,7 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 			*dota.CDOTAUserMsg_HalloweenDrops,
 			*dota.CDOTAUserMsg_HudError,
 			*dota.CDOTAUserMsg_LocationPing,
+			*dota.CDOTAUserMsg_CourierKilledAlert, // NOTE: might be useful later
 			*dota.CDOTAUserMsg_MapLine,
 			*dota.CDOTAUserMsg_MinimapEvent,
 			*dota.CDOTAUserMsg_NevermoreRequiem,
