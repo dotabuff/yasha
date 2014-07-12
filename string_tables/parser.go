@@ -76,7 +76,7 @@ func Parse(data []byte, numEntries, maxEntries, dataSizeBits int, dataFixedSize 
 					s := keyHistory[basis]
 					if int(length) > len(s) {
 						spew.Dump(s, length)
-						nameBuf += s[0:length] + br.ReadStringN(int(MaxNameLength-length))
+						nameBuf += s + br.ReadStringN(int(MaxNameLength))
 					} else {
 						nameBuf += s[0:length] + br.ReadStringN(int(MaxNameLength-length))
 					}
