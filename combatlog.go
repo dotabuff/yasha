@@ -66,6 +66,8 @@ func (c combatLogParser) parse(obj *dota.CSVCMsg_GameEvent) CombatLogEntry {
 		v = &CombatLogPurchase{}
 	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_XP:
 		v = &CombatLogXP{}
+	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_BUYBACK:
+		v = &CombatLogBuyback{}
 	default:
 		pp(t, keys)
 		return nil
@@ -73,6 +75,24 @@ func (c combatLogParser) parse(obj *dota.CSVCMsg_GameEvent) CombatLogEntry {
 
 	c.assign(v, keys)
 	return v
+}
+
+/*
+ 7  val_short: 9
+ 9  val_float: 2625.6892
+11  val_float: 2666.3
+*/
+type CombatLogBuyback struct {
+	Hero        string  `logIndex:"7" logTable:"CombatLogNames"`
+	DeathTime   float32 `logIndex:"9"`
+	BuybackTime float32 `logIndex:"11"`
+}
+
+func (c CombatLogBuyback) Type() dota.DOTA_COMBATLOG_TYPES {
+	return dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_BUYBACK
+}
+func (c CombatLogBuyback) Timestamp() float32 {
+	return c.BuybackTime
 }
 
 type CombatLogItem struct {
