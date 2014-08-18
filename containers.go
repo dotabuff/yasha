@@ -1,4 +1,4 @@
-package core
+package yasha
 
 import "github.com/davecgh/go-spew/spew"
 

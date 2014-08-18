@@ -4,7 +4,7 @@ import (
 	"math"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/dotabuff/d2rp/core/utils"
+	"github.com/dotabuff/yasha/utils"
 )
 
 const (

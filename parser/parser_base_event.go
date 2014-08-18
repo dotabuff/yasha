@@ -3,7 +3,7 @@ package parser
 
 import (
 	"code.google.com/p/gogoprotobuf/proto"
-	"github.com/dotabuff/d2rp/dota"
+	"github.com/dotabuff/yasha/dota"
 )
 
 func (p *Parser) AsBaseEvent(commandName string) (proto.Message, error) {

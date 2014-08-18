@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/dotabuff/d2rp/core/send_tables"
+	"github.com/dotabuff/yasha/send_tables"
 )
 
 var p = spew.Dump

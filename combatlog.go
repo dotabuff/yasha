@@ -1,12 +1,12 @@
-package core
+package yasha
 
 import (
 	"reflect"
 	"strconv"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/dotabuff/d2rp/core/string_tables"
-	"github.com/dotabuff/d2rp/dota"
+	"github.com/dotabuff/yasha/dota"
+	"github.com/dotabuff/yasha/string_tables"
 )
 
 type CombatLogEntry interface {

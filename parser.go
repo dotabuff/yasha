@@ -1,4 +1,4 @@
-package core
+package yasha
 
 import (
 	"math"
@@ -6,12 +6,12 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 
-	"github.com/dotabuff/d2rp/core/packet_entities"
-	"github.com/dotabuff/d2rp/core/parser"
-	"github.com/dotabuff/d2rp/core/send_tables"
-	"github.com/dotabuff/d2rp/core/string_tables"
-	"github.com/dotabuff/d2rp/core/utils"
-	"github.com/dotabuff/d2rp/dota"
+	"github.com/dotabuff/yasha/dota"
+	"github.com/dotabuff/yasha/packet_entities"
+	"github.com/dotabuff/yasha/parser"
+	"github.com/dotabuff/yasha/send_tables"
+	"github.com/dotabuff/yasha/string_tables"
+	"github.com/dotabuff/yasha/utils"
 )
 
 type Parser struct {

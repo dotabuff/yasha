@@ -2,7 +2,7 @@ package parser
 
 import (
 	"code.google.com/p/gogoprotobuf/proto"
-	dota "github.com/dotabuff/d2rp/dota"
+	"github.com/dotabuff/yasha/dota"
 )
 
 type ParserItem struct {

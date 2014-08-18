@@ -2,8 +2,8 @@ package parser
 
 import (
 	"github.com/davecgh/go-spew/spew"
-	"github.com/dotabuff/d2rp/core/utils"
-	"github.com/dotabuff/d2rp/dota"
+	"github.com/dotabuff/yasha/dota"
+	"github.com/dotabuff/yasha/utils"
 )
 
 var p = spew.Dump
