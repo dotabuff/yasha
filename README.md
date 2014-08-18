@@ -1,6 +1,6 @@
 # Yasha
 
-Dota 2 (Source 1) replay parser written in Go.
+Dota 2 (Source 1) replay parser written in Go, extracted from [Dotabuff TrueSkill](https://secure.dotabuff.com/trueskill).
 
 We're working on both maintaining the parser for replays of both Source 1 and Source 2 Engines.
 
@@ -26,6 +26,10 @@ And in your code:
 
 Please be aware that you _can't import_ Sange and Yasha in the same binary!
 The Protocol Buffer definitions conflict, and will panic.
+
+## Test Coverage
+
+Yasha is a dependency of and was extracted from [Dotabuff TrueSkill](https://secure.dotabuff.com/trueskill). Test coverage is currently upstream. We'll be working to implement comprehensive testing in both Yasha and Sange and are especially grateful for contributions in this area.
 
 ## Usage
 
