@@ -1914,6 +1914,7 @@ type CGCSystemMsg_GetAccountDetails_Response struct {
 	EresultDeprecated   *uint32 `protobuf:"varint,1,opt,name=eresult_deprecated,def=2" json:"eresult_deprecated,omitempty"`
 	AccountName         *string `protobuf:"bytes,2,opt,name=account_name" json:"account_name,omitempty"`
 	PersonaName         *string `protobuf:"bytes,3,opt,name=persona_name" json:"persona_name,omitempty"`
+	IsProfileCreated    *bool   `protobuf:"varint,26,opt,name=is_profile_created" json:"is_profile_created,omitempty"`
 	IsProfilePublic     *bool   `protobuf:"varint,4,opt,name=is_profile_public" json:"is_profile_public,omitempty"`
 	IsInventoryPublic   *bool   `protobuf:"varint,5,opt,name=is_inventory_public" json:"is_inventory_public,omitempty"`
 	IsVacBanned         *bool   `protobuf:"varint,7,opt,name=is_vac_banned" json:"is_vac_banned,omitempty"`
@@ -1933,6 +1934,8 @@ type CGCSystemMsg_GetAccountDetails_Response struct {
 	SuspensionEndTime   *uint32 `protobuf:"varint,21,opt,name=suspension_end_time" json:"suspension_end_time,omitempty"`
 	Currency            *string `protobuf:"bytes,22,opt,name=currency" json:"currency,omitempty"`
 	SteamLevel          *uint32 `protobuf:"varint,23,opt,name=steam_level" json:"steam_level,omitempty"`
+	FriendCount         *uint32 `protobuf:"varint,24,opt,name=friend_count" json:"friend_count,omitempty"`
+	AccountCreationTime *uint32 `protobuf:"varint,25,opt,name=account_creation_time" json:"account_creation_time,omitempty"`
 	XXX_unrecognized    []byte  `json:"-"`
 }
 
@@ -1963,6 +1966,13 @@ func (m *CGCSystemMsg_GetAccountDetails_Response) GetPersonaName() string {
 		return *m.PersonaName
 	}
 	return ""
+}
+
+func (m *CGCSystemMsg_GetAccountDetails_Response) GetIsProfileCreated() bool {
+	if m != nil && m.IsProfileCreated != nil {
+		return *m.IsProfileCreated
+	}
+	return false
 }
 
 func (m *CGCSystemMsg_GetAccountDetails_Response) GetIsProfilePublic() bool {
@@ -2094,6 +2104,20 @@ func (m *CGCSystemMsg_GetAccountDetails_Response) GetCurrency() string {
 func (m *CGCSystemMsg_GetAccountDetails_Response) GetSteamLevel() uint32 {
 	if m != nil && m.SteamLevel != nil {
 		return *m.SteamLevel
+	}
+	return 0
+}
+
+func (m *CGCSystemMsg_GetAccountDetails_Response) GetFriendCount() uint32 {
+	if m != nil && m.FriendCount != nil {
+		return *m.FriendCount
+	}
+	return 0
+}
+
+func (m *CGCSystemMsg_GetAccountDetails_Response) GetAccountCreationTime() uint32 {
+	if m != nil && m.AccountCreationTime != nil {
+		return *m.AccountCreationTime
 	}
 	return 0
 }

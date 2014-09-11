@@ -16,29 +16,35 @@ var _ = math.Inf
 type ETournamentGameState int32
 
 const (
-	ETournamentGameState_k_ETournamentGameState_Pending     ETournamentGameState = 0
-	ETournamentGameState_k_ETournamentGameState_Active      ETournamentGameState = 1
-	ETournamentGameState_k_ETournamentGameState_DireVictory ETournamentGameState = 2
-	ETournamentGameState_k_ETournamentGameState_RadVictory  ETournamentGameState = 3
-	ETournamentGameState_k_ETournamentGameState_Canceled    ETournamentGameState = 4
-	ETournamentGameState_k_ETournamentTeamState_NotNeeded   ETournamentGameState = 5
+	ETournamentGameState_k_ETournamentGameState_Unknown                ETournamentGameState = 0
+	ETournamentGameState_k_ETournamentGameState_Scheduled              ETournamentGameState = 1
+	ETournamentGameState_k_ETournamentGameState_WaitingForLobbyToStart ETournamentGameState = 2
+	ETournamentGameState_k_ETournamentGameState_Active                 ETournamentGameState = 3
+	ETournamentGameState_k_ETournamentGameState_DireVictory            ETournamentGameState = 4
+	ETournamentGameState_k_ETournamentGameState_RadVictory             ETournamentGameState = 5
+	ETournamentGameState_k_ETournamentGameState_Canceled               ETournamentGameState = 6
+	ETournamentGameState_k_ETournamentTeamState_NotNeeded              ETournamentGameState = 7
 )
 
 var ETournamentGameState_name = map[int32]string{
-	0: "k_ETournamentGameState_Pending",
-	1: "k_ETournamentGameState_Active",
-	2: "k_ETournamentGameState_DireVictory",
-	3: "k_ETournamentGameState_RadVictory",
-	4: "k_ETournamentGameState_Canceled",
-	5: "k_ETournamentTeamState_NotNeeded",
+	0: "k_ETournamentGameState_Unknown",
+	1: "k_ETournamentGameState_Scheduled",
+	2: "k_ETournamentGameState_WaitingForLobbyToStart",
+	3: "k_ETournamentGameState_Active",
+	4: "k_ETournamentGameState_DireVictory",
+	5: "k_ETournamentGameState_RadVictory",
+	6: "k_ETournamentGameState_Canceled",
+	7: "k_ETournamentTeamState_NotNeeded",
 }
 var ETournamentGameState_value = map[string]int32{
-	"k_ETournamentGameState_Pending":     0,
-	"k_ETournamentGameState_Active":      1,
-	"k_ETournamentGameState_DireVictory": 2,
-	"k_ETournamentGameState_RadVictory":  3,
-	"k_ETournamentGameState_Canceled":    4,
-	"k_ETournamentTeamState_NotNeeded":   5,
+	"k_ETournamentGameState_Unknown":                0,
+	"k_ETournamentGameState_Scheduled":              1,
+	"k_ETournamentGameState_WaitingForLobbyToStart": 2,
+	"k_ETournamentGameState_Active":                 3,
+	"k_ETournamentGameState_DireVictory":            4,
+	"k_ETournamentGameState_RadVictory":             5,
+	"k_ETournamentGameState_Canceled":               6,
+	"k_ETournamentTeamState_NotNeeded":              7,
 }
 
 func (x ETournamentGameState) Enum() *ETournamentGameState {
@@ -3726,22 +3732,20 @@ func (m *CMsgDOTATournament) GetNodes() []*CMsgDOTATournament_Node {
 }
 
 type CMsgDOTATournament_Team struct {
-	TeamId           *uint32               `protobuf:"varint,1,opt,name=team_id" json:"team_id,omitempty"`
-	TeamName         *string               `protobuf:"bytes,2,opt,name=team_name" json:"team_name,omitempty"`
-	TeamAbbrev       *string               `protobuf:"bytes,3,opt,name=team_abbrev" json:"team_abbrev,omitempty"`
-	Players          []uint32              `protobuf:"varint,4,rep,packed,name=players" json:"players,omitempty"`
-	Seed             *uint32               `protobuf:"varint,5,opt,name=seed" json:"seed,omitempty"`
-	TeamLogo         *uint64               `protobuf:"varint,6,opt,name=team_logo" json:"team_logo,omitempty"`
-	CountryCode      *string               `protobuf:"bytes,7,opt,name=country_code" json:"country_code,omitempty"`
-	NodeOrState      *ETournamentTeamState `protobuf:"varint,8,opt,name=node_or_state,enum=dota.ETournamentTeamState,def=0" json:"node_or_state,omitempty"`
-	XXX_unrecognized []byte                `json:"-"`
+	TeamId           *uint32  `protobuf:"varint,1,opt,name=team_id" json:"team_id,omitempty"`
+	TeamName         *string  `protobuf:"bytes,2,opt,name=team_name" json:"team_name,omitempty"`
+	TeamAbbrev       *string  `protobuf:"bytes,3,opt,name=team_abbrev" json:"team_abbrev,omitempty"`
+	Players          []uint32 `protobuf:"varint,4,rep,packed,name=players" json:"players,omitempty"`
+	Seed             *uint32  `protobuf:"varint,5,opt,name=seed" json:"seed,omitempty"`
+	TeamLogo         *uint64  `protobuf:"varint,6,opt,name=team_logo" json:"team_logo,omitempty"`
+	CountryCode      *string  `protobuf:"bytes,7,opt,name=country_code" json:"country_code,omitempty"`
+	NodeOrState      *uint32  `protobuf:"varint,8,opt,name=node_or_state" json:"node_or_state,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
 }
 
 func (m *CMsgDOTATournament_Team) Reset()         { *m = CMsgDOTATournament_Team{} }
 func (m *CMsgDOTATournament_Team) String() string { return proto.CompactTextString(m) }
 func (*CMsgDOTATournament_Team) ProtoMessage()    {}
-
-const Default_CMsgDOTATournament_Team_NodeOrState ETournamentTeamState = ETournamentTeamState_k_ETournamentTeamState_Unknown
 
 func (m *CMsgDOTATournament_Team) GetTeamId() uint32 {
 	if m != nil && m.TeamId != nil {
@@ -3792,11 +3796,11 @@ func (m *CMsgDOTATournament_Team) GetCountryCode() string {
 	return ""
 }
 
-func (m *CMsgDOTATournament_Team) GetNodeOrState() ETournamentTeamState {
+func (m *CMsgDOTATournament_Team) GetNodeOrState() uint32 {
 	if m != nil && m.NodeOrState != nil {
 		return *m.NodeOrState
 	}
-	return Default_CMsgDOTATournament_Team_NodeOrState
+	return 0
 }
 
 type CMsgDOTATournament_Game struct {
@@ -3812,6 +3816,8 @@ type CMsgDOTATournament_Game struct {
 	Message          *string               `protobuf:"bytes,9,opt,name=message" json:"message,omitempty"`
 	ResultsFinal     *bool                 `protobuf:"varint,10,opt,name=results_final" json:"results_final,omitempty"`
 	State            *ETournamentGameState `protobuf:"varint,14,opt,name=state,enum=dota.ETournamentGameState,def=0" json:"state,omitempty"`
+	NodeId           *uint32               `protobuf:"varint,15,opt,name=node_id" json:"node_id,omitempty"`
+	StartTime        *uint32               `protobuf:"varint,16,opt,name=start_time" json:"start_time,omitempty"`
 	XXX_unrecognized []byte                `json:"-"`
 }
 
@@ -3819,7 +3825,7 @@ func (m *CMsgDOTATournament_Game) Reset()         { *m = CMsgDOTATournament_Game
 func (m *CMsgDOTATournament_Game) String() string { return proto.CompactTextString(m) }
 func (*CMsgDOTATournament_Game) ProtoMessage()    {}
 
-const Default_CMsgDOTATournament_Game_State ETournamentGameState = ETournamentGameState_k_ETournamentGameState_Pending
+const Default_CMsgDOTATournament_Game_State ETournamentGameState = ETournamentGameState_k_ETournamentGameState_Unknown
 
 func (m *CMsgDOTATournament_Game) GetGameId() uint32 {
 	if m != nil && m.GameId != nil {
@@ -3905,20 +3911,38 @@ func (m *CMsgDOTATournament_Game) GetState() ETournamentGameState {
 	return Default_CMsgDOTATournament_Game_State
 }
 
+func (m *CMsgDOTATournament_Game) GetNodeId() uint32 {
+	if m != nil && m.NodeId != nil {
+		return *m.NodeId
+	}
+	return 0
+}
+
+func (m *CMsgDOTATournament_Game) GetStartTime() uint32 {
+	if m != nil && m.StartTime != nil {
+		return *m.StartTime
+	}
+	return 0
+}
+
 type CMsgDOTATournament_Node struct {
-	NodeId           *uint32  `protobuf:"varint,1,opt,name=node_id" json:"node_id,omitempty"`
-	TeamSeedA        *uint32  `protobuf:"varint,2,opt,name=team_seed_a" json:"team_seed_a,omitempty"`
-	TeamSeedB        *uint32  `protobuf:"varint,3,opt,name=team_seed_b" json:"team_seed_b,omitempty"`
-	WinnerNode       *uint32  `protobuf:"varint,4,opt,name=winner_node" json:"winner_node,omitempty"`
-	LoserNode        *uint32  `protobuf:"varint,5,opt,name=loser_node" json:"loser_node,omitempty"`
-	GameIds          []uint32 `protobuf:"varint,6,rep,packed,name=game_ids" json:"game_ids,omitempty"`
-	WinsRequired     *uint32  `protobuf:"varint,7,opt,name=wins_required" json:"wins_required,omitempty"`
-	XXX_unrecognized []byte   `json:"-"`
+	NodeId           *uint32               `protobuf:"varint,1,opt,name=node_id" json:"node_id,omitempty"`
+	TeamSeedA        *uint32               `protobuf:"varint,2,opt,name=team_seed_a" json:"team_seed_a,omitempty"`
+	TeamSeedB        *uint32               `protobuf:"varint,3,opt,name=team_seed_b" json:"team_seed_b,omitempty"`
+	WinnerNode       *uint32               `protobuf:"varint,4,opt,name=winner_node" json:"winner_node,omitempty"`
+	LoserNode        *uint32               `protobuf:"varint,5,opt,name=loser_node" json:"loser_node,omitempty"`
+	SeriesType       *uint32               `protobuf:"varint,7,opt,name=series_type" json:"series_type,omitempty"`
+	NodeState        *ETournamentNodeState `protobuf:"varint,8,opt,name=node_state,enum=dota.ETournamentNodeState,def=0" json:"node_state,omitempty"`
+	SeriesId         *uint32               `protobuf:"varint,9,opt,name=series_id" json:"series_id,omitempty"`
+	StartTime        *uint32               `protobuf:"varint,16,opt,name=start_time" json:"start_time,omitempty"`
+	XXX_unrecognized []byte                `json:"-"`
 }
 
 func (m *CMsgDOTATournament_Node) Reset()         { *m = CMsgDOTATournament_Node{} }
 func (m *CMsgDOTATournament_Node) String() string { return proto.CompactTextString(m) }
 func (*CMsgDOTATournament_Node) ProtoMessage()    {}
+
+const Default_CMsgDOTATournament_Node_NodeState ETournamentNodeState = ETournamentNodeState_k_ETournamentNodeState_Unknown
 
 func (m *CMsgDOTATournament_Node) GetNodeId() uint32 {
 	if m != nil && m.NodeId != nil {
@@ -3955,16 +3979,30 @@ func (m *CMsgDOTATournament_Node) GetLoserNode() uint32 {
 	return 0
 }
 
-func (m *CMsgDOTATournament_Node) GetGameIds() []uint32 {
-	if m != nil {
-		return m.GameIds
+func (m *CMsgDOTATournament_Node) GetSeriesType() uint32 {
+	if m != nil && m.SeriesType != nil {
+		return *m.SeriesType
 	}
-	return nil
+	return 0
 }
 
-func (m *CMsgDOTATournament_Node) GetWinsRequired() uint32 {
-	if m != nil && m.WinsRequired != nil {
-		return *m.WinsRequired
+func (m *CMsgDOTATournament_Node) GetNodeState() ETournamentNodeState {
+	if m != nil && m.NodeState != nil {
+		return *m.NodeState
+	}
+	return Default_CMsgDOTATournament_Node_NodeState
+}
+
+func (m *CMsgDOTATournament_Node) GetSeriesId() uint32 {
+	if m != nil && m.SeriesId != nil {
+		return *m.SeriesId
+	}
+	return 0
+}
+
+func (m *CMsgDOTATournament_Node) GetStartTime() uint32 {
+	if m != nil && m.StartTime != nil {
+		return *m.StartTime
 	}
 	return 0
 }
@@ -12185,6 +12223,176 @@ func (m *CMsgClientToGCGetAdditionalEquipsResponse) GetEquips() []*CAdditionalEq
 		return m.Equips
 	}
 	return nil
+}
+
+type CMsgClientToGCGetAllHeroProgress struct {
+	AccountId        *uint32 `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgClientToGCGetAllHeroProgress) Reset()         { *m = CMsgClientToGCGetAllHeroProgress{} }
+func (m *CMsgClientToGCGetAllHeroProgress) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCGetAllHeroProgress) ProtoMessage()    {}
+
+func (m *CMsgClientToGCGetAllHeroProgress) GetAccountId() uint32 {
+	if m != nil && m.AccountId != nil {
+		return *m.AccountId
+	}
+	return 0
+}
+
+type CMsgClientToGCGetAllHeroProgressResponse struct {
+	AccountId          *uint32  `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	CurrHeroId         *uint32  `protobuf:"varint,2,opt,name=curr_hero_id" json:"curr_hero_id,omitempty"`
+	LapsCompleted      *uint32  `protobuf:"varint,3,opt,name=laps_completed" json:"laps_completed,omitempty"`
+	CurrHeroGames      *uint32  `protobuf:"varint,4,opt,name=curr_hero_games" json:"curr_hero_games,omitempty"`
+	CurrLapTimeStarted *uint32  `protobuf:"varint,5,opt,name=curr_lap_time_started" json:"curr_lap_time_started,omitempty"`
+	CurrLapGames       *uint32  `protobuf:"varint,6,opt,name=curr_lap_games" json:"curr_lap_games,omitempty"`
+	BestLapGames       *uint32  `protobuf:"varint,7,opt,name=best_lap_games" json:"best_lap_games,omitempty"`
+	BestLapTime        *uint32  `protobuf:"varint,8,opt,name=best_lap_time" json:"best_lap_time,omitempty"`
+	LapHeroesCompleted *uint32  `protobuf:"varint,9,opt,name=lap_heroes_completed" json:"lap_heroes_completed,omitempty"`
+	LapHeroesRemaining *uint32  `protobuf:"varint,10,opt,name=lap_heroes_remaining" json:"lap_heroes_remaining,omitempty"`
+	NextHeroId         *uint32  `protobuf:"varint,11,opt,name=next_hero_id" json:"next_hero_id,omitempty"`
+	PrevHeroId         *uint32  `protobuf:"varint,12,opt,name=prev_hero_id" json:"prev_hero_id,omitempty"`
+	PrevHeroGames      *uint32  `protobuf:"varint,13,opt,name=prev_hero_games" json:"prev_hero_games,omitempty"`
+	PrevAvgTries       *float32 `protobuf:"fixed32,14,opt,name=prev_avg_tries" json:"prev_avg_tries,omitempty"`
+	CurrAvgTries       *float32 `protobuf:"fixed32,15,opt,name=curr_avg_tries" json:"curr_avg_tries,omitempty"`
+	NextAvgTries       *float32 `protobuf:"fixed32,16,opt,name=next_avg_tries" json:"next_avg_tries,omitempty"`
+	FullLapAvgTries    *float32 `protobuf:"fixed32,17,opt,name=full_lap_avg_tries" json:"full_lap_avg_tries,omitempty"`
+	CurrLapAvgTries    *float32 `protobuf:"fixed32,18,opt,name=curr_lap_avg_tries" json:"curr_lap_avg_tries,omitempty"`
+	XXX_unrecognized   []byte   `json:"-"`
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) Reset() {
+	*m = CMsgClientToGCGetAllHeroProgressResponse{}
+}
+func (m *CMsgClientToGCGetAllHeroProgressResponse) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCGetAllHeroProgressResponse) ProtoMessage()    {}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetAccountId() uint32 {
+	if m != nil && m.AccountId != nil {
+		return *m.AccountId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetCurrHeroId() uint32 {
+	if m != nil && m.CurrHeroId != nil {
+		return *m.CurrHeroId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetLapsCompleted() uint32 {
+	if m != nil && m.LapsCompleted != nil {
+		return *m.LapsCompleted
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetCurrHeroGames() uint32 {
+	if m != nil && m.CurrHeroGames != nil {
+		return *m.CurrHeroGames
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetCurrLapTimeStarted() uint32 {
+	if m != nil && m.CurrLapTimeStarted != nil {
+		return *m.CurrLapTimeStarted
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetCurrLapGames() uint32 {
+	if m != nil && m.CurrLapGames != nil {
+		return *m.CurrLapGames
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetBestLapGames() uint32 {
+	if m != nil && m.BestLapGames != nil {
+		return *m.BestLapGames
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetBestLapTime() uint32 {
+	if m != nil && m.BestLapTime != nil {
+		return *m.BestLapTime
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetLapHeroesCompleted() uint32 {
+	if m != nil && m.LapHeroesCompleted != nil {
+		return *m.LapHeroesCompleted
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetLapHeroesRemaining() uint32 {
+	if m != nil && m.LapHeroesRemaining != nil {
+		return *m.LapHeroesRemaining
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetNextHeroId() uint32 {
+	if m != nil && m.NextHeroId != nil {
+		return *m.NextHeroId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetPrevHeroId() uint32 {
+	if m != nil && m.PrevHeroId != nil {
+		return *m.PrevHeroId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetPrevHeroGames() uint32 {
+	if m != nil && m.PrevHeroGames != nil {
+		return *m.PrevHeroGames
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetPrevAvgTries() float32 {
+	if m != nil && m.PrevAvgTries != nil {
+		return *m.PrevAvgTries
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetCurrAvgTries() float32 {
+	if m != nil && m.CurrAvgTries != nil {
+		return *m.CurrAvgTries
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetNextAvgTries() float32 {
+	if m != nil && m.NextAvgTries != nil {
+		return *m.NextAvgTries
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetFullLapAvgTries() float32 {
+	if m != nil && m.FullLapAvgTries != nil {
+		return *m.FullLapAvgTries
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetCurrLapAvgTries() float32 {
+	if m != nil && m.CurrLapAvgTries != nil {
+		return *m.CurrLapAvgTries
+	}
+	return 0
 }
 
 func init() {

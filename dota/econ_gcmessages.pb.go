@@ -1230,7 +1230,7 @@ func (m *CMsgGCToGCGetUserPCBangNoResponse) GetPcBangNo() uint32 {
 }
 
 type CMsgRequestCrateItems struct {
-	CrateSeries      *uint32 `protobuf:"varint,1,opt,name=crate_series" json:"crate_series,omitempty"`
+	CrateItemDef     *uint32 `protobuf:"varint,1,opt,name=crate_item_def" json:"crate_item_def,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -1238,15 +1238,15 @@ func (m *CMsgRequestCrateItems) Reset()         { *m = CMsgRequestCrateItems{} }
 func (m *CMsgRequestCrateItems) String() string { return proto.CompactTextString(m) }
 func (*CMsgRequestCrateItems) ProtoMessage()    {}
 
-func (m *CMsgRequestCrateItems) GetCrateSeries() uint32 {
-	if m != nil && m.CrateSeries != nil {
-		return *m.CrateSeries
+func (m *CMsgRequestCrateItems) GetCrateItemDef() uint32 {
+	if m != nil && m.CrateItemDef != nil {
+		return *m.CrateItemDef
 	}
 	return 0
 }
 
 type CMsgRequestCrateItemsResponse struct {
-	CrateSeries      *uint32  `protobuf:"varint,1,opt,name=crate_series" json:"crate_series,omitempty"`
+	CrateItemDef     *uint32  `protobuf:"varint,1,opt,name=crate_item_def" json:"crate_item_def,omitempty"`
 	ItemDefs         []uint32 `protobuf:"varint,2,rep,name=item_defs" json:"item_defs,omitempty"`
 	XXX_unrecognized []byte   `json:"-"`
 }
@@ -1255,9 +1255,9 @@ func (m *CMsgRequestCrateItemsResponse) Reset()         { *m = CMsgRequestCrateI
 func (m *CMsgRequestCrateItemsResponse) String() string { return proto.CompactTextString(m) }
 func (*CMsgRequestCrateItemsResponse) ProtoMessage()    {}
 
-func (m *CMsgRequestCrateItemsResponse) GetCrateSeries() uint32 {
-	if m != nil && m.CrateSeries != nil {
-		return *m.CrateSeries
+func (m *CMsgRequestCrateItemsResponse) GetCrateItemDef() uint32 {
+	if m != nil && m.CrateItemDef != nil {
+		return *m.CrateItemDef
 	}
 	return 0
 }

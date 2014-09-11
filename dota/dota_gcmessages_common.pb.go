@@ -462,8 +462,14 @@ const (
 	EDOTAGCMsg_k_EMsgClientToGCGetAdditionalEquipsResponse                EDOTAGCMsg = 7515
 	EDOTAGCMsg_k_EMsgServerToGCGetAdditionalEquips                        EDOTAGCMsg = 7516
 	EDOTAGCMsg_k_EMsgServerToGCGetAdditionalEquipsResponse                EDOTAGCMsg = 7517
+	EDOTAGCMsg_k_EMsgDOTARedeemItem                                       EDOTAGCMsg = 7518
+	EDOTAGCMsg_k_EMsgDOTARedeemItemResponse                               EDOTAGCMsg = 7519
+	EDOTAGCMsg_k_EMsgSQLGCToGCGrantAllHeroProgress                        EDOTAGCMsg = 7520
+	EDOTAGCMsg_k_EMsgClientToGCGetAllHeroProgress                         EDOTAGCMsg = 7521
+	EDOTAGCMsg_k_EMsgClientToGCGetAllHeroProgressResponse                 EDOTAGCMsg = 7522
 	EDOTAGCMsg_k_EMsgGCToGCGetServerForClient                             EDOTAGCMsg = 7523
 	EDOTAGCMsg_k_EMsgGCToGCGetServerForClientResponse                     EDOTAGCMsg = 7524
+	EDOTAGCMsg_k_EMsgSQLProcessTournamentGameOutcome                      EDOTAGCMsg = 7525
 	EDOTAGCMsg_k_EMsgGCDev_GrantWarKill                                   EDOTAGCMsg = 8001
 )
 
@@ -914,8 +920,14 @@ var EDOTAGCMsg_name = map[int32]string{
 	7515: "k_EMsgClientToGCGetAdditionalEquipsResponse",
 	7516: "k_EMsgServerToGCGetAdditionalEquips",
 	7517: "k_EMsgServerToGCGetAdditionalEquipsResponse",
+	7518: "k_EMsgDOTARedeemItem",
+	7519: "k_EMsgDOTARedeemItemResponse",
+	7520: "k_EMsgSQLGCToGCGrantAllHeroProgress",
+	7521: "k_EMsgClientToGCGetAllHeroProgress",
+	7522: "k_EMsgClientToGCGetAllHeroProgressResponse",
 	7523: "k_EMsgGCToGCGetServerForClient",
 	7524: "k_EMsgGCToGCGetServerForClientResponse",
+	7525: "k_EMsgSQLProcessTournamentGameOutcome",
 	8001: "k_EMsgGCDev_GrantWarKill",
 }
 var EDOTAGCMsg_value = map[string]int32{
@@ -1365,8 +1377,14 @@ var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgClientToGCGetAdditionalEquipsResponse":                7515,
 	"k_EMsgServerToGCGetAdditionalEquips":                        7516,
 	"k_EMsgServerToGCGetAdditionalEquipsResponse":                7517,
+	"k_EMsgDOTARedeemItem":                                       7518,
+	"k_EMsgDOTARedeemItemResponse":                               7519,
+	"k_EMsgSQLGCToGCGrantAllHeroProgress":                        7520,
+	"k_EMsgClientToGCGetAllHeroProgress":                         7521,
+	"k_EMsgClientToGCGetAllHeroProgressResponse":                 7522,
 	"k_EMsgGCToGCGetServerForClient":                             7523,
 	"k_EMsgGCToGCGetServerForClientResponse":                     7524,
+	"k_EMsgSQLProcessTournamentGameOutcome":                      7525,
 	"k_EMsgGCDev_GrantWarKill":                                   8001,
 }
 
@@ -2738,6 +2756,7 @@ type CSODOTAGameAccountClient struct {
 	PartyCompetitiveGamesPlayed              *uint32             `protobuf:"varint,62,opt,name=party_competitive_games_played" json:"party_competitive_games_played,omitempty"`
 	Casual_1V1GamesPlayed                    *uint32             `protobuf:"varint,65,opt,name=casual_1v1_games_played" json:"casual_1v1_games_played,omitempty"`
 	CompetitiveTeamGamesPlayed               *uint32             `protobuf:"varint,66,opt,name=competitive_team_games_played" json:"competitive_team_games_played,omitempty"`
+	CurrAllHeroChallengeId                   *uint32             `protobuf:"varint,67,opt,name=curr_all_hero_challenge_id" json:"curr_all_hero_challenge_id,omitempty"`
 	XXX_unrecognized                         []byte              `json:"-"`
 }
 
@@ -3037,6 +3056,13 @@ func (m *CSODOTAGameAccountClient) GetCasual_1V1GamesPlayed() uint32 {
 func (m *CSODOTAGameAccountClient) GetCompetitiveTeamGamesPlayed() uint32 {
 	if m != nil && m.CompetitiveTeamGamesPlayed != nil {
 		return *m.CompetitiveTeamGamesPlayed
+	}
+	return 0
+}
+
+func (m *CSODOTAGameAccountClient) GetCurrAllHeroChallengeId() uint32 {
+	if m != nil && m.CurrAllHeroChallengeId != nil {
+		return *m.CurrAllHeroChallengeId
 	}
 	return 0
 }
@@ -5048,26 +5074,26 @@ func (m *CProtoItemSocket_Spectator) GetTeamId() uint32 {
 	return 0
 }
 
-type CProtoItemSocket_AnimModifier struct {
+type CProtoItemSocket_AssetModifier struct {
 	Socket           *CProtoItemSocket `protobuf:"bytes,1,opt,name=socket" json:"socket,omitempty"`
-	AnimModifier     *uint32           `protobuf:"varint,2,opt,name=anim_modifier" json:"anim_modifier,omitempty"`
+	AssetModifier    *uint32           `protobuf:"varint,2,opt,name=asset_modifier" json:"asset_modifier,omitempty"`
 	XXX_unrecognized []byte            `json:"-"`
 }
 
-func (m *CProtoItemSocket_AnimModifier) Reset()         { *m = CProtoItemSocket_AnimModifier{} }
-func (m *CProtoItemSocket_AnimModifier) String() string { return proto.CompactTextString(m) }
-func (*CProtoItemSocket_AnimModifier) ProtoMessage()    {}
+func (m *CProtoItemSocket_AssetModifier) Reset()         { *m = CProtoItemSocket_AssetModifier{} }
+func (m *CProtoItemSocket_AssetModifier) String() string { return proto.CompactTextString(m) }
+func (*CProtoItemSocket_AssetModifier) ProtoMessage()    {}
 
-func (m *CProtoItemSocket_AnimModifier) GetSocket() *CProtoItemSocket {
+func (m *CProtoItemSocket_AssetModifier) GetSocket() *CProtoItemSocket {
 	if m != nil {
 		return m.Socket
 	}
 	return nil
 }
 
-func (m *CProtoItemSocket_AnimModifier) GetAnimModifier() uint32 {
-	if m != nil && m.AnimModifier != nil {
-		return *m.AnimModifier
+func (m *CProtoItemSocket_AssetModifier) GetAssetModifier() uint32 {
+	if m != nil && m.AssetModifier != nil {
+		return *m.AssetModifier
 	}
 	return 0
 }
@@ -5693,6 +5719,38 @@ func (m *CAdditionalEquipSlot) GetDefIndex() uint32 {
 	}
 	return 0
 }
+
+type CMsgDOTARedeemItem struct {
+	CurrencyId       *uint64 `protobuf:"varint,1,opt,name=currency_id" json:"currency_id,omitempty"`
+	PurchaseDef      *uint32 `protobuf:"varint,2,opt,name=purchase_def" json:"purchase_def,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgDOTARedeemItem) Reset()         { *m = CMsgDOTARedeemItem{} }
+func (m *CMsgDOTARedeemItem) String() string { return proto.CompactTextString(m) }
+func (*CMsgDOTARedeemItem) ProtoMessage()    {}
+
+func (m *CMsgDOTARedeemItem) GetCurrencyId() uint64 {
+	if m != nil && m.CurrencyId != nil {
+		return *m.CurrencyId
+	}
+	return 0
+}
+
+func (m *CMsgDOTARedeemItem) GetPurchaseDef() uint32 {
+	if m != nil && m.PurchaseDef != nil {
+		return *m.PurchaseDef
+	}
+	return 0
+}
+
+type CMsgDOTARedeemItemResponse struct {
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *CMsgDOTARedeemItemResponse) Reset()         { *m = CMsgDOTARedeemItemResponse{} }
+func (m *CMsgDOTARedeemItemResponse) String() string { return proto.CompactTextString(m) }
+func (*CMsgDOTARedeemItemResponse) ProtoMessage()    {}
 
 func init() {
 	proto.RegisterEnum("dota.EDOTAGCMsg", EDOTAGCMsg_name, EDOTAGCMsg_value)

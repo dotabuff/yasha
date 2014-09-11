@@ -47,6 +47,7 @@ const (
 	EDotaClientMessages_DOTA_CM_CameraZoomAmount                       EDotaClientMessages = 27
 	EDotaClientMessages_DOTA_CM_BroadcasterUsingCamerman               EDotaClientMessages = 28
 	EDotaClientMessages_DOTA_CM_BroadcasterUsingAssistedCameraOperator EDotaClientMessages = 29
+	EDotaClientMessages_DOTA_CM_FreeInventory                          EDotaClientMessages = 31
 )
 
 var EDotaClientMessages_name = map[int32]string{
@@ -79,6 +80,7 @@ var EDotaClientMessages_name = map[int32]string{
 	27: "DOTA_CM_CameraZoomAmount",
 	28: "DOTA_CM_BroadcasterUsingCamerman",
 	29: "DOTA_CM_BroadcasterUsingAssistedCameraOperator",
+	31: "DOTA_CM_FreeInventory",
 }
 var EDotaClientMessages_value = map[string]int32{
 	"DOTA_CM_MapLine":                                1,
@@ -110,6 +112,7 @@ var EDotaClientMessages_value = map[string]int32{
 	"DOTA_CM_CameraZoomAmount":                       27,
 	"DOTA_CM_BroadcasterUsingCamerman":               28,
 	"DOTA_CM_BroadcasterUsingAssistedCameraOperator": 29,
+	"DOTA_CM_FreeInventory":                          31,
 }
 
 func (x EDotaClientMessages) Enum() *EDotaClientMessages {
@@ -641,6 +644,54 @@ func (m *CDOTAClientMsg_BroadcasterUsingAssistedCameraOperator) GetEnabled() boo
 		return *m.Enabled
 	}
 	return false
+}
+
+type CAdditionalEquipSlotClientMsg struct {
+	ClassId          *uint32 `protobuf:"varint,1,opt,name=class_id" json:"class_id,omitempty"`
+	SlotId           *uint32 `protobuf:"varint,2,opt,name=slot_id" json:"slot_id,omitempty"`
+	DefIndex         *uint32 `protobuf:"varint,3,opt,name=def_index" json:"def_index,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CAdditionalEquipSlotClientMsg) Reset()         { *m = CAdditionalEquipSlotClientMsg{} }
+func (m *CAdditionalEquipSlotClientMsg) String() string { return proto.CompactTextString(m) }
+func (*CAdditionalEquipSlotClientMsg) ProtoMessage()    {}
+
+func (m *CAdditionalEquipSlotClientMsg) GetClassId() uint32 {
+	if m != nil && m.ClassId != nil {
+		return *m.ClassId
+	}
+	return 0
+}
+
+func (m *CAdditionalEquipSlotClientMsg) GetSlotId() uint32 {
+	if m != nil && m.SlotId != nil {
+		return *m.SlotId
+	}
+	return 0
+}
+
+func (m *CAdditionalEquipSlotClientMsg) GetDefIndex() uint32 {
+	if m != nil && m.DefIndex != nil {
+		return *m.DefIndex
+	}
+	return 0
+}
+
+type CDOTAClientMsg_FreeInventory struct {
+	Equips           []*CAdditionalEquipSlotClientMsg `protobuf:"bytes,1,rep,name=equips" json:"equips,omitempty"`
+	XXX_unrecognized []byte                           `json:"-"`
+}
+
+func (m *CDOTAClientMsg_FreeInventory) Reset()         { *m = CDOTAClientMsg_FreeInventory{} }
+func (m *CDOTAClientMsg_FreeInventory) String() string { return proto.CompactTextString(m) }
+func (*CDOTAClientMsg_FreeInventory) ProtoMessage()    {}
+
+func (m *CDOTAClientMsg_FreeInventory) GetEquips() []*CAdditionalEquipSlotClientMsg {
+	if m != nil {
+		return m.Equips
+	}
+	return nil
 }
 
 func init() {

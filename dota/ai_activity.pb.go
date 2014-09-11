@@ -12,8 +12,8 @@ It is generated from these files:
 	dota_broadcastmessages.proto
 	dota_clientmessages.proto
 	dota_commonmessages.proto
-	dota_gcmessages_client.proto
 	dota_gcmessages_client_fantasy.proto
+	dota_gcmessages_client.proto
 	dota_gcmessages_common.proto
 	dota_gcmessages_server.proto
 	dota_modifiers.proto
@@ -23,8 +23,8 @@ It is generated from these files:
 	gcsystemmsgs.proto
 	htmlmessages.proto
 	netmessages.proto
-	network_connection.proto
 	networkbasetypes.proto
+	network_connection.proto
 	steammessages.proto
 	usermessages.proto
 
