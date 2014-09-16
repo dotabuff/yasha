@@ -1542,6 +1542,7 @@ type CMsgGCToGCGrantAccountRolledItems_Item struct {
 	Origin                 *uint32                                                        `protobuf:"varint,4,opt,name=origin" json:"origin,omitempty"`
 	DynamicAttributes      []*CMsgGCToGCGrantAccountRolledItems_Item_DynamicAttribute     `protobuf:"bytes,5,rep,name=dynamic_attributes" json:"dynamic_attributes,omitempty"`
 	AdditionalAuditEntries []*CMsgGCToGCGrantAccountRolledItems_Item_AdditionalAuditEntry `protobuf:"bytes,6,rep,name=additional_audit_entries" json:"additional_audit_entries,omitempty"`
+	InventoryToken         *uint32                                                        `protobuf:"varint,7,opt,name=inventory_token" json:"inventory_token,omitempty"`
 	XXX_unrecognized       []byte                                                         `json:"-"`
 }
 
@@ -1591,6 +1592,13 @@ func (m *CMsgGCToGCGrantAccountRolledItems_Item) GetAdditionalAuditEntries() []*
 		return m.AdditionalAuditEntries
 	}
 	return nil
+}
+
+func (m *CMsgGCToGCGrantAccountRolledItems_Item) GetInventoryToken() uint32 {
+	if m != nil && m.InventoryToken != nil {
+		return *m.InventoryToken
+	}
+	return 0
 }
 
 type CMsgGCToGCGrantAccountRolledItems_Item_DynamicAttribute struct {

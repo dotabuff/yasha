@@ -2851,10 +2851,11 @@ func (m *CMsgPracticeLobbySetCoach) GetTeam() DOTA_GC_TEAM {
 }
 
 type CMsgPracticeLobbyJoinBroadcastChannel struct {
-	Channel              *uint32 `protobuf:"varint,1,opt,name=channel" json:"channel,omitempty"`
-	PreferredDescription *string `protobuf:"bytes,2,opt,name=preferred_description" json:"preferred_description,omitempty"`
-	PreferredCountryCode *string `protobuf:"bytes,3,opt,name=preferred_country_code" json:"preferred_country_code,omitempty"`
-	XXX_unrecognized     []byte  `json:"-"`
+	Channel               *uint32 `protobuf:"varint,1,opt,name=channel" json:"channel,omitempty"`
+	PreferredDescription  *string `protobuf:"bytes,2,opt,name=preferred_description" json:"preferred_description,omitempty"`
+	PreferredCountryCode  *string `protobuf:"bytes,3,opt,name=preferred_country_code" json:"preferred_country_code,omitempty"`
+	PreferredLanguageCode *string `protobuf:"bytes,4,opt,name=preferred_language_code" json:"preferred_language_code,omitempty"`
+	XXX_unrecognized      []byte  `json:"-"`
 }
 
 func (m *CMsgPracticeLobbyJoinBroadcastChannel) Reset()         { *m = CMsgPracticeLobbyJoinBroadcastChannel{} }
@@ -2878,6 +2879,13 @@ func (m *CMsgPracticeLobbyJoinBroadcastChannel) GetPreferredDescription() string
 func (m *CMsgPracticeLobbyJoinBroadcastChannel) GetPreferredCountryCode() string {
 	if m != nil && m.PreferredCountryCode != nil {
 		return *m.PreferredCountryCode
+	}
+	return ""
+}
+
+func (m *CMsgPracticeLobbyJoinBroadcastChannel) GetPreferredLanguageCode() string {
+	if m != nil && m.PreferredLanguageCode != nil {
+		return *m.PreferredLanguageCode
 	}
 	return ""
 }
@@ -4816,6 +4824,7 @@ type CMsgDOTAMatch_BroadcasterChannel struct {
 	CountryCode      *string                          `protobuf:"bytes,1,opt,name=country_code" json:"country_code,omitempty"`
 	Description      *string                          `protobuf:"bytes,2,opt,name=description" json:"description,omitempty"`
 	BroadcasterInfos []*CMsgDOTAMatch_BroadcasterInfo `protobuf:"bytes,3,rep,name=broadcaster_infos" json:"broadcaster_infos,omitempty"`
+	LanguageCode     *string                          `protobuf:"bytes,4,opt,name=language_code" json:"language_code,omitempty"`
 	XXX_unrecognized []byte                           `json:"-"`
 }
 
@@ -4842,6 +4851,13 @@ func (m *CMsgDOTAMatch_BroadcasterChannel) GetBroadcasterInfos() []*CMsgDOTAMatc
 		return m.BroadcasterInfos
 	}
 	return nil
+}
+
+func (m *CMsgDOTAMatch_BroadcasterChannel) GetLanguageCode() string {
+	if m != nil && m.LanguageCode != nil {
+		return *m.LanguageCode
+	}
+	return ""
 }
 
 type CMsgDOTAPlayerMatchHistory struct {
@@ -10879,6 +10895,7 @@ func (m *CMsgGCItemEditorReleaseReservationResponse) GetReleased() bool {
 
 type CMsgDOTARewardTutorialPrizes struct {
 	LocationId       *uint32 `protobuf:"varint,1,opt,name=location_id" json:"location_id,omitempty"`
+	TrackingOnly     *bool   `protobuf:"varint,2,opt,name=tracking_only" json:"tracking_only,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -10891,6 +10908,13 @@ func (m *CMsgDOTARewardTutorialPrizes) GetLocationId() uint32 {
 		return *m.LocationId
 	}
 	return 0
+}
+
+func (m *CMsgDOTARewardTutorialPrizes) GetTrackingOnly() bool {
+	if m != nil && m.TrackingOnly != nil {
+		return *m.TrackingOnly
+	}
+	return false
 }
 
 type CMsgDOTALastHitChallengeHighScorePost struct {
@@ -10981,6 +11005,7 @@ type CMsgGCLobbyUpdateBroadcastChannelInfo struct {
 	ChannelId        *uint32 `protobuf:"varint,1,opt,name=channel_id" json:"channel_id,omitempty"`
 	CountryCode      *string `protobuf:"bytes,2,opt,name=country_code" json:"country_code,omitempty"`
 	Description      *string `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	LanguageCode     *string `protobuf:"bytes,4,opt,name=language_code" json:"language_code,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -11005,6 +11030,13 @@ func (m *CMsgGCLobbyUpdateBroadcastChannelInfo) GetCountryCode() string {
 func (m *CMsgGCLobbyUpdateBroadcastChannelInfo) GetDescription() string {
 	if m != nil && m.Description != nil {
 		return *m.Description
+	}
+	return ""
+}
+
+func (m *CMsgGCLobbyUpdateBroadcastChannelInfo) GetLanguageCode() string {
+	if m != nil && m.LanguageCode != nil {
+		return *m.LanguageCode
 	}
 	return ""
 }
@@ -11721,6 +11753,24 @@ func (m *CMsgGCNotificationsMarkReadRequest) Reset()         { *m = CMsgGCNotifi
 func (m *CMsgGCNotificationsMarkReadRequest) String() string { return proto.CompactTextString(m) }
 func (*CMsgGCNotificationsMarkReadRequest) ProtoMessage()    {}
 
+type CMsgClientToGCMarkNotificationListRead struct {
+	NotificationIds  []uint64 `protobuf:"varint,1,rep,name=notification_ids" json:"notification_ids,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
+}
+
+func (m *CMsgClientToGCMarkNotificationListRead) Reset() {
+	*m = CMsgClientToGCMarkNotificationListRead{}
+}
+func (m *CMsgClientToGCMarkNotificationListRead) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCMarkNotificationListRead) ProtoMessage()    {}
+
+func (m *CMsgClientToGCMarkNotificationListRead) GetNotificationIds() []uint64 {
+	if m != nil {
+		return m.NotificationIds
+	}
+	return nil
+}
+
 type CMsgGCLeagueAdminState struct {
 	Leagues          []uint32                                    `protobuf:"varint,1,rep,name=leagues" json:"leagues,omitempty"`
 	Keys             []*CMsgGCLeagueAdminState_PrivateLeagueKeys `protobuf:"bytes,2,rep,name=keys" json:"keys,omitempty"`
@@ -12260,6 +12310,7 @@ type CMsgClientToGCGetAllHeroProgressResponse struct {
 	NextAvgTries       *float32 `protobuf:"fixed32,16,opt,name=next_avg_tries" json:"next_avg_tries,omitempty"`
 	FullLapAvgTries    *float32 `protobuf:"fixed32,17,opt,name=full_lap_avg_tries" json:"full_lap_avg_tries,omitempty"`
 	CurrLapAvgTries    *float32 `protobuf:"fixed32,18,opt,name=curr_lap_avg_tries" json:"curr_lap_avg_tries,omitempty"`
+	ProfileName        *string  `protobuf:"bytes,19,opt,name=profile_name" json:"profile_name,omitempty"`
 	XXX_unrecognized   []byte   `json:"-"`
 }
 
@@ -12391,6 +12442,169 @@ func (m *CMsgClientToGCGetAllHeroProgressResponse) GetFullLapAvgTries() float32 
 func (m *CMsgClientToGCGetAllHeroProgressResponse) GetCurrLapAvgTries() float32 {
 	if m != nil && m.CurrLapAvgTries != nil {
 		return *m.CurrLapAvgTries
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetAllHeroProgressResponse) GetProfileName() string {
+	if m != nil && m.ProfileName != nil {
+		return *m.ProfileName
+	}
+	return ""
+}
+
+type CMsgClientToGCGetTrophyList struct {
+	AccountId        *uint32 `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgClientToGCGetTrophyList) Reset()         { *m = CMsgClientToGCGetTrophyList{} }
+func (m *CMsgClientToGCGetTrophyList) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCGetTrophyList) ProtoMessage()    {}
+
+func (m *CMsgClientToGCGetTrophyList) GetAccountId() uint32 {
+	if m != nil && m.AccountId != nil {
+		return *m.AccountId
+	}
+	return 0
+}
+
+type CMsgClientToGCGetTrophyListResponse struct {
+	AccountId        *uint32                                       `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	Trophies         []*CMsgClientToGCGetTrophyListResponse_Trophy `protobuf:"bytes,2,rep,name=trophies" json:"trophies,omitempty"`
+	ProfileName      *string                                       `protobuf:"bytes,3,opt,name=profile_name" json:"profile_name,omitempty"`
+	XXX_unrecognized []byte                                        `json:"-"`
+}
+
+func (m *CMsgClientToGCGetTrophyListResponse) Reset()         { *m = CMsgClientToGCGetTrophyListResponse{} }
+func (m *CMsgClientToGCGetTrophyListResponse) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCGetTrophyListResponse) ProtoMessage()    {}
+
+func (m *CMsgClientToGCGetTrophyListResponse) GetAccountId() uint32 {
+	if m != nil && m.AccountId != nil {
+		return *m.AccountId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetTrophyListResponse) GetTrophies() []*CMsgClientToGCGetTrophyListResponse_Trophy {
+	if m != nil {
+		return m.Trophies
+	}
+	return nil
+}
+
+func (m *CMsgClientToGCGetTrophyListResponse) GetProfileName() string {
+	if m != nil && m.ProfileName != nil {
+		return *m.ProfileName
+	}
+	return ""
+}
+
+type CMsgClientToGCGetTrophyListResponse_Trophy struct {
+	TrophyId         *uint32 `protobuf:"varint,1,opt,name=trophy_id" json:"trophy_id,omitempty"`
+	TrophyScore      *uint32 `protobuf:"varint,2,opt,name=trophy_score" json:"trophy_score,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgClientToGCGetTrophyListResponse_Trophy) Reset() {
+	*m = CMsgClientToGCGetTrophyListResponse_Trophy{}
+}
+func (m *CMsgClientToGCGetTrophyListResponse_Trophy) String() string {
+	return proto.CompactTextString(m)
+}
+func (*CMsgClientToGCGetTrophyListResponse_Trophy) ProtoMessage() {}
+
+func (m *CMsgClientToGCGetTrophyListResponse_Trophy) GetTrophyId() uint32 {
+	if m != nil && m.TrophyId != nil {
+		return *m.TrophyId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCGetTrophyListResponse_Trophy) GetTrophyScore() uint32 {
+	if m != nil && m.TrophyScore != nil {
+		return *m.TrophyScore
+	}
+	return 0
+}
+
+type CMsgGCToClientTrophyAwarded struct {
+	TrophyId         *uint32 `protobuf:"varint,1,opt,name=trophy_id" json:"trophy_id,omitempty"`
+	TrophyScore      *uint32 `protobuf:"varint,2,opt,name=trophy_score" json:"trophy_score,omitempty"`
+	TrophyOldScore   *uint32 `protobuf:"varint,3,opt,name=trophy_old_score" json:"trophy_old_score,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgGCToClientTrophyAwarded) Reset()         { *m = CMsgGCToClientTrophyAwarded{} }
+func (m *CMsgGCToClientTrophyAwarded) String() string { return proto.CompactTextString(m) }
+func (*CMsgGCToClientTrophyAwarded) ProtoMessage()    {}
+
+func (m *CMsgGCToClientTrophyAwarded) GetTrophyId() uint32 {
+	if m != nil && m.TrophyId != nil {
+		return *m.TrophyId
+	}
+	return 0
+}
+
+func (m *CMsgGCToClientTrophyAwarded) GetTrophyScore() uint32 {
+	if m != nil && m.TrophyScore != nil {
+		return *m.TrophyScore
+	}
+	return 0
+}
+
+func (m *CMsgGCToClientTrophyAwarded) GetTrophyOldScore() uint32 {
+	if m != nil && m.TrophyOldScore != nil {
+		return *m.TrophyOldScore
+	}
+	return 0
+}
+
+type CMsgClientToGCGetProfileCard struct {
+	AccountId        *uint32 `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgClientToGCGetProfileCard) Reset()         { *m = CMsgClientToGCGetProfileCard{} }
+func (m *CMsgClientToGCGetProfileCard) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCGetProfileCard) ProtoMessage()    {}
+
+func (m *CMsgClientToGCGetProfileCard) GetAccountId() uint32 {
+	if m != nil && m.AccountId != nil {
+		return *m.AccountId
+	}
+	return 0
+}
+
+type CMsgClientToGCSetProfileCardSlot struct {
+	SlotId           *uint32 `protobuf:"varint,1,opt,name=slot_id" json:"slot_id,omitempty"`
+	SlotType         *uint32 `protobuf:"varint,2,opt,name=slot_type" json:"slot_type,omitempty"`
+	SlotValue        *uint64 `protobuf:"varint,3,opt,name=slot_value" json:"slot_value,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgClientToGCSetProfileCardSlot) Reset()         { *m = CMsgClientToGCSetProfileCardSlot{} }
+func (m *CMsgClientToGCSetProfileCardSlot) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCSetProfileCardSlot) ProtoMessage()    {}
+
+func (m *CMsgClientToGCSetProfileCardSlot) GetSlotId() uint32 {
+	if m != nil && m.SlotId != nil {
+		return *m.SlotId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCSetProfileCardSlot) GetSlotType() uint32 {
+	if m != nil && m.SlotType != nil {
+		return *m.SlotType
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCSetProfileCardSlot) GetSlotValue() uint64 {
+	if m != nil && m.SlotValue != nil {
+		return *m.SlotValue
 	}
 	return 0
 }

@@ -24,17 +24,32 @@ Dir.glob('dota/**/*.proto') do |filename|
 end
 
 broken = Hash.new{|h,k| h[k] = {} }
-broken["SVC_Messages"] = %w[svc_EntityMessage]
-broken["EBaseUserMessages"] = %w[UM_MAX_BASE UM_CloseCaptionDirect]
-broken["EDotaUserMessages"] = %w[DOTA_UM_AddUnitToSelection DOTA_UM_CharacterSpeakConcept DOTA_UM_GamerulesStateChanged DOTA_UM_TournamentDrop]
-broken["EDemoCommands"] = %w[DEM_SignonPacket DEM_Max DEM_IsCompressed]
+broken["SVC_Messages"] = %w[
+  svc_EntityMessage
+]
+broken["EBaseUserMessages"] = %w[
+  UM_MAX_BASE
+  UM_CloseCaptionDirect
+]
+broken["EDotaUserMessages"] = %w[
+  DOTA_UM_AddUnitToSelection
+  DOTA_UM_CharacterSpeakConcept
+  DOTA_UM_GamerulesStateChanged
+  DOTA_UM_TournamentDrop
+  DOTA_UM_CombatLogData
+]
+broken["EDemoCommands"] = %w[
+  DEM_SignonPacket
+  DEM_Max
+  DEM_IsCompressed
+]
 
 map_type_options = {
-  DEM: {enum: 'EDemoCommands',     iprefix: 'CDemo',         tprefix: 'DEM_'},
-  NET: {enum: 'NET_Messages',      iprefix: 'CNETMsg_',      tprefix: 'NET_'},
-  SVC: {enum: 'SVC_Messages',      iprefix: 'CSVCMsg_',      tprefix: 'SVC_'},
-  BUM: {enum: 'EBaseUserMessages', iprefix: 'CUserMsg_',     tprefix: 'UM_'},
-  DUM: {enum: 'EDotaUserMessages', iprefix: 'CDOTAUserMsg_', tprefix: 'DOTA_UM_'},
+  DEM: {enum: 'EDemoCommands',     iprefix: 'CDemo'},
+  NET: {enum: 'NET_Messages',      iprefix: 'CNETMsg_'},
+  SVC: {enum: 'SVC_Messages',      iprefix: 'CSVCMsg_'},
+  BUM: {enum: 'EBaseUserMessages', iprefix: 'CUserMsg_'},
+  DUM: {enum: 'EDotaUserMessages', iprefix: 'CDOTAUserMsg_'},
 }
 
 map_type = ->(kind, name, value){
@@ -48,7 +63,7 @@ map_type = ->(kind, name, value){
   %(&dota.#{i}{})
 }
 
-File.open 'core/parser/parser_base_event.go', 'w+' do |io|
+File.open 'parser/parser_base_event.go', 'w+' do |io|
   Open3.popen3 'gofmt' do |si, so, se|
     tee = ->(*str){
       puts(*str)

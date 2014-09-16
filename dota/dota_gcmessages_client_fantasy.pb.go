@@ -608,7 +608,7 @@ const (
 	CMsgDOTAFantasyTeamRosterSwapResponse_ERROR_UNSPECIFIED         CMsgDOTAFantasyTeamRosterSwapResponse_EResult = 1
 	CMsgDOTAFantasyTeamRosterSwapResponse_ERROR_OWNER_NOT_IN_LEAGUE CMsgDOTAFantasyTeamRosterSwapResponse_EResult = 2
 	CMsgDOTAFantasyTeamRosterSwapResponse_ERROR_SLOTS_INVALID       CMsgDOTAFantasyTeamRosterSwapResponse_EResult = 3
-	CMsgDOTAFantasyTeamRosterSwapResponse_ERROR_ROSTER_LOCKED       CMsgDOTAFantasyTeamRosterSwapResponse_EResult = 4
+	CMsgDOTAFantasyTeamRosterSwapResponse_ERROR_SLOT_LOCKED         CMsgDOTAFantasyTeamRosterSwapResponse_EResult = 4
 )
 
 var CMsgDOTAFantasyTeamRosterSwapResponse_EResult_name = map[int32]string{
@@ -616,14 +616,14 @@ var CMsgDOTAFantasyTeamRosterSwapResponse_EResult_name = map[int32]string{
 	1: "ERROR_UNSPECIFIED",
 	2: "ERROR_OWNER_NOT_IN_LEAGUE",
 	3: "ERROR_SLOTS_INVALID",
-	4: "ERROR_ROSTER_LOCKED",
+	4: "ERROR_SLOT_LOCKED",
 }
 var CMsgDOTAFantasyTeamRosterSwapResponse_EResult_value = map[string]int32{
 	"SUCCESS":                   0,
 	"ERROR_UNSPECIFIED":         1,
 	"ERROR_OWNER_NOT_IN_LEAGUE": 2,
 	"ERROR_SLOTS_INVALID":       3,
-	"ERROR_ROSTER_LOCKED":       4,
+	"ERROR_SLOT_LOCKED":         4,
 }
 
 func (x CMsgDOTAFantasyTeamRosterSwapResponse_EResult) Enum() *CMsgDOTAFantasyTeamRosterSwapResponse_EResult {
@@ -881,6 +881,7 @@ const (
 	CMsgDOTAFantasyRemoveOwnerResponse_ERROR_UNSPECIFIED   CMsgDOTAFantasyRemoveOwnerResponse_EResult = 1
 	CMsgDOTAFantasyRemoveOwnerResponse_ERROR_NO_PERMISSION CMsgDOTAFantasyRemoveOwnerResponse_EResult = 2
 	CMsgDOTAFantasyRemoveOwnerResponse_ERROR_LEAGUE_LOCKED CMsgDOTAFantasyRemoveOwnerResponse_EResult = 3
+	CMsgDOTAFantasyRemoveOwnerResponse_ERROR_NOT_A_MEMBER  CMsgDOTAFantasyRemoveOwnerResponse_EResult = 4
 )
 
 var CMsgDOTAFantasyRemoveOwnerResponse_EResult_name = map[int32]string{
@@ -888,12 +889,14 @@ var CMsgDOTAFantasyRemoveOwnerResponse_EResult_name = map[int32]string{
 	1: "ERROR_UNSPECIFIED",
 	2: "ERROR_NO_PERMISSION",
 	3: "ERROR_LEAGUE_LOCKED",
+	4: "ERROR_NOT_A_MEMBER",
 }
 var CMsgDOTAFantasyRemoveOwnerResponse_EResult_value = map[string]int32{
 	"SUCCESS":             0,
 	"ERROR_UNSPECIFIED":   1,
 	"ERROR_NO_PERMISSION": 2,
 	"ERROR_LEAGUE_LOCKED": 3,
+	"ERROR_NOT_A_MEMBER":  4,
 }
 
 func (x CMsgDOTAFantasyRemoveOwnerResponse_EResult) Enum() *CMsgDOTAFantasyRemoveOwnerResponse_EResult {
@@ -1180,106 +1183,122 @@ func (m *CMsgDOTACreateFantasyLeagueResponse) GetResult() CMsgDOTACreateFantasyL
 	return Default_CMsgDOTACreateFantasyLeagueResponse_Result
 }
 
-type CMsgFantasyLeagueRoleScoring struct {
-	Level            *float32 `protobuf:"fixed32,1,opt,name=level" json:"level,omitempty"`
-	Kills            *float32 `protobuf:"fixed32,2,opt,name=kills" json:"kills,omitempty"`
-	Deaths           *float32 `protobuf:"fixed32,3,opt,name=deaths" json:"deaths,omitempty"`
-	Assists          *float32 `protobuf:"fixed32,4,opt,name=assists" json:"assists,omitempty"`
-	LastHits         *float32 `protobuf:"fixed32,5,opt,name=last_hits" json:"last_hits,omitempty"`
-	Denies           *float32 `protobuf:"fixed32,6,opt,name=denies" json:"denies,omitempty"`
-	Gpm              *float32 `protobuf:"fixed32,7,opt,name=gpm" json:"gpm,omitempty"`
-	Xppm             *float32 `protobuf:"fixed32,8,opt,name=xppm" json:"xppm,omitempty"`
-	Stuns            *float32 `protobuf:"fixed32,9,opt,name=stuns" json:"stuns,omitempty"`
-	Healing          *float32 `protobuf:"fixed32,10,opt,name=healing" json:"healing,omitempty"`
-	TowerKills       *float32 `protobuf:"fixed32,11,opt,name=tower_kills" json:"tower_kills,omitempty"`
-	RoshanKills      *float32 `protobuf:"fixed32,12,opt,name=roshan_kills" json:"roshan_kills,omitempty"`
-	XXX_unrecognized []byte   `json:"-"`
+type CMsgFantasyLeagueScoring struct {
+	Level                  *float32 `protobuf:"fixed32,1,opt,name=level" json:"level,omitempty"`
+	Kills                  *float32 `protobuf:"fixed32,2,opt,name=kills" json:"kills,omitempty"`
+	Deaths                 *float32 `protobuf:"fixed32,3,opt,name=deaths" json:"deaths,omitempty"`
+	Assists                *float32 `protobuf:"fixed32,4,opt,name=assists" json:"assists,omitempty"`
+	LastHits               *float32 `protobuf:"fixed32,5,opt,name=last_hits" json:"last_hits,omitempty"`
+	Denies                 *float32 `protobuf:"fixed32,6,opt,name=denies" json:"denies,omitempty"`
+	Gpm                    *float32 `protobuf:"fixed32,7,opt,name=gpm" json:"gpm,omitempty"`
+	Xppm                   *float32 `protobuf:"fixed32,8,opt,name=xppm" json:"xppm,omitempty"`
+	Stuns                  *float32 `protobuf:"fixed32,9,opt,name=stuns" json:"stuns,omitempty"`
+	Healing                *float32 `protobuf:"fixed32,10,opt,name=healing" json:"healing,omitempty"`
+	TowerKills             *float32 `protobuf:"fixed32,11,opt,name=tower_kills" json:"tower_kills,omitempty"`
+	RoshanKills            *float32 `protobuf:"fixed32,12,opt,name=roshan_kills" json:"roshan_kills,omitempty"`
+	MultiplierPremium      *float32 `protobuf:"fixed32,13,opt,name=multiplier_premium" json:"multiplier_premium,omitempty"`
+	MultiplierProfessional *float32 `protobuf:"fixed32,14,opt,name=multiplier_professional" json:"multiplier_professional,omitempty"`
+	XXX_unrecognized       []byte   `json:"-"`
 }
 
-func (m *CMsgFantasyLeagueRoleScoring) Reset()         { *m = CMsgFantasyLeagueRoleScoring{} }
-func (m *CMsgFantasyLeagueRoleScoring) String() string { return proto.CompactTextString(m) }
-func (*CMsgFantasyLeagueRoleScoring) ProtoMessage()    {}
+func (m *CMsgFantasyLeagueScoring) Reset()         { *m = CMsgFantasyLeagueScoring{} }
+func (m *CMsgFantasyLeagueScoring) String() string { return proto.CompactTextString(m) }
+func (*CMsgFantasyLeagueScoring) ProtoMessage()    {}
 
-func (m *CMsgFantasyLeagueRoleScoring) GetLevel() float32 {
+func (m *CMsgFantasyLeagueScoring) GetLevel() float32 {
 	if m != nil && m.Level != nil {
 		return *m.Level
 	}
 	return 0
 }
 
-func (m *CMsgFantasyLeagueRoleScoring) GetKills() float32 {
+func (m *CMsgFantasyLeagueScoring) GetKills() float32 {
 	if m != nil && m.Kills != nil {
 		return *m.Kills
 	}
 	return 0
 }
 
-func (m *CMsgFantasyLeagueRoleScoring) GetDeaths() float32 {
+func (m *CMsgFantasyLeagueScoring) GetDeaths() float32 {
 	if m != nil && m.Deaths != nil {
 		return *m.Deaths
 	}
 	return 0
 }
 
-func (m *CMsgFantasyLeagueRoleScoring) GetAssists() float32 {
+func (m *CMsgFantasyLeagueScoring) GetAssists() float32 {
 	if m != nil && m.Assists != nil {
 		return *m.Assists
 	}
 	return 0
 }
 
-func (m *CMsgFantasyLeagueRoleScoring) GetLastHits() float32 {
+func (m *CMsgFantasyLeagueScoring) GetLastHits() float32 {
 	if m != nil && m.LastHits != nil {
 		return *m.LastHits
 	}
 	return 0
 }
 
-func (m *CMsgFantasyLeagueRoleScoring) GetDenies() float32 {
+func (m *CMsgFantasyLeagueScoring) GetDenies() float32 {
 	if m != nil && m.Denies != nil {
 		return *m.Denies
 	}
 	return 0
 }
 
-func (m *CMsgFantasyLeagueRoleScoring) GetGpm() float32 {
+func (m *CMsgFantasyLeagueScoring) GetGpm() float32 {
 	if m != nil && m.Gpm != nil {
 		return *m.Gpm
 	}
 	return 0
 }
 
-func (m *CMsgFantasyLeagueRoleScoring) GetXppm() float32 {
+func (m *CMsgFantasyLeagueScoring) GetXppm() float32 {
 	if m != nil && m.Xppm != nil {
 		return *m.Xppm
 	}
 	return 0
 }
 
-func (m *CMsgFantasyLeagueRoleScoring) GetStuns() float32 {
+func (m *CMsgFantasyLeagueScoring) GetStuns() float32 {
 	if m != nil && m.Stuns != nil {
 		return *m.Stuns
 	}
 	return 0
 }
 
-func (m *CMsgFantasyLeagueRoleScoring) GetHealing() float32 {
+func (m *CMsgFantasyLeagueScoring) GetHealing() float32 {
 	if m != nil && m.Healing != nil {
 		return *m.Healing
 	}
 	return 0
 }
 
-func (m *CMsgFantasyLeagueRoleScoring) GetTowerKills() float32 {
+func (m *CMsgFantasyLeagueScoring) GetTowerKills() float32 {
 	if m != nil && m.TowerKills != nil {
 		return *m.TowerKills
 	}
 	return 0
 }
 
-func (m *CMsgFantasyLeagueRoleScoring) GetRoshanKills() float32 {
+func (m *CMsgFantasyLeagueScoring) GetRoshanKills() float32 {
 	if m != nil && m.RoshanKills != nil {
 		return *m.RoshanKills
+	}
+	return 0
+}
+
+func (m *CMsgFantasyLeagueScoring) GetMultiplierPremium() float32 {
+	if m != nil && m.MultiplierPremium != nil {
+		return *m.MultiplierPremium
+	}
+	return 0
+}
+
+func (m *CMsgFantasyLeagueScoring) GetMultiplierProfessional() float32 {
+	if m != nil && m.MultiplierProfessional != nil {
+		return *m.MultiplierProfessional
 	}
 	return 0
 }
@@ -1291,7 +1310,7 @@ type CMsgDOTAFantasyLeagueInfo struct {
 	SelectionMode         *Fantasy_Selection_Mode                `protobuf:"varint,4,opt,name=selection_mode,enum=dota.Fantasy_Selection_Mode,def=0" json:"selection_mode,omitempty"`
 	TeamCount             *uint32                                `protobuf:"varint,5,opt,name=team_count" json:"team_count,omitempty"`
 	Logo                  *uint64                                `protobuf:"varint,6,opt,name=logo" json:"logo,omitempty"`
-	Scoring               *CMsgFantasyLeagueRoleScoring          `protobuf:"bytes,7,opt,name=scoring" json:"scoring,omitempty"`
+	Scoring               *CMsgFantasyLeagueScoring              `protobuf:"bytes,7,opt,name=scoring" json:"scoring,omitempty"`
 	DraftTime             *uint32                                `protobuf:"varint,12,opt,name=draft_time" json:"draft_time,omitempty"`
 	DraftPickTime         *uint32                                `protobuf:"varint,13,opt,name=draft_pick_time" json:"draft_pick_time,omitempty"`
 	SeasonStart           *uint32                                `protobuf:"varint,15,opt,name=season_start" json:"season_start,omitempty"`
@@ -1360,7 +1379,7 @@ func (m *CMsgDOTAFantasyLeagueInfo) GetLogo() uint64 {
 	return 0
 }
 
-func (m *CMsgDOTAFantasyLeagueInfo) GetScoring() *CMsgFantasyLeagueRoleScoring {
+func (m *CMsgDOTAFantasyLeagueInfo) GetScoring() *CMsgFantasyLeagueScoring {
 	if m != nil {
 		return m.Scoring
 	}
@@ -1966,54 +1985,6 @@ func (m *CMsgDOTAFantasyTeamInfo) GetCurrentRoster() []uint32 {
 		return m.CurrentRoster
 	}
 	return nil
-}
-
-type CMsgDOTAFantasyMatchFinished struct {
-	MatchId          *uint32 `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
-	LeagueId         *uint32 `protobuf:"varint,2,opt,name=league_id" json:"league_id,omitempty"`
-	SeriesId         *uint32 `protobuf:"varint,3,opt,name=series_id" json:"series_id,omitempty"`
-	StartTime        *uint32 `protobuf:"varint,4,opt,name=start_time" json:"start_time,omitempty"`
-	SeriesType       *uint32 `protobuf:"varint,5,opt,name=series_type" json:"series_type,omitempty"`
-	XXX_unrecognized []byte  `json:"-"`
-}
-
-func (m *CMsgDOTAFantasyMatchFinished) Reset()         { *m = CMsgDOTAFantasyMatchFinished{} }
-func (m *CMsgDOTAFantasyMatchFinished) String() string { return proto.CompactTextString(m) }
-func (*CMsgDOTAFantasyMatchFinished) ProtoMessage()    {}
-
-func (m *CMsgDOTAFantasyMatchFinished) GetMatchId() uint32 {
-	if m != nil && m.MatchId != nil {
-		return *m.MatchId
-	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyMatchFinished) GetLeagueId() uint32 {
-	if m != nil && m.LeagueId != nil {
-		return *m.LeagueId
-	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyMatchFinished) GetSeriesId() uint32 {
-	if m != nil && m.SeriesId != nil {
-		return *m.SeriesId
-	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyMatchFinished) GetStartTime() uint32 {
-	if m != nil && m.StartTime != nil {
-		return *m.StartTime
-	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyMatchFinished) GetSeriesType() uint32 {
-	if m != nil && m.SeriesType != nil {
-		return *m.SeriesType
-	}
-	return 0
 }
 
 type CMsgDOTAFantasyTeamScoreRequest struct {
@@ -3311,6 +3282,7 @@ func (m *CMsgDOTAFantasyTeamRosterRequest) GetTimestamp() uint32 {
 type CMsgDOTAFantasyTeamRosterResponse struct {
 	Result           *CMsgDOTAFantasyTeamRosterResponse_EResult `protobuf:"varint,1,opt,name=result,enum=dota.CMsgDOTAFantasyTeamRosterResponse_EResult,def=0" json:"result,omitempty"`
 	PlayerAccountIds []uint32                                   `protobuf:"varint,2,rep,name=player_account_ids" json:"player_account_ids,omitempty"`
+	PlayerLocked     []bool                                     `protobuf:"varint,3,rep,name=player_locked" json:"player_locked,omitempty"`
 	XXX_unrecognized []byte                                     `json:"-"`
 }
 
@@ -3330,6 +3302,13 @@ func (m *CMsgDOTAFantasyTeamRosterResponse) GetResult() CMsgDOTAFantasyTeamRoste
 func (m *CMsgDOTAFantasyTeamRosterResponse) GetPlayerAccountIds() []uint32 {
 	if m != nil {
 		return m.PlayerAccountIds
+	}
+	return nil
+}
+
+func (m *CMsgDOTAFantasyTeamRosterResponse) GetPlayerLocked() []bool {
+	if m != nil {
+		return m.PlayerLocked
 	}
 	return nil
 }
@@ -3384,24 +3363,136 @@ func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse) GetStats() []*CMsgDOTAFant
 	return nil
 }
 
-type CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats struct {
-	AccountId        *uint32  `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
-	Matches          *uint32  `protobuf:"varint,2,opt,name=matches" json:"matches,omitempty"`
-	Weeks            *uint32  `protobuf:"varint,3,opt,name=weeks" json:"weeks,omitempty"`
-	Score            *float32 `protobuf:"fixed32,4,opt,name=score" json:"score,omitempty"`
-	Levels           *float32 `protobuf:"fixed32,5,opt,name=levels" json:"levels,omitempty"`
-	Kills            *float32 `protobuf:"fixed32,6,opt,name=kills" json:"kills,omitempty"`
-	Deaths           *float32 `protobuf:"fixed32,7,opt,name=deaths" json:"deaths,omitempty"`
-	Assists          *float32 `protobuf:"fixed32,8,opt,name=assists" json:"assists,omitempty"`
-	LastHits         *float32 `protobuf:"fixed32,9,opt,name=last_hits" json:"last_hits,omitempty"`
-	Denies           *float32 `protobuf:"fixed32,10,opt,name=denies" json:"denies,omitempty"`
-	Gpm              *float32 `protobuf:"fixed32,11,opt,name=gpm" json:"gpm,omitempty"`
-	Xppm             *float32 `protobuf:"fixed32,12,opt,name=xppm" json:"xppm,omitempty"`
-	Stuns            *float32 `protobuf:"fixed32,13,opt,name=stuns" json:"stuns,omitempty"`
-	Healing          *float32 `protobuf:"fixed32,14,opt,name=healing" json:"healing,omitempty"`
-	TowerKills       *float32 `protobuf:"fixed32,15,opt,name=tower_kills" json:"tower_kills,omitempty"`
-	RoshanKills      *float32 `protobuf:"fixed32,16,opt,name=roshan_kills" json:"roshan_kills,omitempty"`
+type CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator struct {
+	Matches          *uint32  `protobuf:"varint,1,opt,name=matches" json:"matches,omitempty"`
+	Levels           *float32 `protobuf:"fixed32,2,opt,name=levels" json:"levels,omitempty"`
+	Kills            *float32 `protobuf:"fixed32,3,opt,name=kills" json:"kills,omitempty"`
+	Deaths           *float32 `protobuf:"fixed32,4,opt,name=deaths" json:"deaths,omitempty"`
+	Assists          *float32 `protobuf:"fixed32,5,opt,name=assists" json:"assists,omitempty"`
+	LastHits         *float32 `protobuf:"fixed32,6,opt,name=last_hits" json:"last_hits,omitempty"`
+	Denies           *float32 `protobuf:"fixed32,7,opt,name=denies" json:"denies,omitempty"`
+	Gpm              *float32 `protobuf:"fixed32,8,opt,name=gpm" json:"gpm,omitempty"`
+	Xppm             *float32 `protobuf:"fixed32,9,opt,name=xppm" json:"xppm,omitempty"`
+	Stuns            *float32 `protobuf:"fixed32,10,opt,name=stuns" json:"stuns,omitempty"`
+	Healing          *float32 `protobuf:"fixed32,11,opt,name=healing" json:"healing,omitempty"`
+	TowerKills       *float32 `protobuf:"fixed32,12,opt,name=tower_kills" json:"tower_kills,omitempty"`
+	RoshanKills      *float32 `protobuf:"fixed32,13,opt,name=roshan_kills" json:"roshan_kills,omitempty"`
+	Score            *float32 `protobuf:"fixed32,14,opt,name=score" json:"score,omitempty"`
 	XXX_unrecognized []byte   `json:"-"`
+}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) Reset() {
+	*m = CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator{}
+}
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) String() string {
+	return proto.CompactTextString(m)
+}
+func (*CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) ProtoMessage() {}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) GetMatches() uint32 {
+	if m != nil && m.Matches != nil {
+		return *m.Matches
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) GetLevels() float32 {
+	if m != nil && m.Levels != nil {
+		return *m.Levels
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) GetKills() float32 {
+	if m != nil && m.Kills != nil {
+		return *m.Kills
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) GetDeaths() float32 {
+	if m != nil && m.Deaths != nil {
+		return *m.Deaths
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) GetAssists() float32 {
+	if m != nil && m.Assists != nil {
+		return *m.Assists
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) GetLastHits() float32 {
+	if m != nil && m.LastHits != nil {
+		return *m.LastHits
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) GetDenies() float32 {
+	if m != nil && m.Denies != nil {
+		return *m.Denies
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) GetGpm() float32 {
+	if m != nil && m.Gpm != nil {
+		return *m.Gpm
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) GetXppm() float32 {
+	if m != nil && m.Xppm != nil {
+		return *m.Xppm
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) GetStuns() float32 {
+	if m != nil && m.Stuns != nil {
+		return *m.Stuns
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) GetHealing() float32 {
+	if m != nil && m.Healing != nil {
+		return *m.Healing
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) GetTowerKills() float32 {
+	if m != nil && m.TowerKills != nil {
+		return *m.TowerKills
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) GetRoshanKills() float32 {
+	if m != nil && m.RoshanKills != nil {
+		return *m.RoshanKills
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator) GetScore() float32 {
+	if m != nil && m.Score != nil {
+		return *m.Score
+	}
+	return 0
+}
+
+type CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats struct {
+	AccountId         *uint32                                                             `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	Weeks             *uint32                                                             `protobuf:"varint,2,opt,name=weeks" json:"weeks,omitempty"`
+	StatsPremium      *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator `protobuf:"bytes,4,opt,name=stats_premium" json:"stats_premium,omitempty"`
+	StatsProfessional *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator `protobuf:"bytes,5,opt,name=stats_professional" json:"stats_professional,omitempty"`
+	XXX_unrecognized  []byte                                                              `json:"-"`
 }
 
 func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) Reset() {
@@ -3419,13 +3510,6 @@ func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetAccountId()
 	return 0
 }
 
-func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetMatches() uint32 {
-	if m != nil && m.Matches != nil {
-		return *m.Matches
-	}
-	return 0
-}
-
 func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetWeeks() uint32 {
 	if m != nil && m.Weeks != nil {
 		return *m.Weeks
@@ -3433,95 +3517,18 @@ func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetWeeks() uin
 	return 0
 }
 
-func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetScore() float32 {
-	if m != nil && m.Score != nil {
-		return *m.Score
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetStatsPremium() *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator {
+	if m != nil {
+		return m.StatsPremium
 	}
-	return 0
+	return nil
 }
 
-func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetLevels() float32 {
-	if m != nil && m.Levels != nil {
-		return *m.Levels
+func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetStatsProfessional() *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerScoreAccumulator {
+	if m != nil {
+		return m.StatsProfessional
 	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetKills() float32 {
-	if m != nil && m.Kills != nil {
-		return *m.Kills
-	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetDeaths() float32 {
-	if m != nil && m.Deaths != nil {
-		return *m.Deaths
-	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetAssists() float32 {
-	if m != nil && m.Assists != nil {
-		return *m.Assists
-	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetLastHits() float32 {
-	if m != nil && m.LastHits != nil {
-		return *m.LastHits
-	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetDenies() float32 {
-	if m != nil && m.Denies != nil {
-		return *m.Denies
-	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetGpm() float32 {
-	if m != nil && m.Gpm != nil {
-		return *m.Gpm
-	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetXppm() float32 {
-	if m != nil && m.Xppm != nil {
-		return *m.Xppm
-	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetStuns() float32 {
-	if m != nil && m.Stuns != nil {
-		return *m.Stuns
-	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetHealing() float32 {
-	if m != nil && m.Healing != nil {
-		return *m.Healing
-	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetTowerKills() float32 {
-	if m != nil && m.TowerKills != nil {
-		return *m.TowerKills
-	}
-	return 0
-}
-
-func (m *CMsgDOTAFantasyPlayerHisoricalStatsResponse_PlayerStats) GetRoshanKills() float32 {
-	if m != nil && m.RoshanKills != nil {
-		return *m.RoshanKills
-	}
-	return 0
+	return nil
 }
 
 type CMsgDOTAFantasyMessageAdd struct {
@@ -3901,19 +3908,19 @@ func (m *CMsgDOTAFantasyPlayerScoreDetailsResponse) GetData() []*CMsgDOTAFantasy
 }
 
 type CMsgDOTAFantasyPlayerScoreDetailsResponse_PlayerMatchData struct {
-	MatchId          *uint32                       `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
-	SeriesId         *uint32                       `protobuf:"varint,2,opt,name=series_id" json:"series_id,omitempty"`
-	SeriesNum        *uint32                       `protobuf:"varint,3,opt,name=series_num" json:"series_num,omitempty"`
-	SeriesType       *uint32                       `protobuf:"varint,4,opt,name=series_type" json:"series_type,omitempty"`
-	SeriesMultiplier *float32                      `protobuf:"fixed32,5,opt,name=series_multiplier" json:"series_multiplier,omitempty"`
-	LeagueId         *uint32                       `protobuf:"varint,6,opt,name=league_id" json:"league_id,omitempty"`
-	OpposingTeamId   *uint32                       `protobuf:"varint,7,opt,name=opposing_team_id" json:"opposing_team_id,omitempty"`
-	OpposingTeamLogo *uint64                       `protobuf:"varint,8,opt,name=opposing_team_logo" json:"opposing_team_logo,omitempty"`
-	OpposingTeamName *string                       `protobuf:"bytes,9,opt,name=opposing_team_name" json:"opposing_team_name,omitempty"`
-	Stats            *CMsgFantasyLeagueRoleScoring `protobuf:"bytes,10,opt,name=stats" json:"stats,omitempty"`
-	OwnedBy          *uint32                       `protobuf:"varint,11,opt,name=owned_by" json:"owned_by,omitempty"`
-	Benched          *bool                         `protobuf:"varint,12,opt,name=benched" json:"benched,omitempty"`
-	XXX_unrecognized []byte                        `json:"-"`
+	MatchId          *uint32                   `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
+	SeriesId         *uint32                   `protobuf:"varint,2,opt,name=series_id" json:"series_id,omitempty"`
+	SeriesNum        *uint32                   `protobuf:"varint,3,opt,name=series_num" json:"series_num,omitempty"`
+	SeriesType       *uint32                   `protobuf:"varint,4,opt,name=series_type" json:"series_type,omitempty"`
+	LeagueTier       *uint32                   `protobuf:"varint,5,opt,name=league_tier" json:"league_tier,omitempty"`
+	LeagueId         *uint32                   `protobuf:"varint,6,opt,name=league_id" json:"league_id,omitempty"`
+	OpposingTeamId   *uint32                   `protobuf:"varint,7,opt,name=opposing_team_id" json:"opposing_team_id,omitempty"`
+	OpposingTeamLogo *uint64                   `protobuf:"varint,8,opt,name=opposing_team_logo" json:"opposing_team_logo,omitempty"`
+	OpposingTeamName *string                   `protobuf:"bytes,9,opt,name=opposing_team_name" json:"opposing_team_name,omitempty"`
+	Stats            *CMsgFantasyLeagueScoring `protobuf:"bytes,10,opt,name=stats" json:"stats,omitempty"`
+	OwnedBy          *uint32                   `protobuf:"varint,11,opt,name=owned_by" json:"owned_by,omitempty"`
+	Benched          *bool                     `protobuf:"varint,12,opt,name=benched" json:"benched,omitempty"`
+	XXX_unrecognized []byte                    `json:"-"`
 }
 
 func (m *CMsgDOTAFantasyPlayerScoreDetailsResponse_PlayerMatchData) Reset() {
@@ -3952,9 +3959,9 @@ func (m *CMsgDOTAFantasyPlayerScoreDetailsResponse_PlayerMatchData) GetSeriesTyp
 	return 0
 }
 
-func (m *CMsgDOTAFantasyPlayerScoreDetailsResponse_PlayerMatchData) GetSeriesMultiplier() float32 {
-	if m != nil && m.SeriesMultiplier != nil {
-		return *m.SeriesMultiplier
+func (m *CMsgDOTAFantasyPlayerScoreDetailsResponse_PlayerMatchData) GetLeagueTier() uint32 {
+	if m != nil && m.LeagueTier != nil {
+		return *m.LeagueTier
 	}
 	return 0
 }
@@ -3987,7 +3994,7 @@ func (m *CMsgDOTAFantasyPlayerScoreDetailsResponse_PlayerMatchData) GetOpposingT
 	return ""
 }
 
-func (m *CMsgDOTAFantasyPlayerScoreDetailsResponse_PlayerMatchData) GetStats() *CMsgFantasyLeagueRoleScoring {
+func (m *CMsgDOTAFantasyPlayerScoreDetailsResponse_PlayerMatchData) GetStats() *CMsgFantasyLeagueScoring {
 	if m != nil {
 		return m.Stats
 	}

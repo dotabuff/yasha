@@ -94,6 +94,38 @@ func (x *GCConnectionStatus) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type CMsgSHA1Digest struct {
+	Block1           *uint64 `protobuf:"fixed64,1,req,name=block1" json:"block1,omitempty"`
+	Block2           *uint64 `protobuf:"fixed64,2,req,name=block2" json:"block2,omitempty"`
+	Block3           *uint32 `protobuf:"fixed32,3,req,name=block3" json:"block3,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgSHA1Digest) Reset()         { *m = CMsgSHA1Digest{} }
+func (m *CMsgSHA1Digest) String() string { return proto.CompactTextString(m) }
+func (*CMsgSHA1Digest) ProtoMessage()    {}
+
+func (m *CMsgSHA1Digest) GetBlock1() uint64 {
+	if m != nil && m.Block1 != nil {
+		return *m.Block1
+	}
+	return 0
+}
+
+func (m *CMsgSHA1Digest) GetBlock2() uint64 {
+	if m != nil && m.Block2 != nil {
+		return *m.Block2
+	}
+	return 0
+}
+
+func (m *CMsgSHA1Digest) GetBlock3() uint32 {
+	if m != nil && m.Block3 != nil {
+		return *m.Block3
+	}
+	return 0
+}
+
 type CMsgSOIDOwner struct {
 	Type             *uint32 `protobuf:"varint,1,opt,name=type" json:"type,omitempty"`
 	Id               *uint64 `protobuf:"varint,2,opt,name=id" json:"id,omitempty"`
@@ -818,6 +850,7 @@ type CMsgClientHello struct {
 	ClientSessionNeed   *uint32                   `protobuf:"varint,3,opt,name=client_session_need" json:"client_session_need,omitempty"`
 	ClientLauncher      *PartnerAccountType       `protobuf:"varint,4,opt,name=client_launcher,enum=dota.PartnerAccountType,def=0" json:"client_launcher,omitempty"`
 	SecretKey           *string                   `protobuf:"bytes,5,opt,name=secret_key" json:"secret_key,omitempty"`
+	ClientLanguage      *uint32                   `protobuf:"varint,6,opt,name=client_language" json:"client_language,omitempty"`
 	XXX_unrecognized    []byte                    `json:"-"`
 }
 
@@ -860,6 +893,13 @@ func (m *CMsgClientHello) GetSecretKey() string {
 		return *m.SecretKey
 	}
 	return ""
+}
+
+func (m *CMsgClientHello) GetClientLanguage() uint32 {
+	if m != nil && m.ClientLanguage != nil {
+		return *m.ClientLanguage
+	}
+	return 0
 }
 
 type CMsgClientWelcome struct {

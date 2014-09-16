@@ -645,6 +645,7 @@ const (
 	Activity_ACT_DOTA_THUNDER_STRIKE                         Activity = 599
 	Activity_ACT_DOTA_KINETIC_FIELD                          Activity = 600
 	Activity_ACT_DOTA_STATIC_STORM                           Activity = 601
+	Activity_ACT_DOTA_MINI_TAUNT                             Activity = 602
 )
 
 var Activity_name = map[int32]string{
@@ -1249,6 +1250,7 @@ var Activity_name = map[int32]string{
 	599: "ACT_DOTA_THUNDER_STRIKE",
 	600: "ACT_DOTA_KINETIC_FIELD",
 	601: "ACT_DOTA_STATIC_STORM",
+	602: "ACT_DOTA_MINI_TAUNT",
 }
 var Activity_value = map[string]int32{
 	"ACT_INVALID":                                     -1,
@@ -1852,6 +1854,7 @@ var Activity_value = map[string]int32{
 	"ACT_DOTA_THUNDER_STRIKE":                         599,
 	"ACT_DOTA_KINETIC_FIELD":                          600,
 	"ACT_DOTA_STATIC_STORM":                           601,
+	"ACT_DOTA_MINI_TAUNT":                             602,
 }
 
 func (x Activity) Enum() *Activity {

@@ -380,6 +380,30 @@ func (m *CDOTAMsg_ItemAlert) GetItemid() int32 {
 	return 0
 }
 
+type CDOTAMsg_EnemyItemAlert struct {
+	PlayerId         *uint32 `protobuf:"varint,1,opt,name=player_id" json:"player_id,omitempty"`
+	Itemid           *int32  `protobuf:"varint,2,opt,name=itemid" json:"itemid,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CDOTAMsg_EnemyItemAlert) Reset()         { *m = CDOTAMsg_EnemyItemAlert{} }
+func (m *CDOTAMsg_EnemyItemAlert) String() string { return proto.CompactTextString(m) }
+func (*CDOTAMsg_EnemyItemAlert) ProtoMessage()    {}
+
+func (m *CDOTAMsg_EnemyItemAlert) GetPlayerId() uint32 {
+	if m != nil && m.PlayerId != nil {
+		return *m.PlayerId
+	}
+	return 0
+}
+
+func (m *CDOTAMsg_EnemyItemAlert) GetItemid() int32 {
+	if m != nil && m.Itemid != nil {
+		return *m.Itemid
+	}
+	return 0
+}
+
 type CDOTAMsg_MapLine struct {
 	X                *int32 `protobuf:"varint,1,opt,name=x" json:"x,omitempty"`
 	Y                *int32 `protobuf:"varint,2,opt,name=y" json:"y,omitempty"`

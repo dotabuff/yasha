@@ -13,6 +13,99 @@ var _ = proto.Marshal
 var _ = &json.SyntaxError{}
 var _ = math.Inf
 
+type ESuspiciousActivity int32
+
+const (
+	ESuspiciousActivity_k_ESuspiciousActivity_VAC_MultipleInstances ESuspiciousActivity = 1
+	ESuspiciousActivity_k_ESuspiciousActivity_IntentionalFeeding    ESuspiciousActivity = 100
+	ESuspiciousActivity_k_ESuspiciousActivity_SuspectedBotFarming   ESuspiciousActivity = 101
+)
+
+var ESuspiciousActivity_name = map[int32]string{
+	1:   "k_ESuspiciousActivity_VAC_MultipleInstances",
+	100: "k_ESuspiciousActivity_IntentionalFeeding",
+	101: "k_ESuspiciousActivity_SuspectedBotFarming",
+}
+var ESuspiciousActivity_value = map[string]int32{
+	"k_ESuspiciousActivity_VAC_MultipleInstances": 1,
+	"k_ESuspiciousActivity_IntentionalFeeding":    100,
+	"k_ESuspiciousActivity_SuspectedBotFarming":   101,
+}
+
+func (x ESuspiciousActivity) Enum() *ESuspiciousActivity {
+	p := new(ESuspiciousActivity)
+	*p = x
+	return p
+}
+func (x ESuspiciousActivity) String() string {
+	return proto.EnumName(ESuspiciousActivity_name, int32(x))
+}
+func (x *ESuspiciousActivity) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(ESuspiciousActivity_value, data, "ESuspiciousActivity")
+	if err != nil {
+		return err
+	}
+	*x = ESuspiciousActivity(value)
+	return nil
+}
+
+type ESuspiciousBuildType int32
+
+const (
+	ESuspiciousBuildType_k_ESuspiciousBuildType_None               ESuspiciousBuildType = 0
+	ESuspiciousBuildType_k_ESuspiciousBuildType_NoGoldSpent        ESuspiciousBuildType = 1
+	ESuspiciousBuildType_k_ESuspiciousBuildType_NoItems            ESuspiciousBuildType = 2
+	ESuspiciousBuildType_k_ESuspiciousBuildType_NoSignificantItems ESuspiciousBuildType = 3
+	ESuspiciousBuildType_k_ESuspiciousBuildType_TooManyBoots       ESuspiciousBuildType = 4
+	ESuspiciousBuildType_k_ESuspiciousBuildType_Bot1               ESuspiciousBuildType = 101
+	ESuspiciousBuildType_k_ESuspiciousBuildType_Bot2               ESuspiciousBuildType = 102
+	ESuspiciousBuildType_k_ESuspiciousBuildType_Bot3               ESuspiciousBuildType = 103
+	ESuspiciousBuildType_k_ESuspiciousBuildType_Bot4               ESuspiciousBuildType = 104
+	ESuspiciousBuildType_k_ESuspiciousBuildType_Bot5               ESuspiciousBuildType = 105
+)
+
+var ESuspiciousBuildType_name = map[int32]string{
+	0:   "k_ESuspiciousBuildType_None",
+	1:   "k_ESuspiciousBuildType_NoGoldSpent",
+	2:   "k_ESuspiciousBuildType_NoItems",
+	3:   "k_ESuspiciousBuildType_NoSignificantItems",
+	4:   "k_ESuspiciousBuildType_TooManyBoots",
+	101: "k_ESuspiciousBuildType_Bot1",
+	102: "k_ESuspiciousBuildType_Bot2",
+	103: "k_ESuspiciousBuildType_Bot3",
+	104: "k_ESuspiciousBuildType_Bot4",
+	105: "k_ESuspiciousBuildType_Bot5",
+}
+var ESuspiciousBuildType_value = map[string]int32{
+	"k_ESuspiciousBuildType_None":               0,
+	"k_ESuspiciousBuildType_NoGoldSpent":        1,
+	"k_ESuspiciousBuildType_NoItems":            2,
+	"k_ESuspiciousBuildType_NoSignificantItems": 3,
+	"k_ESuspiciousBuildType_TooManyBoots":       4,
+	"k_ESuspiciousBuildType_Bot1":               101,
+	"k_ESuspiciousBuildType_Bot2":               102,
+	"k_ESuspiciousBuildType_Bot3":               103,
+	"k_ESuspiciousBuildType_Bot4":               104,
+	"k_ESuspiciousBuildType_Bot5":               105,
+}
+
+func (x ESuspiciousBuildType) Enum() *ESuspiciousBuildType {
+	p := new(ESuspiciousBuildType)
+	*p = x
+	return p
+}
+func (x ESuspiciousBuildType) String() string {
+	return proto.EnumName(ESuspiciousBuildType_name, int32(x))
+}
+func (x *ESuspiciousBuildType) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(ESuspiciousBuildType_value, data, "ESuspiciousBuildType")
+	if err != nil {
+		return err
+	}
+	*x = ESuspiciousBuildType(value)
+	return nil
+}
+
 type CMsgConnectedPlayers_SendReason int32
 
 const (
@@ -590,6 +683,7 @@ type CMsgDOTAFantasyPlayerStats struct {
 	TowerKills       *uint32  `protobuf:"varint,14,opt,name=tower_kills" json:"tower_kills,omitempty"`
 	RoshanKills      *uint32  `protobuf:"varint,15,opt,name=roshan_kills" json:"roshan_kills,omitempty"`
 	TeamId           *uint32  `protobuf:"varint,16,opt,name=team_id" json:"team_id,omitempty"`
+	LeagueId         *uint32  `protobuf:"varint,17,opt,name=league_id" json:"league_id,omitempty"`
 	XXX_unrecognized []byte   `json:"-"`
 }
 
@@ -705,6 +799,61 @@ func (m *CMsgDOTAFantasyPlayerStats) GetRoshanKills() uint32 {
 func (m *CMsgDOTAFantasyPlayerStats) GetTeamId() uint32 {
 	if m != nil && m.TeamId != nil {
 		return *m.TeamId
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyPlayerStats) GetLeagueId() uint32 {
+	if m != nil && m.LeagueId != nil {
+		return *m.LeagueId
+	}
+	return 0
+}
+
+type CMsgDOTAFantasyMatch struct {
+	MatchId          *uint32 `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
+	LeagueId         *uint32 `protobuf:"varint,2,opt,name=league_id" json:"league_id,omitempty"`
+	SeriesId         *uint32 `protobuf:"varint,3,opt,name=series_id" json:"series_id,omitempty"`
+	StartTime        *uint32 `protobuf:"varint,4,opt,name=start_time" json:"start_time,omitempty"`
+	SeriesType       *uint32 `protobuf:"varint,5,opt,name=series_type" json:"series_type,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgDOTAFantasyMatch) Reset()         { *m = CMsgDOTAFantasyMatch{} }
+func (m *CMsgDOTAFantasyMatch) String() string { return proto.CompactTextString(m) }
+func (*CMsgDOTAFantasyMatch) ProtoMessage()    {}
+
+func (m *CMsgDOTAFantasyMatch) GetMatchId() uint32 {
+	if m != nil && m.MatchId != nil {
+		return *m.MatchId
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyMatch) GetLeagueId() uint32 {
+	if m != nil && m.LeagueId != nil {
+		return *m.LeagueId
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyMatch) GetSeriesId() uint32 {
+	if m != nil && m.SeriesId != nil {
+		return *m.SeriesId
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyMatch) GetStartTime() uint32 {
+	if m != nil && m.StartTime != nil {
+		return *m.StartTime
+	}
+	return 0
+}
+
+func (m *CMsgDOTAFantasyMatch) GetSeriesType() uint32 {
+	if m != nil && m.SeriesType != nil {
+		return *m.SeriesType
 	}
 	return 0
 }
@@ -1207,6 +1356,76 @@ func (m *CMsgSignOutDraftInfo) GetPicksBans() []*CMatchHeroSelectEvent {
 		return m.PicksBans
 	}
 	return nil
+}
+
+type CMsgSignOutBotInfo struct {
+	AllowCheats         *bool                                       `protobuf:"varint,1,opt,name=allow_cheats" json:"allow_cheats,omitempty"`
+	BotDifficulty       *DOTABotDifficulty                          `protobuf:"varint,2,opt,name=bot_difficulty,enum=dota.DOTABotDifficulty,def=0" json:"bot_difficulty,omitempty"`
+	CreatedLobby        *bool                                       `protobuf:"varint,3,opt,name=created_lobby" json:"created_lobby,omitempty"`
+	BotSlotDifficulties []*CMsgSignOutBotInfo_CMsgBotSlotDifficulty `protobuf:"bytes,4,rep,name=bot_slot_difficulties" json:"bot_slot_difficulties,omitempty"`
+	XXX_unrecognized    []byte                                      `json:"-"`
+}
+
+func (m *CMsgSignOutBotInfo) Reset()         { *m = CMsgSignOutBotInfo{} }
+func (m *CMsgSignOutBotInfo) String() string { return proto.CompactTextString(m) }
+func (*CMsgSignOutBotInfo) ProtoMessage()    {}
+
+const Default_CMsgSignOutBotInfo_BotDifficulty DOTABotDifficulty = DOTABotDifficulty_BOT_DIFFICULTY_PASSIVE
+
+func (m *CMsgSignOutBotInfo) GetAllowCheats() bool {
+	if m != nil && m.AllowCheats != nil {
+		return *m.AllowCheats
+	}
+	return false
+}
+
+func (m *CMsgSignOutBotInfo) GetBotDifficulty() DOTABotDifficulty {
+	if m != nil && m.BotDifficulty != nil {
+		return *m.BotDifficulty
+	}
+	return Default_CMsgSignOutBotInfo_BotDifficulty
+}
+
+func (m *CMsgSignOutBotInfo) GetCreatedLobby() bool {
+	if m != nil && m.CreatedLobby != nil {
+		return *m.CreatedLobby
+	}
+	return false
+}
+
+func (m *CMsgSignOutBotInfo) GetBotSlotDifficulties() []*CMsgSignOutBotInfo_CMsgBotSlotDifficulty {
+	if m != nil {
+		return m.BotSlotDifficulties
+	}
+	return nil
+}
+
+type CMsgSignOutBotInfo_CMsgBotSlotDifficulty struct {
+	Slot             *uint32            `protobuf:"varint,1,opt,name=slot" json:"slot,omitempty"`
+	BotDifficulty    *DOTABotDifficulty `protobuf:"varint,2,opt,name=bot_difficulty,enum=dota.DOTABotDifficulty,def=0" json:"bot_difficulty,omitempty"`
+	XXX_unrecognized []byte             `json:"-"`
+}
+
+func (m *CMsgSignOutBotInfo_CMsgBotSlotDifficulty) Reset() {
+	*m = CMsgSignOutBotInfo_CMsgBotSlotDifficulty{}
+}
+func (m *CMsgSignOutBotInfo_CMsgBotSlotDifficulty) String() string { return proto.CompactTextString(m) }
+func (*CMsgSignOutBotInfo_CMsgBotSlotDifficulty) ProtoMessage()    {}
+
+const Default_CMsgSignOutBotInfo_CMsgBotSlotDifficulty_BotDifficulty DOTABotDifficulty = DOTABotDifficulty_BOT_DIFFICULTY_PASSIVE
+
+func (m *CMsgSignOutBotInfo_CMsgBotSlotDifficulty) GetSlot() uint32 {
+	if m != nil && m.Slot != nil {
+		return *m.Slot
+	}
+	return 0
+}
+
+func (m *CMsgSignOutBotInfo_CMsgBotSlotDifficulty) GetBotDifficulty() DOTABotDifficulty {
+	if m != nil && m.BotDifficulty != nil {
+		return *m.BotDifficulty
+	}
+	return Default_CMsgSignOutBotInfo_CMsgBotSlotDifficulty_BotDifficulty
 }
 
 type CMsgGameMatchSignoutResponse struct {
@@ -3022,7 +3241,7 @@ func (m *CMsgServerGCUpdateSpectatorCount) GetSpectatorCount() uint32 {
 type CSerializedCombatLog struct {
 	Version          *uint32                          `protobuf:"varint,1,opt,name=version" json:"version,omitempty"`
 	Dictionary       *CSerializedCombatLog_Dictionary `protobuf:"bytes,2,opt,name=dictionary" json:"dictionary,omitempty"`
-	Entries          []*CSerializedCombatLog_Entry    `protobuf:"bytes,3,rep,name=entries" json:"entries,omitempty"`
+	Entries          []*CMsgDOTACombatLogEntry        `protobuf:"bytes,3,rep,name=entries" json:"entries,omitempty"`
 	XXX_unrecognized []byte                           `json:"-"`
 }
 
@@ -3044,7 +3263,7 @@ func (m *CSerializedCombatLog) GetDictionary() *CSerializedCombatLog_Dictionary 
 	return nil
 }
 
-func (m *CSerializedCombatLog) GetEntries() []*CSerializedCombatLog_Entry {
+func (m *CSerializedCombatLog) GetEntries() []*CMsgDOTACombatLogEntry {
 	if m != nil {
 		return m.Entries
 	}
@@ -3093,126 +3312,6 @@ func (m *CSerializedCombatLog_Dictionary_DictString) GetValue() string {
 		return *m.Value
 	}
 	return ""
-}
-
-type CSerializedCombatLog_Entry struct {
-	Type             *uint32  `protobuf:"varint,1,opt,name=type" json:"type,omitempty"`
-	TargetName       *uint32  `protobuf:"varint,2,opt,name=target_name" json:"target_name,omitempty"`
-	TargetSourceName *uint32  `protobuf:"varint,3,opt,name=target_source_name" json:"target_source_name,omitempty"`
-	AttackerName     *uint32  `protobuf:"varint,4,opt,name=attacker_name" json:"attacker_name,omitempty"`
-	InflictorName    *uint32  `protobuf:"varint,5,opt,name=inflictor_name" json:"inflictor_name,omitempty"`
-	AttackerIllusion *bool    `protobuf:"varint,6,opt,name=attacker_illusion" json:"attacker_illusion,omitempty"`
-	TargetIllusion   *bool    `protobuf:"varint,7,opt,name=target_illusion" json:"target_illusion,omitempty"`
-	VisibleRadiant   *bool    `protobuf:"varint,8,opt,name=visible_radiant" json:"visible_radiant,omitempty"`
-	VisibleDire      *bool    `protobuf:"varint,9,opt,name=visible_dire" json:"visible_dire,omitempty"`
-	Value            *uint32  `protobuf:"varint,10,opt,name=value" json:"value,omitempty"`
-	Health           *uint32  `protobuf:"varint,11,opt,name=health" json:"health,omitempty"`
-	TimeStamp        *float32 `protobuf:"fixed32,12,opt,name=time_stamp" json:"time_stamp,omitempty"`
-	StunDuration     *float32 `protobuf:"fixed32,13,opt,name=stun_duration" json:"stun_duration,omitempty"`
-	SlowDuration     *float32 `protobuf:"fixed32,14,opt,name=slow_duration" json:"slow_duration,omitempty"`
-	XXX_unrecognized []byte   `json:"-"`
-}
-
-func (m *CSerializedCombatLog_Entry) Reset()         { *m = CSerializedCombatLog_Entry{} }
-func (m *CSerializedCombatLog_Entry) String() string { return proto.CompactTextString(m) }
-func (*CSerializedCombatLog_Entry) ProtoMessage()    {}
-
-func (m *CSerializedCombatLog_Entry) GetType() uint32 {
-	if m != nil && m.Type != nil {
-		return *m.Type
-	}
-	return 0
-}
-
-func (m *CSerializedCombatLog_Entry) GetTargetName() uint32 {
-	if m != nil && m.TargetName != nil {
-		return *m.TargetName
-	}
-	return 0
-}
-
-func (m *CSerializedCombatLog_Entry) GetTargetSourceName() uint32 {
-	if m != nil && m.TargetSourceName != nil {
-		return *m.TargetSourceName
-	}
-	return 0
-}
-
-func (m *CSerializedCombatLog_Entry) GetAttackerName() uint32 {
-	if m != nil && m.AttackerName != nil {
-		return *m.AttackerName
-	}
-	return 0
-}
-
-func (m *CSerializedCombatLog_Entry) GetInflictorName() uint32 {
-	if m != nil && m.InflictorName != nil {
-		return *m.InflictorName
-	}
-	return 0
-}
-
-func (m *CSerializedCombatLog_Entry) GetAttackerIllusion() bool {
-	if m != nil && m.AttackerIllusion != nil {
-		return *m.AttackerIllusion
-	}
-	return false
-}
-
-func (m *CSerializedCombatLog_Entry) GetTargetIllusion() bool {
-	if m != nil && m.TargetIllusion != nil {
-		return *m.TargetIllusion
-	}
-	return false
-}
-
-func (m *CSerializedCombatLog_Entry) GetVisibleRadiant() bool {
-	if m != nil && m.VisibleRadiant != nil {
-		return *m.VisibleRadiant
-	}
-	return false
-}
-
-func (m *CSerializedCombatLog_Entry) GetVisibleDire() bool {
-	if m != nil && m.VisibleDire != nil {
-		return *m.VisibleDire
-	}
-	return false
-}
-
-func (m *CSerializedCombatLog_Entry) GetValue() uint32 {
-	if m != nil && m.Value != nil {
-		return *m.Value
-	}
-	return 0
-}
-
-func (m *CSerializedCombatLog_Entry) GetHealth() uint32 {
-	if m != nil && m.Health != nil {
-		return *m.Health
-	}
-	return 0
-}
-
-func (m *CSerializedCombatLog_Entry) GetTimeStamp() float32 {
-	if m != nil && m.TimeStamp != nil {
-		return *m.TimeStamp
-	}
-	return 0
-}
-
-func (m *CSerializedCombatLog_Entry) GetStunDuration() float32 {
-	if m != nil && m.StunDuration != nil {
-		return *m.StunDuration
-	}
-	return 0
-}
-
-func (m *CSerializedCombatLog_Entry) GetSlowDuration() float32 {
-	if m != nil && m.SlowDuration != nil {
-		return *m.SlowDuration
-	}
-	return 0
 }
 
 type CMsgServerToGCGetAdditionalEquips struct {
@@ -3277,7 +3376,141 @@ func (m *CMsgServerToGCGetAdditionalEquipsResponse_CUserEquips) GetEquips() []*C
 	return nil
 }
 
+type CMsgServerToGCGetProfileCard struct {
+	AccountIds       []uint32 `protobuf:"varint,1,rep,name=account_ids" json:"account_ids,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
+}
+
+func (m *CMsgServerToGCGetProfileCard) Reset()         { *m = CMsgServerToGCGetProfileCard{} }
+func (m *CMsgServerToGCGetProfileCard) String() string { return proto.CompactTextString(m) }
+func (*CMsgServerToGCGetProfileCard) ProtoMessage()    {}
+
+func (m *CMsgServerToGCGetProfileCard) GetAccountIds() []uint32 {
+	if m != nil {
+		return m.AccountIds
+	}
+	return nil
+}
+
+type CMsgServerToGCGetProfileCardResponse struct {
+	Cards            []*CMsgDOTAProfileCard `protobuf:"bytes,1,rep,name=cards" json:"cards,omitempty"`
+	XXX_unrecognized []byte                 `json:"-"`
+}
+
+func (m *CMsgServerToGCGetProfileCardResponse) Reset()         { *m = CMsgServerToGCGetProfileCardResponse{} }
+func (m *CMsgServerToGCGetProfileCardResponse) String() string { return proto.CompactTextString(m) }
+func (*CMsgServerToGCGetProfileCardResponse) ProtoMessage()    {}
+
+func (m *CMsgServerToGCGetProfileCardResponse) GetCards() []*CMsgDOTAProfileCard {
+	if m != nil {
+		return m.Cards
+	}
+	return nil
+}
+
+type CMsgServerToGCVictoryPredictions struct {
+	Records          []*CMsgServerToGCVictoryPredictions_Record `protobuf:"bytes,1,rep,name=records" json:"records,omitempty"`
+	XXX_unrecognized []byte                                     `json:"-"`
+}
+
+func (m *CMsgServerToGCVictoryPredictions) Reset()         { *m = CMsgServerToGCVictoryPredictions{} }
+func (m *CMsgServerToGCVictoryPredictions) String() string { return proto.CompactTextString(m) }
+func (*CMsgServerToGCVictoryPredictions) ProtoMessage()    {}
+
+func (m *CMsgServerToGCVictoryPredictions) GetRecords() []*CMsgServerToGCVictoryPredictions_Record {
+	if m != nil {
+		return m.Records
+	}
+	return nil
+}
+
+type CMsgServerToGCVictoryPredictions_Record struct {
+	AccountId        *uint32 `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	ItemId           *uint64 `protobuf:"varint,2,opt,name=item_id" json:"item_id,omitempty"`
+	Victory          *bool   `protobuf:"varint,3,opt,name=victory" json:"victory,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgServerToGCVictoryPredictions_Record) Reset() {
+	*m = CMsgServerToGCVictoryPredictions_Record{}
+}
+func (m *CMsgServerToGCVictoryPredictions_Record) String() string { return proto.CompactTextString(m) }
+func (*CMsgServerToGCVictoryPredictions_Record) ProtoMessage()    {}
+
+func (m *CMsgServerToGCVictoryPredictions_Record) GetAccountId() uint32 {
+	if m != nil && m.AccountId != nil {
+		return *m.AccountId
+	}
+	return 0
+}
+
+func (m *CMsgServerToGCVictoryPredictions_Record) GetItemId() uint64 {
+	if m != nil && m.ItemId != nil {
+		return *m.ItemId
+	}
+	return 0
+}
+
+func (m *CMsgServerToGCVictoryPredictions_Record) GetVictory() bool {
+	if m != nil && m.Victory != nil {
+		return *m.Victory
+	}
+	return false
+}
+
+type CMsgSuspiciousActivity struct {
+	AccountId        *uint32              `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	Activity         *ESuspiciousActivity `protobuf:"varint,2,opt,name=activity,enum=dota.ESuspiciousActivity,def=1" json:"activity,omitempty"`
+	Intdata1         *int32               `protobuf:"zigzag32,3,opt,name=intdata1" json:"intdata1,omitempty"`
+	Intdata2         *int32               `protobuf:"zigzag32,4,opt,name=intdata2" json:"intdata2,omitempty"`
+	Time             *uint32              `protobuf:"varint,5,opt,name=time" json:"time,omitempty"`
+	XXX_unrecognized []byte               `json:"-"`
+}
+
+func (m *CMsgSuspiciousActivity) Reset()         { *m = CMsgSuspiciousActivity{} }
+func (m *CMsgSuspiciousActivity) String() string { return proto.CompactTextString(m) }
+func (*CMsgSuspiciousActivity) ProtoMessage()    {}
+
+const Default_CMsgSuspiciousActivity_Activity ESuspiciousActivity = ESuspiciousActivity_k_ESuspiciousActivity_VAC_MultipleInstances
+
+func (m *CMsgSuspiciousActivity) GetAccountId() uint32 {
+	if m != nil && m.AccountId != nil {
+		return *m.AccountId
+	}
+	return 0
+}
+
+func (m *CMsgSuspiciousActivity) GetActivity() ESuspiciousActivity {
+	if m != nil && m.Activity != nil {
+		return *m.Activity
+	}
+	return Default_CMsgSuspiciousActivity_Activity
+}
+
+func (m *CMsgSuspiciousActivity) GetIntdata1() int32 {
+	if m != nil && m.Intdata1 != nil {
+		return *m.Intdata1
+	}
+	return 0
+}
+
+func (m *CMsgSuspiciousActivity) GetIntdata2() int32 {
+	if m != nil && m.Intdata2 != nil {
+		return *m.Intdata2
+	}
+	return 0
+}
+
+func (m *CMsgSuspiciousActivity) GetTime() uint32 {
+	if m != nil && m.Time != nil {
+		return *m.Time
+	}
+	return 0
+}
+
 func init() {
+	proto.RegisterEnum("dota.ESuspiciousActivity", ESuspiciousActivity_name, ESuspiciousActivity_value)
+	proto.RegisterEnum("dota.ESuspiciousBuildType", ESuspiciousBuildType_name, ESuspiciousBuildType_value)
 	proto.RegisterEnum("dota.CMsgConnectedPlayers_SendReason", CMsgConnectedPlayers_SendReason_name, CMsgConnectedPlayers_SendReason_value)
 	proto.RegisterEnum("dota.CMsgGameServerInfo_ServerType", CMsgGameServerInfo_ServerType_name, CMsgGameServerInfo_ServerType_value)
 	proto.RegisterEnum("dota.CMsgDOTALiveScoreboardUpdate_Team_Player_DOTAUltimateState", CMsgDOTALiveScoreboardUpdate_Team_Player_DOTAUltimateState_name, CMsgDOTALiveScoreboardUpdate_Team_Player_DOTAUltimateState_value)

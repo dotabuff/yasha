@@ -170,8 +170,6 @@ func (p *Parser) AsBaseEvent(commandName string) (proto.Message, error) {
 		return &dota.CDOTAUserMsg_ChatEvent{}, nil
 	case "DOTA_UM_CombatHeroPositions":
 		return &dota.CDOTAUserMsg_CombatHeroPositions{}, nil
-	case "DOTA_UM_CombatLogData":
-		return &dota.CDOTAUserMsg_CombatLogData{}, nil
 	case "DOTA_UM_CombatLogShowDeath":
 		return &dota.CDOTAUserMsg_CombatLogShowDeath{}, nil
 	case "DOTA_UM_CreateLinearProjectile":
@@ -284,6 +282,14 @@ func (p *Parser) AsBaseEvent(commandName string) (proto.Message, error) {
 		return &dota.CDOTAUserMsg_AbilitySteal{}, nil
 	case "DOTA_UM_CourierKilledAlert":
 		return &dota.CDOTAUserMsg_CourierKilledAlert{}, nil
+	case "DOTA_UM_EnemyItemAlert":
+		return &dota.CDOTAUserMsg_EnemyItemAlert{}, nil
+	case "DOTA_UM_StatsMatchDetails":
+		return &dota.CDOTAUserMsg_StatsMatchDetails{}, nil
+	case "DOTA_UM_MiniTaunt":
+		return &dota.CDOTAUserMsg_MiniTaunt{}, nil
+	case "DOTA_UM_BuyBackStateAlert":
+		return &dota.CDOTAUserMsg_BuyBackStateAlert{}, nil
 	}
 	return nil, Error("Type not found: " + commandName)
 }
@@ -426,8 +432,6 @@ func (p *Parser) AsBaseEventBUMDUM(value int) (proto.Message, error) {
 		return &dota.CDOTAUserMsg_ChatEvent{}, nil
 	case 67:
 		return &dota.CDOTAUserMsg_CombatHeroPositions{}, nil
-	case 68:
-		return &dota.CDOTAUserMsg_CombatLogData{}, nil
 	case 70:
 		return &dota.CDOTAUserMsg_CombatLogShowDeath{}, nil
 	case 71:
@@ -540,6 +544,14 @@ func (p *Parser) AsBaseEventBUMDUM(value int) (proto.Message, error) {
 		return &dota.CDOTAUserMsg_AbilitySteal{}, nil
 	case 128:
 		return &dota.CDOTAUserMsg_CourierKilledAlert{}, nil
+	case 129:
+		return &dota.CDOTAUserMsg_EnemyItemAlert{}, nil
+	case 130:
+		return &dota.CDOTAUserMsg_StatsMatchDetails{}, nil
+	case 131:
+		return &dota.CDOTAUserMsg_MiniTaunt{}, nil
+	case 132:
+		return &dota.CDOTAUserMsg_BuyBackStateAlert{}, nil
 	}
 	return nil, Error("Unknown BUMDUM")
 }

@@ -47,7 +47,9 @@ const (
 	EDotaClientMessages_DOTA_CM_CameraZoomAmount                       EDotaClientMessages = 27
 	EDotaClientMessages_DOTA_CM_BroadcasterUsingCamerman               EDotaClientMessages = 28
 	EDotaClientMessages_DOTA_CM_BroadcasterUsingAssistedCameraOperator EDotaClientMessages = 29
+	EDotaClientMessages_DOTA_CM_EnemyItemAlert                         EDotaClientMessages = 30
 	EDotaClientMessages_DOTA_CM_FreeInventory                          EDotaClientMessages = 31
+	EDotaClientMessages_DOTA_CM_BuyBackStateAlert                      EDotaClientMessages = 32
 )
 
 var EDotaClientMessages_name = map[int32]string{
@@ -80,7 +82,9 @@ var EDotaClientMessages_name = map[int32]string{
 	27: "DOTA_CM_CameraZoomAmount",
 	28: "DOTA_CM_BroadcasterUsingCamerman",
 	29: "DOTA_CM_BroadcasterUsingAssistedCameraOperator",
+	30: "DOTA_CM_EnemyItemAlert",
 	31: "DOTA_CM_FreeInventory",
+	32: "DOTA_CM_BuyBackStateAlert",
 }
 var EDotaClientMessages_value = map[string]int32{
 	"DOTA_CM_MapLine":                                1,
@@ -112,7 +116,9 @@ var EDotaClientMessages_value = map[string]int32{
 	"DOTA_CM_CameraZoomAmount":                       27,
 	"DOTA_CM_BroadcasterUsingCamerman":               28,
 	"DOTA_CM_BroadcasterUsingAssistedCameraOperator": 29,
+	"DOTA_CM_EnemyItemAlert":                         30,
 	"DOTA_CM_FreeInventory":                          31,
+	"DOTA_CM_BuyBackStateAlert":                      32,
 }
 
 func (x EDotaClientMessages) Enum() *EDotaClientMessages {
@@ -160,6 +166,22 @@ func (*CDOTAClientMsg_ItemAlert) ProtoMessage()    {}
 func (m *CDOTAClientMsg_ItemAlert) GetItemAlert() *CDOTAMsg_ItemAlert {
 	if m != nil {
 		return m.ItemAlert
+	}
+	return nil
+}
+
+type CDOTAClientMsg_EnemyItemAlert struct {
+	EnemyItemAlert   *CDOTAMsg_EnemyItemAlert `protobuf:"bytes,1,opt,name=enemy_item_alert" json:"enemy_item_alert,omitempty"`
+	XXX_unrecognized []byte                   `json:"-"`
+}
+
+func (m *CDOTAClientMsg_EnemyItemAlert) Reset()         { *m = CDOTAClientMsg_EnemyItemAlert{} }
+func (m *CDOTAClientMsg_EnemyItemAlert) String() string { return proto.CompactTextString(m) }
+func (*CDOTAClientMsg_EnemyItemAlert) ProtoMessage()    {}
+
+func (m *CDOTAClientMsg_EnemyItemAlert) GetEnemyItemAlert() *CDOTAMsg_EnemyItemAlert {
+	if m != nil {
+		return m.EnemyItemAlert
 	}
 	return nil
 }
@@ -575,6 +597,14 @@ func (m *CDOTAClientMsg_WillPurchaseAlert) GetItemid() int32 {
 	}
 	return 0
 }
+
+type CDOTAClientMsg_BuyBackStateAlert struct {
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *CDOTAClientMsg_BuyBackStateAlert) Reset()         { *m = CDOTAClientMsg_BuyBackStateAlert{} }
+func (m *CDOTAClientMsg_BuyBackStateAlert) String() string { return proto.CompactTextString(m) }
+func (*CDOTAClientMsg_BuyBackStateAlert) ProtoMessage()    {}
 
 type CDOTAClientMsg_PlayerShowCase struct {
 	Showcase         *bool  `protobuf:"varint,1,opt,name=showcase" json:"showcase,omitempty"`
