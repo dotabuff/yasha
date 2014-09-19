@@ -1,7 +1,16 @@
 package packet_entities
 
+import (
+	"github.com/dotabuff/yasha/utils"
+)
+
+type UpdateType int
+
 const (
-	serialNumBits = 11
+	Create UpdateType = iota
+	Delete
+	Leave
+	Preserve
 )
 
 type PacketEntity struct {
@@ -16,6 +25,8 @@ type PacketEntity struct {
 	Delta        map[string]interface{}
 	OldDelta     map[string]interface{}
 }
+
+const serialNumBits = 11
 
 func (pe *PacketEntity) Handle() int {
 	return pe.Index | (pe.SerialNum << serialNumBits)
@@ -36,4 +47,19 @@ func (pe *PacketEntity) Clone() *PacketEntity {
 		Type:         pe.Type,
 		Values:       values,
 	}
+}
+
+func ReadUpdateType(br *utils.BitReader) UpdateType {
+	result := Preserve
+	if !br.ReadBoolean() {
+		if br.ReadBoolean() {
+			result = Create
+		}
+	} else {
+		result = Leave
+		if br.ReadBoolean() {
+			result = Delete
+		}
+	}
+	return result
 }
