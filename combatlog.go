@@ -387,7 +387,12 @@ func (c combatLogParser) assign(v CombatLogEntry, keys []*dota.CSVCMsg_GameEvent
 			valShort := key.GetValShort()
 			if logTable := fieldTag.Get("logTable"); logTable != "" {
 				table := c.stsh.GetTableNow(logTable).Items
-				field.SetString(table[int(valShort)].Str)
+				entry := table[int(valShort)]
+				if entry == nil {
+					spew.Printf("no entry %d in %s\n", valShort, logTable)
+				} else {
+					field.SetString(entry.Str)
+				}
 			} else if field.Kind() == reflect.Bool {
 				field.SetBool(valShort == 1)
 			} else {
