@@ -25,7 +25,7 @@ const (
 	EDOTAGCMsg_k_EMsgGCOtherJoinedChannel                                 EDOTAGCMsg = 7013
 	EDOTAGCMsg_k_EMsgGCOtherLeftChannel                                   EDOTAGCMsg = 7014
 	EDOTAGCMsg_k_EMsgGCMatchHistoryList                                   EDOTAGCMsg = 7017
-	EDOTAGCMsg_k_EMsgGCStatus                                             EDOTAGCMsg = 7026
+	EDOTAGCMsg_k_EMsgServerToGCRequestStatus                              EDOTAGCMsg = 7026
 	EDOTAGCMsg_k_EMsgGCGetRecentMatches                                   EDOTAGCMsg = 7027
 	EDOTAGCMsg_k_EMsgGCRecentMatchesResponse                              EDOTAGCMsg = 7028
 	EDOTAGCMsg_k_EMsgGCFindSourceTVGames                                  EDOTAGCMsg = 7031
@@ -489,6 +489,8 @@ const (
 	EDOTAGCMsg_k_EMsgClientToGCMarkNotificationListRead                   EDOTAGCMsg = 7542
 	EDOTAGCMsg_k_EMsgGCToClientNewNotificationAdded                       EDOTAGCMsg = 7543
 	EDOTAGCMsg_k_EMsgServerToGCSuspiciousActivity                         EDOTAGCMsg = 7544
+	EDOTAGCMsg_k_EMsgSignOutCommunicationSummary                          EDOTAGCMsg = 7545
+	EDOTAGCMsg_k_EMsgServerToGCRequestStatus_Response                     EDOTAGCMsg = 7546
 	EDOTAGCMsg_k_EMsgGCDev_GrantWarKill                                   EDOTAGCMsg = 8001
 )
 
@@ -502,7 +504,7 @@ var EDOTAGCMsg_name = map[int32]string{
 	7013: "k_EMsgGCOtherJoinedChannel",
 	7014: "k_EMsgGCOtherLeftChannel",
 	7017: "k_EMsgGCMatchHistoryList",
-	7026: "k_EMsgGCStatus",
+	7026: "k_EMsgServerToGCRequestStatus",
 	7027: "k_EMsgGCGetRecentMatches",
 	7028: "k_EMsgGCRecentMatchesResponse",
 	7031: "k_EMsgGCFindSourceTVGames",
@@ -966,6 +968,8 @@ var EDOTAGCMsg_name = map[int32]string{
 	7542: "k_EMsgClientToGCMarkNotificationListRead",
 	7543: "k_EMsgGCToClientNewNotificationAdded",
 	7544: "k_EMsgServerToGCSuspiciousActivity",
+	7545: "k_EMsgSignOutCommunicationSummary",
+	7546: "k_EMsgServerToGCRequestStatus_Response",
 	8001: "k_EMsgGCDev_GrantWarKill",
 }
 var EDOTAGCMsg_value = map[string]int32{
@@ -978,7 +982,7 @@ var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgGCOtherJoinedChannel":                                 7013,
 	"k_EMsgGCOtherLeftChannel":                                   7014,
 	"k_EMsgGCMatchHistoryList":                                   7017,
-	"k_EMsgGCStatus":                                             7026,
+	"k_EMsgServerToGCRequestStatus":                              7026,
 	"k_EMsgGCGetRecentMatches":                                   7027,
 	"k_EMsgGCRecentMatchesResponse":                              7028,
 	"k_EMsgGCFindSourceTVGames":                                  7031,
@@ -1442,6 +1446,8 @@ var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgClientToGCMarkNotificationListRead":                   7542,
 	"k_EMsgGCToClientNewNotificationAdded":                       7543,
 	"k_EMsgServerToGCSuspiciousActivity":                         7544,
+	"k_EMsgSignOutCommunicationSummary":                          7545,
+	"k_EMsgServerToGCRequestStatus_Response":                     7546,
 	"k_EMsgGCDev_GrantWarKill":                                   8001,
 }
 
@@ -1487,6 +1493,7 @@ const (
 	DOTA_GameMode_DOTA_GAMEMODE_EVENT         DOTA_GameMode = 19
 	DOTA_GameMode_DOTA_GAMEMODE_ARDM          DOTA_GameMode = 20
 	DOTA_GameMode_DOTA_GAMEMODE_1V1MID        DOTA_GameMode = 21
+	DOTA_GameMode_DOTA_GAMEMODE_ALL_DRAFT     DOTA_GameMode = 22
 )
 
 var DOTA_GameMode_name = map[int32]string{
@@ -1512,6 +1519,7 @@ var DOTA_GameMode_name = map[int32]string{
 	19: "DOTA_GAMEMODE_EVENT",
 	20: "DOTA_GAMEMODE_ARDM",
 	21: "DOTA_GAMEMODE_1V1MID",
+	22: "DOTA_GAMEMODE_ALL_DRAFT",
 }
 var DOTA_GameMode_value = map[string]int32{
 	"DOTA_GAMEMODE_NONE":          0,
@@ -1536,6 +1544,7 @@ var DOTA_GameMode_value = map[string]int32{
 	"DOTA_GAMEMODE_EVENT":         19,
 	"DOTA_GAMEMODE_ARDM":          20,
 	"DOTA_GAMEMODE_1V1MID":        21,
+	"DOTA_GAMEMODE_ALL_DRAFT":     22,
 }
 
 func (x DOTA_GameMode) Enum() *DOTA_GameMode {
@@ -3598,7 +3607,7 @@ func (m *CMsgDOTAPartyMemberSetCoach) GetWantsCoach() bool {
 }
 
 type CDOTASaveGame struct {
-	MatchId          *uint32                       `protobuf:"varint,5,opt,name=match_id" json:"match_id,omitempty"`
+	MatchId          *uint64                       `protobuf:"varint,5,opt,name=match_id" json:"match_id,omitempty"`
 	SaveTime         *uint32                       `protobuf:"varint,2,opt,name=save_time" json:"save_time,omitempty"`
 	Players          []*CDOTASaveGame_Player       `protobuf:"bytes,3,rep,name=players" json:"players,omitempty"`
 	SaveInstances    []*CDOTASaveGame_SaveInstance `protobuf:"bytes,4,rep,name=save_instances" json:"save_instances,omitempty"`
@@ -3609,7 +3618,7 @@ func (m *CDOTASaveGame) Reset()         { *m = CDOTASaveGame{} }
 func (m *CDOTASaveGame) String() string { return proto.CompactTextString(m) }
 func (*CDOTASaveGame) ProtoMessage()    {}
 
-func (m *CDOTASaveGame) GetMatchId() uint32 {
+func (m *CDOTASaveGame) GetMatchId() uint64 {
 	if m != nil && m.MatchId != nil {
 		return *m.MatchId
 	}
@@ -4268,7 +4277,7 @@ type CSODOTALobby struct {
 	NumSpectators        *uint32                       `protobuf:"varint,23,opt,name=num_spectators" json:"num_spectators,omitempty"`
 	Matchgroup           *uint32                       `protobuf:"varint,25,opt,name=matchgroup" json:"matchgroup,omitempty"`
 	CmPick               *DOTA_CM_PICK                 `protobuf:"varint,28,opt,name=cm_pick,enum=dota.DOTA_CM_PICK,def=0" json:"cm_pick,omitempty"`
-	MatchId              *uint32                       `protobuf:"varint,30,opt,name=match_id" json:"match_id,omitempty"`
+	MatchId              *uint64                       `protobuf:"varint,30,opt,name=match_id" json:"match_id,omitempty"`
 	AllowSpectating      *bool                         `protobuf:"varint,31,opt,name=allow_spectating,def=1" json:"allow_spectating,omitempty"`
 	BotDifficulty        *DOTABotDifficulty            `protobuf:"varint,36,opt,name=bot_difficulty,enum=dota.DOTABotDifficulty,def=3" json:"bot_difficulty,omitempty"`
 	GameVersion          *DOTAGameVersion              `protobuf:"varint,37,opt,name=game_version,enum=dota.DOTAGameVersion,def=0" json:"game_version,omitempty"`
@@ -4482,7 +4491,7 @@ func (m *CSODOTALobby) GetCmPick() DOTA_CM_PICK {
 	return Default_CSODOTALobby_CmPick
 }
 
-func (m *CSODOTALobby) GetMatchId() uint32 {
+func (m *CSODOTALobby) GetMatchId() uint64 {
 	if m != nil && m.MatchId != nil {
 		return *m.MatchId
 	}
@@ -5819,6 +5828,8 @@ type CMsgDOTACombatLogEntry struct {
 	LocationY          *float32              `protobuf:"fixed32,22,opt,name=location_y" json:"location_y,omitempty"`
 	GoldReason         *uint32               `protobuf:"varint,23,opt,name=gold_reason" json:"gold_reason,omitempty"`
 	TimestampRaw       *float32              `protobuf:"fixed32,24,opt,name=timestamp_raw" json:"timestamp_raw,omitempty"`
+	ModifierDuration   *float32              `protobuf:"fixed32,25,opt,name=modifier_duration" json:"modifier_duration,omitempty"`
+	XpReason           *uint32               `protobuf:"varint,26,opt,name=xp_reason" json:"xp_reason,omitempty"`
 	XXX_unrecognized   []byte                `json:"-"`
 }
 
@@ -5992,6 +6003,20 @@ func (m *CMsgDOTACombatLogEntry) GetGoldReason() uint32 {
 func (m *CMsgDOTACombatLogEntry) GetTimestampRaw() float32 {
 	if m != nil && m.TimestampRaw != nil {
 		return *m.TimestampRaw
+	}
+	return 0
+}
+
+func (m *CMsgDOTACombatLogEntry) GetModifierDuration() float32 {
+	if m != nil && m.ModifierDuration != nil {
+		return *m.ModifierDuration
+	}
+	return 0
+}
+
+func (m *CMsgDOTACombatLogEntry) GetXpReason() uint32 {
+	if m != nil && m.XpReason != nil {
+		return *m.XpReason
 	}
 	return 0
 }

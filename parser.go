@@ -7,7 +7,6 @@ import (
 	"github.com/davecgh/go-spew/spew"
 
 	"github.com/dotabuff/yasha/dota"
-	"github.com/dotabuff/yasha/packet_entities"
 	"github.com/dotabuff/yasha/parser"
 	"github.com/dotabuff/yasha/send_tables"
 	"github.com/dotabuff/yasha/string_tables"
@@ -30,12 +29,12 @@ type Parser struct {
 	VoiceInit             *dota.CSVCMsg_VoiceInit
 
 	ActiveModifiers map[int]*dota.CDOTAModifierBuffTableEntry
-	Entities        []*packet_entities.PacketEntity
-	ByHandle        map[int]*packet_entities.PacketEntity
+	Entities        []*PacketEntity
+	ByHandle        map[int]*PacketEntity
 
-	OnEntityCreated   func(*packet_entities.PacketEntity)
-	OnEntityDeleted   func(*packet_entities.PacketEntity)
-	OnEntityPreserved func(*packet_entities.PacketEntity)
+	OnEntityCreated   func(*PacketEntity)
+	OnEntityDeleted   func(*PacketEntity)
+	OnEntityPreserved func(*PacketEntity)
 
 	OnActiveModifierDelta func(map[int]*string_tables.StringTableItem, string_tables.ModifierBuffs)
 
@@ -68,13 +67,13 @@ func NewParser(data []byte) *Parser {
 func (p *Parser) Parse() {
 	p.Sth = send_tables.NewHelper()
 	p.Stsh = string_tables.NewStateHelper()
-	p.Entities = make([]*packet_entities.PacketEntity, 2048)
+	p.Entities = make([]*PacketEntity, 2048)
 	p.ClassInfosIdMapping = map[string]int{}
 	p.ClassInfosNameMapping = map[int]string{}
 	p.GameEventMap = map[int32]*dota.CSVCMsg_GameEventListDescriptorT{}
 	p.Mapping = map[int][]*send_tables.SendProp{}
 	p.Multiples = map[int]map[string]int{}
-	p.ByHandle = map[int]*packet_entities.PacketEntity{}
+	p.ByHandle = map[int]*PacketEntity{}
 	p.combatLogParser = &combatLogParser{
 		stsh:     p.Stsh,
 		distinct: map[dota.DOTA_COMBATLOG_TYPES][]map[interface{}]bool{},
@@ -341,20 +340,20 @@ func (p *Parser) ParsePacket(tick int, pe *dota.CSVCMsg_PacketEntities) {
 	br := utils.NewBitReader(pe.GetEntityData())
 	currentIndex := -1
 
-	createPackets := []*packet_entities.PacketEntity{}
-	preservePackets := []*packet_entities.PacketEntity{}
-	deletePackets := []*packet_entities.PacketEntity{}
+	createPackets := []*PacketEntity{}
+	preservePackets := []*PacketEntity{}
+	deletePackets := []*PacketEntity{}
 
 	for i := 0; i < int(pe.GetUpdatedEntries()); i++ {
 		currentIndex = br.ReadNextEntityIndex(currentIndex)
-		uType := packet_entities.ReadUpdateType(br)
+		uType := ReadUpdateType(br)
 
 		switch uType {
-		case packet_entities.Create:
+		case Create:
 			createPackets = append(createPackets, p.entityCreate(br, currentIndex, tick))
-		case packet_entities.Preserve:
+		case Preserve:
 			preservePackets = append(preservePackets, p.entityPreserve(br, currentIndex, tick))
-		case packet_entities.Delete:
+		case Delete:
 			deletePackets = append(deletePackets, p.entityDelete(br, currentIndex, tick))
 		}
 	}
@@ -382,13 +381,13 @@ func (p *Parser) ParsePacket(tick int, pe *dota.CSVCMsg_PacketEntities) {
 	}
 }
 
-func (p *Parser) entityCreate(br *utils.BitReader, currentIndex, tick int) *packet_entities.PacketEntity {
-	pe := &packet_entities.PacketEntity{
+func (p *Parser) entityCreate(br *utils.BitReader, currentIndex, tick int) *PacketEntity {
+	pe := &PacketEntity{
 		Tick:      tick,
 		ClassId:   int(br.ReadUBits(p.ClassIdNumBits)),
 		SerialNum: int(br.ReadUBits(10)),
 		Index:     currentIndex,
-		Type:      packet_entities.Create,
+		Type:      Create,
 		Values:    map[string]interface{}{},
 	}
 	pe.EntityHandle = pe.Handle()
@@ -412,10 +411,10 @@ func (p *Parser) entityCreate(br *utils.BitReader, currentIndex, tick int) *pack
 	return pe
 }
 
-func (p *Parser) entityPreserve(br *utils.BitReader, currentIndex, tick int) *packet_entities.PacketEntity {
+func (p *Parser) entityPreserve(br *utils.BitReader, currentIndex, tick int) *PacketEntity {
 	pe := p.Entities[currentIndex]
 	pe.Tick = tick
-	pe.Type = packet_entities.Preserve
+	pe.Type = Preserve
 	indices := br.ReadPropertiesIndex()
 	classId := p.ClassInfosIdMapping[pe.Name]
 	pe.Delta = br.ReadPropertiesValues(p.Mapping[classId], p.Multiples[classId], indices)
@@ -429,6 +428,6 @@ func (p *Parser) entityPreserve(br *utils.BitReader, currentIndex, tick int) *pa
 	return pe
 }
 
-func (p *Parser) entityDelete(br *utils.BitReader, currentIndex, tick int) *packet_entities.PacketEntity {
+func (p *Parser) entityDelete(br *utils.BitReader, currentIndex, tick int) *PacketEntity {
 	return p.Entities[currentIndex]
 }

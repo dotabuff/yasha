@@ -98,6 +98,8 @@ const (
 	EGCSystemMsg_k_EGCMsgVSReportedSuspiciousActivity      EGCSystemMsg = 509
 	EGCSystemMsg_k_EGCMsgDPPartnerMicroTxns                EGCSystemMsg = 512
 	EGCSystemMsg_k_EGCMsgDPPartnerMicroTxnsResponse        EGCSystemMsg = 513
+	EGCSystemMsg_k_EGCMsgGetIPASN                          EGCSystemMsg = 514
+	EGCSystemMsg_k_EGCMsgGetIPASNResponse                  EGCSystemMsg = 515
 )
 
 var EGCSystemMsg_name = map[int32]string{
@@ -183,6 +185,8 @@ var EGCSystemMsg_name = map[int32]string{
 	509: "k_EGCMsgVSReportedSuspiciousActivity",
 	512: "k_EGCMsgDPPartnerMicroTxns",
 	513: "k_EGCMsgDPPartnerMicroTxnsResponse",
+	514: "k_EGCMsgGetIPASN",
+	515: "k_EGCMsgGetIPASNResponse",
 }
 var EGCSystemMsg_value = map[string]int32{
 	"k_EGCMsgInvalid":                           0,
@@ -267,6 +271,8 @@ var EGCSystemMsg_value = map[string]int32{
 	"k_EGCMsgVSReportedSuspiciousActivity":      509,
 	"k_EGCMsgDPPartnerMicroTxns":                512,
 	"k_EGCMsgDPPartnerMicroTxnsResponse":        513,
+	"k_EGCMsgGetIPASN":                          514,
+	"k_EGCMsgGetIPASNResponse":                  515,
 }
 
 func (x EGCSystemMsg) Enum() *EGCSystemMsg {

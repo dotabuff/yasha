@@ -86,6 +86,8 @@ const (
 	EDotaUserMessages_DOTA_UM_StatsMatchDetails        EDotaUserMessages = 130
 	EDotaUserMessages_DOTA_UM_MiniTaunt                EDotaUserMessages = 131
 	EDotaUserMessages_DOTA_UM_BuyBackStateAlert        EDotaUserMessages = 132
+	EDotaUserMessages_DOTA_UM_QuickBuyAlert            EDotaUserMessages = 133
+	EDotaUserMessages_DOTA_UM_StatsHeroDetails         EDotaUserMessages = 134
 )
 
 var EDotaUserMessages_name = map[int32]string{
@@ -157,6 +159,8 @@ var EDotaUserMessages_name = map[int32]string{
 	130: "DOTA_UM_StatsMatchDetails",
 	131: "DOTA_UM_MiniTaunt",
 	132: "DOTA_UM_BuyBackStateAlert",
+	133: "DOTA_UM_QuickBuyAlert",
+	134: "DOTA_UM_StatsHeroDetails",
 }
 var EDotaUserMessages_value = map[string]int32{
 	"DOTA_UM_AddUnitToSelection":       64,
@@ -227,6 +231,8 @@ var EDotaUserMessages_value = map[string]int32{
 	"DOTA_UM_StatsMatchDetails":        130,
 	"DOTA_UM_MiniTaunt":                131,
 	"DOTA_UM_BuyBackStateAlert":        132,
+	"DOTA_UM_QuickBuyAlert":            133,
+	"DOTA_UM_StatsHeroDetails":         134,
 }
 
 func (x EDotaUserMessages) Enum() *EDotaUserMessages {
@@ -594,17 +600,20 @@ const (
 	DOTA_ABILITY_PING_TYPE_ABILITY_PING_READY    DOTA_ABILITY_PING_TYPE = 1
 	DOTA_ABILITY_PING_TYPE_ABILITY_PING_MANA     DOTA_ABILITY_PING_TYPE = 2
 	DOTA_ABILITY_PING_TYPE_ABILITY_PING_COOLDOWN DOTA_ABILITY_PING_TYPE = 3
+	DOTA_ABILITY_PING_TYPE_ABILITY_PING_ENEMY    DOTA_ABILITY_PING_TYPE = 4
 )
 
 var DOTA_ABILITY_PING_TYPE_name = map[int32]string{
 	1: "ABILITY_PING_READY",
 	2: "ABILITY_PING_MANA",
 	3: "ABILITY_PING_COOLDOWN",
+	4: "ABILITY_PING_ENEMY",
 }
 var DOTA_ABILITY_PING_TYPE_value = map[string]int32{
 	"ABILITY_PING_READY":    1,
 	"ABILITY_PING_MANA":     2,
 	"ABILITY_PING_COOLDOWN": 3,
+	"ABILITY_PING_ENEMY":    4,
 }
 
 func (x DOTA_ABILITY_PING_TYPE) Enum() *DOTA_ABILITY_PING_TYPE {
@@ -810,6 +819,99 @@ func (x *DOTA_OVERHEAD_ALERT) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*x = DOTA_OVERHEAD_ALERT(value)
+	return nil
+}
+
+type EHeroStatType int32
+
+const (
+	EHeroStatType_k_EHeroStatType_None                               EHeroStatType = 0
+	EHeroStatType_k_EHeroStatType_AxeTotalDamage                     EHeroStatType = 2000
+	EHeroStatType_k_EHeroStatType_BattleHungerDamage                 EHeroStatType = 2001
+	EHeroStatType_k_EHeroStatType_CounterHelixDamage                 EHeroStatType = 2002
+	EHeroStatType_k_EHeroStatType_CullingBladeDamage                 EHeroStatType = 2003
+	EHeroStatType_k_EHeroStatType_BerserkersCallCastCount            EHeroStatType = 2004
+	EHeroStatType_k_EHeroStatType_BerserkersCallHeroesHitAverage     EHeroStatType = 2005
+	EHeroStatType_k_EHeroStatType_BerserkersCallOtherUnitsHit        EHeroStatType = 2006
+	EHeroStatType_k_EHeroStatType_BerserkersCallHeroAttacksTaken     EHeroStatType = 2007
+	EHeroStatType_k_EHeroStatType_BerserkersCallOtherAttacksTaken    EHeroStatType = 2008
+	EHeroStatType_k_EHeroStatType_BattleHungerCastCount              EHeroStatType = 2009
+	EHeroStatType_k_EHeroStatType_BattleHungerPotentialDuration      EHeroStatType = 2010
+	EHeroStatType_k_EHeroStatType_BattleHungerAverageDuration        EHeroStatType = 2011
+	EHeroStatType_k_EHeroStatType_CounterHelixProcCount              EHeroStatType = 2012
+	EHeroStatType_k_EHeroStatType_CounterHelixHeroProcCount          EHeroStatType = 2013
+	EHeroStatType_k_EHeroStatType_CounterHelixHeroesHitAverage       EHeroStatType = 2014
+	EHeroStatType_k_EHeroStatType_CounterHelixOtherUnitsHitCount     EHeroStatType = 2015
+	EHeroStatType_k_EHeroStatType_CullingBladeCastCount              EHeroStatType = 2016
+	EHeroStatType_k_EHeroStatType_CullingBladeKillCount              EHeroStatType = 2017
+	EHeroStatType_k_EHeroStatType_CullingBladeAverageHealthCulled    EHeroStatType = 2018
+	EHeroStatType_k_EHeroStatType_CullingBladeAverageDamageAvailable EHeroStatType = 2019
+	EHeroStatType_k_EHeroStatType_CullingBladeHeroBuffAverage        EHeroStatType = 2020
+)
+
+var EHeroStatType_name = map[int32]string{
+	0:    "k_EHeroStatType_None",
+	2000: "k_EHeroStatType_AxeTotalDamage",
+	2001: "k_EHeroStatType_BattleHungerDamage",
+	2002: "k_EHeroStatType_CounterHelixDamage",
+	2003: "k_EHeroStatType_CullingBladeDamage",
+	2004: "k_EHeroStatType_BerserkersCallCastCount",
+	2005: "k_EHeroStatType_BerserkersCallHeroesHitAverage",
+	2006: "k_EHeroStatType_BerserkersCallOtherUnitsHit",
+	2007: "k_EHeroStatType_BerserkersCallHeroAttacksTaken",
+	2008: "k_EHeroStatType_BerserkersCallOtherAttacksTaken",
+	2009: "k_EHeroStatType_BattleHungerCastCount",
+	2010: "k_EHeroStatType_BattleHungerPotentialDuration",
+	2011: "k_EHeroStatType_BattleHungerAverageDuration",
+	2012: "k_EHeroStatType_CounterHelixProcCount",
+	2013: "k_EHeroStatType_CounterHelixHeroProcCount",
+	2014: "k_EHeroStatType_CounterHelixHeroesHitAverage",
+	2015: "k_EHeroStatType_CounterHelixOtherUnitsHitCount",
+	2016: "k_EHeroStatType_CullingBladeCastCount",
+	2017: "k_EHeroStatType_CullingBladeKillCount",
+	2018: "k_EHeroStatType_CullingBladeAverageHealthCulled",
+	2019: "k_EHeroStatType_CullingBladeAverageDamageAvailable",
+	2020: "k_EHeroStatType_CullingBladeHeroBuffAverage",
+}
+var EHeroStatType_value = map[string]int32{
+	"k_EHeroStatType_None":                               0,
+	"k_EHeroStatType_AxeTotalDamage":                     2000,
+	"k_EHeroStatType_BattleHungerDamage":                 2001,
+	"k_EHeroStatType_CounterHelixDamage":                 2002,
+	"k_EHeroStatType_CullingBladeDamage":                 2003,
+	"k_EHeroStatType_BerserkersCallCastCount":            2004,
+	"k_EHeroStatType_BerserkersCallHeroesHitAverage":     2005,
+	"k_EHeroStatType_BerserkersCallOtherUnitsHit":        2006,
+	"k_EHeroStatType_BerserkersCallHeroAttacksTaken":     2007,
+	"k_EHeroStatType_BerserkersCallOtherAttacksTaken":    2008,
+	"k_EHeroStatType_BattleHungerCastCount":              2009,
+	"k_EHeroStatType_BattleHungerPotentialDuration":      2010,
+	"k_EHeroStatType_BattleHungerAverageDuration":        2011,
+	"k_EHeroStatType_CounterHelixProcCount":              2012,
+	"k_EHeroStatType_CounterHelixHeroProcCount":          2013,
+	"k_EHeroStatType_CounterHelixHeroesHitAverage":       2014,
+	"k_EHeroStatType_CounterHelixOtherUnitsHitCount":     2015,
+	"k_EHeroStatType_CullingBladeCastCount":              2016,
+	"k_EHeroStatType_CullingBladeKillCount":              2017,
+	"k_EHeroStatType_CullingBladeAverageHealthCulled":    2018,
+	"k_EHeroStatType_CullingBladeAverageDamageAvailable": 2019,
+	"k_EHeroStatType_CullingBladeHeroBuffAverage":        2020,
+}
+
+func (x EHeroStatType) Enum() *EHeroStatType {
+	p := new(EHeroStatType)
+	*p = x
+	return p
+}
+func (x EHeroStatType) String() string {
+	return proto.EnumName(EHeroStatType_name, int32(x))
+}
+func (x *EHeroStatType) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(EHeroStatType_value, data, "EHeroStatType")
+	if err != nil {
+		return err
+	}
+	*x = EHeroStatType(value)
 	return nil
 }
 
@@ -1259,9 +1361,10 @@ func (m *CDOTAUserMsg_EnemyItemAlert) GetEnemyItemAlert() *CDOTAMsg_EnemyItemAle
 }
 
 type CDOTAUserMsg_WillPurchaseAlert struct {
-	Itemid           *int32 `protobuf:"varint,1,opt,name=itemid" json:"itemid,omitempty"`
-	PlayerId         *int32 `protobuf:"varint,2,opt,name=player_id" json:"player_id,omitempty"`
-	XXX_unrecognized []byte `json:"-"`
+	Itemid           *int32  `protobuf:"varint,1,opt,name=itemid" json:"itemid,omitempty"`
+	PlayerId         *int32  `protobuf:"varint,2,opt,name=player_id" json:"player_id,omitempty"`
+	GoldRemaining    *uint32 `protobuf:"varint,3,opt,name=gold_remaining" json:"gold_remaining,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
 }
 
 func (m *CDOTAUserMsg_WillPurchaseAlert) Reset()         { *m = CDOTAUserMsg_WillPurchaseAlert{} }
@@ -1282,6 +1385,13 @@ func (m *CDOTAUserMsg_WillPurchaseAlert) GetPlayerId() int32 {
 	return 0
 }
 
+func (m *CDOTAUserMsg_WillPurchaseAlert) GetGoldRemaining() uint32 {
+	if m != nil && m.GoldRemaining != nil {
+		return *m.GoldRemaining
+	}
+	return 0
+}
+
 type CDOTAUserMsg_BuyBackStateAlert struct {
 	PlayerId         *int32 `protobuf:"varint,1,opt,name=player_id" json:"player_id,omitempty"`
 	XXX_unrecognized []byte `json:"-"`
@@ -1294,6 +1404,38 @@ func (*CDOTAUserMsg_BuyBackStateAlert) ProtoMessage()    {}
 func (m *CDOTAUserMsg_BuyBackStateAlert) GetPlayerId() int32 {
 	if m != nil && m.PlayerId != nil {
 		return *m.PlayerId
+	}
+	return 0
+}
+
+type CDOTAUserMsg_QuickBuyAlert struct {
+	PlayerId         *int32 `protobuf:"varint,1,opt,name=player_id" json:"player_id,omitempty"`
+	Itemid           *int32 `protobuf:"varint,2,opt,name=itemid" json:"itemid,omitempty"`
+	GoldRequired     *int32 `protobuf:"varint,3,opt,name=gold_required" json:"gold_required,omitempty"`
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *CDOTAUserMsg_QuickBuyAlert) Reset()         { *m = CDOTAUserMsg_QuickBuyAlert{} }
+func (m *CDOTAUserMsg_QuickBuyAlert) String() string { return proto.CompactTextString(m) }
+func (*CDOTAUserMsg_QuickBuyAlert) ProtoMessage()    {}
+
+func (m *CDOTAUserMsg_QuickBuyAlert) GetPlayerId() int32 {
+	if m != nil && m.PlayerId != nil {
+		return *m.PlayerId
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_QuickBuyAlert) GetItemid() int32 {
+	if m != nil && m.Itemid != nil {
+		return *m.Itemid
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_QuickBuyAlert) GetGoldRequired() int32 {
+	if m != nil && m.GoldRequired != nil {
+		return *m.GoldRequired
 	}
 	return 0
 }
@@ -3508,6 +3650,30 @@ func (m *CDOTAUserMsg_AbilitySteal) GetAbilityLevel() uint32 {
 	return 0
 }
 
+type CDOTAUserMsg_StatsHeroLookup struct {
+	PlayerId         *int32 `protobuf:"varint,1,opt,name=player_id" json:"player_id,omitempty"`
+	HeroId           *int32 `protobuf:"varint,2,opt,name=hero_id" json:"hero_id,omitempty"`
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *CDOTAUserMsg_StatsHeroLookup) Reset()         { *m = CDOTAUserMsg_StatsHeroLookup{} }
+func (m *CDOTAUserMsg_StatsHeroLookup) String() string { return proto.CompactTextString(m) }
+func (*CDOTAUserMsg_StatsHeroLookup) ProtoMessage()    {}
+
+func (m *CDOTAUserMsg_StatsHeroLookup) GetPlayerId() int32 {
+	if m != nil && m.PlayerId != nil {
+		return *m.PlayerId
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsHeroLookup) GetHeroId() int32 {
+	if m != nil && m.HeroId != nil {
+		return *m.HeroId
+	}
+	return 0
+}
+
 type CDOTAUserMsg_StatsHeroMinuteDetails struct {
 	LastHits           *uint32  `protobuf:"varint,1,opt,name=last_hits" json:"last_hits,omitempty"`
 	HeroKills          *uint32  `protobuf:"varint,2,opt,name=hero_kills" json:"hero_kills,omitempty"`
@@ -3733,16 +3899,24 @@ func (m *CDOTAUserMsg_StatsKillDetails) GetDeathTime() float32 {
 }
 
 type CDOTAUserMsg_StatsMatchDetails struct {
-	RadiantStats     []*CDOTAUserMsg_StatsTeamMinuteDetails `protobuf:"bytes,1,rep,name=radiant_stats" json:"radiant_stats,omitempty"`
-	DireStats        []*CDOTAUserMsg_StatsTeamMinuteDetails `protobuf:"bytes,2,rep,name=dire_stats" json:"dire_stats,omitempty"`
-	RadiantKills     []*CDOTAUserMsg_StatsKillDetails       `protobuf:"bytes,3,rep,name=radiant_kills" json:"radiant_kills,omitempty"`
-	DireKills        []*CDOTAUserMsg_StatsKillDetails       `protobuf:"bytes,4,rep,name=dire_kills" json:"dire_kills,omitempty"`
+	HeroLookup       []*CDOTAUserMsg_StatsHeroLookup        `protobuf:"bytes,1,rep,name=hero_lookup" json:"hero_lookup,omitempty"`
+	RadiantStats     []*CDOTAUserMsg_StatsTeamMinuteDetails `protobuf:"bytes,2,rep,name=radiant_stats" json:"radiant_stats,omitempty"`
+	DireStats        []*CDOTAUserMsg_StatsTeamMinuteDetails `protobuf:"bytes,3,rep,name=dire_stats" json:"dire_stats,omitempty"`
+	RadiantKills     []*CDOTAUserMsg_StatsKillDetails       `protobuf:"bytes,4,rep,name=radiant_kills" json:"radiant_kills,omitempty"`
+	DireKills        []*CDOTAUserMsg_StatsKillDetails       `protobuf:"bytes,5,rep,name=dire_kills" json:"dire_kills,omitempty"`
 	XXX_unrecognized []byte                                 `json:"-"`
 }
 
 func (m *CDOTAUserMsg_StatsMatchDetails) Reset()         { *m = CDOTAUserMsg_StatsMatchDetails{} }
 func (m *CDOTAUserMsg_StatsMatchDetails) String() string { return proto.CompactTextString(m) }
 func (*CDOTAUserMsg_StatsMatchDetails) ProtoMessage()    {}
+
+func (m *CDOTAUserMsg_StatsMatchDetails) GetHeroLookup() []*CDOTAUserMsg_StatsHeroLookup {
+	if m != nil {
+		return m.HeroLookup
+	}
+	return nil
+}
 
 func (m *CDOTAUserMsg_StatsMatchDetails) GetRadiantStats() []*CDOTAUserMsg_StatsTeamMinuteDetails {
 	if m != nil {
@@ -3788,6 +3962,88 @@ func (m *CDOTAUserMsg_MiniTaunt) GetTauntingPlayerId() uint32 {
 	return 0
 }
 
+type CMsgHeroAbilityStat struct {
+	StatType         *EHeroStatType `protobuf:"varint,1,opt,name=stat_type,enum=dota.EHeroStatType,def=0" json:"stat_type,omitempty"`
+	IntValue         *int32         `protobuf:"varint,2,opt,name=int_value" json:"int_value,omitempty"`
+	FloatValue       *float32       `protobuf:"fixed32,3,opt,name=float_value" json:"float_value,omitempty"`
+	XXX_unrecognized []byte         `json:"-"`
+}
+
+func (m *CMsgHeroAbilityStat) Reset()         { *m = CMsgHeroAbilityStat{} }
+func (m *CMsgHeroAbilityStat) String() string { return proto.CompactTextString(m) }
+func (*CMsgHeroAbilityStat) ProtoMessage()    {}
+
+const Default_CMsgHeroAbilityStat_StatType EHeroStatType = EHeroStatType_k_EHeroStatType_None
+
+func (m *CMsgHeroAbilityStat) GetStatType() EHeroStatType {
+	if m != nil && m.StatType != nil {
+		return *m.StatType
+	}
+	return Default_CMsgHeroAbilityStat_StatType
+}
+
+func (m *CMsgHeroAbilityStat) GetIntValue() int32 {
+	if m != nil && m.IntValue != nil {
+		return *m.IntValue
+	}
+	return 0
+}
+
+func (m *CMsgHeroAbilityStat) GetFloatValue() float32 {
+	if m != nil && m.FloatValue != nil {
+		return *m.FloatValue
+	}
+	return 0
+}
+
+type CMsgCombatAnalyzerPlayerStat struct {
+	AccountId        *uint32                `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	HeroAbilityStats []*CMsgHeroAbilityStat `protobuf:"bytes,2,rep,name=hero_ability_stats" json:"hero_ability_stats,omitempty"`
+	XXX_unrecognized []byte                 `json:"-"`
+}
+
+func (m *CMsgCombatAnalyzerPlayerStat) Reset()         { *m = CMsgCombatAnalyzerPlayerStat{} }
+func (m *CMsgCombatAnalyzerPlayerStat) String() string { return proto.CompactTextString(m) }
+func (*CMsgCombatAnalyzerPlayerStat) ProtoMessage()    {}
+
+func (m *CMsgCombatAnalyzerPlayerStat) GetAccountId() uint32 {
+	if m != nil && m.AccountId != nil {
+		return *m.AccountId
+	}
+	return 0
+}
+
+func (m *CMsgCombatAnalyzerPlayerStat) GetHeroAbilityStats() []*CMsgHeroAbilityStat {
+	if m != nil {
+		return m.HeroAbilityStats
+	}
+	return nil
+}
+
+type CMsgCombatAnalyzerStats struct {
+	MatchId          *uint64                         `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
+	PlayerStats      []*CMsgCombatAnalyzerPlayerStat `protobuf:"bytes,2,rep,name=player_stats" json:"player_stats,omitempty"`
+	XXX_unrecognized []byte                          `json:"-"`
+}
+
+func (m *CMsgCombatAnalyzerStats) Reset()         { *m = CMsgCombatAnalyzerStats{} }
+func (m *CMsgCombatAnalyzerStats) String() string { return proto.CompactTextString(m) }
+func (*CMsgCombatAnalyzerStats) ProtoMessage()    {}
+
+func (m *CMsgCombatAnalyzerStats) GetMatchId() uint64 {
+	if m != nil && m.MatchId != nil {
+		return *m.MatchId
+	}
+	return 0
+}
+
+func (m *CMsgCombatAnalyzerStats) GetPlayerStats() []*CMsgCombatAnalyzerPlayerStat {
+	if m != nil {
+		return m.PlayerStats
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterEnum("dota.EDotaUserMessages", EDotaUserMessages_name, EDotaUserMessages_value)
 	proto.RegisterEnum("dota.DOTA_CHAT_MESSAGE", DOTA_CHAT_MESSAGE_name, DOTA_CHAT_MESSAGE_value)
@@ -3797,5 +4053,6 @@ func init() {
 	proto.RegisterEnum("dota.EDotaEntityMessages", EDotaEntityMessages_name, EDotaEntityMessages_value)
 	proto.RegisterEnum("dota.DOTA_PARTICLE_MESSAGE", DOTA_PARTICLE_MESSAGE_name, DOTA_PARTICLE_MESSAGE_value)
 	proto.RegisterEnum("dota.DOTA_OVERHEAD_ALERT", DOTA_OVERHEAD_ALERT_name, DOTA_OVERHEAD_ALERT_value)
+	proto.RegisterEnum("dota.EHeroStatType", EHeroStatType_name, EHeroStatType_value)
 	proto.RegisterEnum("dota.CDOTAResponseQuerySerialized_Fact_ValueType", CDOTAResponseQuerySerialized_Fact_ValueType_name, CDOTAResponseQuerySerialized_Fact_ValueType_value)
 }

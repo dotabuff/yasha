@@ -809,6 +809,12 @@ const (
 	CMsgDOTAPopup_MM_1V1_NO_LOW_PRIORITY                                CMsgDOTAPopup_PopupID = 46
 	CMsgDOTAPopup_WEEKEND_TOURNEY_REGISTRATION_NOT_OPEN                 CMsgDOTAPopup_PopupID = 47
 	CMsgDOTAPopup_WEEKEND_TOURNEY_UNMATCHED                             CMsgDOTAPopup_PopupID = 48
+	CMsgDOTAPopup_POST_MATCH_SURVEY                                     CMsgDOTAPopup_PopupID = 49
+	CMsgDOTAPopup_TROPHY_AWARDED                                        CMsgDOTAPopup_PopupID = 50
+	CMsgDOTAPopup_TROPHY_LEVEL_UP                                       CMsgDOTAPopup_PopupID = 51
+	CMsgDOTAPopup_ALL_HERO_CHALLENGE_PROGRESS                           CMsgDOTAPopup_PopupID = 52
+	CMsgDOTAPopup_NEED_INITIAL_SKILL                                    CMsgDOTAPopup_PopupID = 53
+	CMsgDOTAPopup_NEED_INITIAL_SKILL_IN_PARTY                           CMsgDOTAPopup_PopupID = 54
 )
 
 var CMsgDOTAPopup_PopupID_name = map[int32]string{
@@ -861,6 +867,12 @@ var CMsgDOTAPopup_PopupID_name = map[int32]string{
 	46: "MM_1V1_NO_LOW_PRIORITY",
 	47: "WEEKEND_TOURNEY_REGISTRATION_NOT_OPEN",
 	48: "WEEKEND_TOURNEY_UNMATCHED",
+	49: "POST_MATCH_SURVEY",
+	50: "TROPHY_AWARDED",
+	51: "TROPHY_LEVEL_UP",
+	52: "ALL_HERO_CHALLENGE_PROGRESS",
+	53: "NEED_INITIAL_SKILL",
+	54: "NEED_INITIAL_SKILL_IN_PARTY",
 }
 var CMsgDOTAPopup_PopupID_value = map[string]int32{
 	"KICKED_FROM_LOBBY":                                     0,
@@ -912,6 +924,12 @@ var CMsgDOTAPopup_PopupID_value = map[string]int32{
 	"MM_1V1_NO_LOW_PRIORITY":                                46,
 	"WEEKEND_TOURNEY_REGISTRATION_NOT_OPEN":                 47,
 	"WEEKEND_TOURNEY_UNMATCHED":                             48,
+	"POST_MATCH_SURVEY":                                     49,
+	"TROPHY_AWARDED":                                        50,
+	"TROPHY_LEVEL_UP":                                       51,
+	"ALL_HERO_CHALLENGE_PROGRESS":                           52,
+	"NEED_INITIAL_SKILL":                                    53,
+	"NEED_INITIAL_SKILL_IN_PARTY":                           54,
 }
 
 func (x CMsgDOTAPopup_PopupID) Enum() *CMsgDOTAPopup_PopupID {
@@ -3818,7 +3836,7 @@ type CMsgDOTATournament_Game struct {
 	GoodTeamSeed     *uint32               `protobuf:"varint,12,opt,name=good_team_seed" json:"good_team_seed,omitempty"`
 	BadTeamSeed      *uint32               `protobuf:"varint,13,opt,name=bad_team_seed" json:"bad_team_seed,omitempty"`
 	LobbyId          *uint64               `protobuf:"fixed64,4,opt,name=lobby_id" json:"lobby_id,omitempty"`
-	MatchId          *uint32               `protobuf:"varint,5,opt,name=match_id" json:"match_id,omitempty"`
+	MatchId          *uint64               `protobuf:"varint,5,opt,name=match_id" json:"match_id,omitempty"`
 	GameName         *string               `protobuf:"bytes,6,opt,name=game_name" json:"game_name,omitempty"`
 	LiveStream       *bool                 `protobuf:"varint,7,opt,name=live_stream" json:"live_stream,omitempty"`
 	Message          *string               `protobuf:"bytes,9,opt,name=message" json:"message,omitempty"`
@@ -3877,7 +3895,7 @@ func (m *CMsgDOTATournament_Game) GetLobbyId() uint64 {
 	return 0
 }
 
-func (m *CMsgDOTATournament_Game) GetMatchId() uint32 {
+func (m *CMsgDOTATournament_Game) GetMatchId() uint64 {
 	if m != nil && m.MatchId != nil {
 		return *m.MatchId
 	}
@@ -4094,7 +4112,7 @@ type CMsgDOTAMatch struct {
 	Duration            *uint32                             `protobuf:"varint,3,opt,name=duration" json:"duration,omitempty"`
 	StartTime           *uint32                             `protobuf:"fixed32,4,opt,name=startTime" json:"startTime,omitempty"`
 	Players             []*CMsgDOTAMatch_Player             `protobuf:"bytes,5,rep,name=players" json:"players,omitempty"`
-	MatchId             *uint32                             `protobuf:"varint,6,opt,name=match_id" json:"match_id,omitempty"`
+	MatchId             *uint64                             `protobuf:"varint,6,opt,name=match_id" json:"match_id,omitempty"`
 	TowerStatus         []uint32                            `protobuf:"varint,8,rep,name=tower_status" json:"tower_status,omitempty"`
 	BarracksStatus      []uint32                            `protobuf:"varint,9,rep,name=barracks_status" json:"barracks_status,omitempty"`
 	Cluster             *uint32                             `protobuf:"varint,10,opt,name=cluster" json:"cluster,omitempty"`
@@ -4167,7 +4185,7 @@ func (m *CMsgDOTAMatch) GetPlayers() []*CMsgDOTAMatch_Player {
 	return nil
 }
 
-func (m *CMsgDOTAMatch) GetMatchId() uint32 {
+func (m *CMsgDOTAMatch) GetMatchId() uint64 {
 	if m != nil && m.MatchId != nil {
 		return *m.MatchId
 	}
@@ -4861,7 +4879,7 @@ func (m *CMsgDOTAMatch_BroadcasterChannel) GetLanguageCode() string {
 }
 
 type CMsgDOTAPlayerMatchHistory struct {
-	MatchIds         []uint32 `protobuf:"varint,1,rep,name=match_ids" json:"match_ids,omitempty"`
+	MatchIds         []uint64 `protobuf:"varint,1,rep,name=match_ids" json:"match_ids,omitempty"`
 	XXX_unrecognized []byte   `json:"-"`
 }
 
@@ -4869,7 +4887,7 @@ func (m *CMsgDOTAPlayerMatchHistory) Reset()         { *m = CMsgDOTAPlayerMatchH
 func (m *CMsgDOTAPlayerMatchHistory) String() string { return proto.CompactTextString(m) }
 func (*CMsgDOTAPlayerMatchHistory) ProtoMessage()    {}
 
-func (m *CMsgDOTAPlayerMatchHistory) GetMatchIds() []uint32 {
+func (m *CMsgDOTAPlayerMatchHistory) GetMatchIds() []uint64 {
 	if m != nil {
 		return m.MatchIds
 	}
@@ -4877,8 +4895,8 @@ func (m *CMsgDOTAPlayerMatchHistory) GetMatchIds() []uint32 {
 }
 
 type CMsgDOTAMatchHistoryFilter struct {
-	MatchIds                 []uint32 `protobuf:"varint,1,rep,name=match_ids" json:"match_ids,omitempty"`
-	NewestMatchIdAtLastQuery *uint32  `protobuf:"varint,2,opt,name=newest_match_id_at_last_query" json:"newest_match_id_at_last_query,omitempty"`
+	MatchIds                 []uint64 `protobuf:"varint,1,rep,name=match_ids" json:"match_ids,omitempty"`
+	NewestMatchIdAtLastQuery *uint64  `protobuf:"varint,2,opt,name=newest_match_id_at_last_query" json:"newest_match_id_at_last_query,omitempty"`
 	TimeLastQuery            *uint32  `protobuf:"varint,3,opt,name=time_last_query" json:"time_last_query,omitempty"`
 	XXX_unrecognized         []byte   `json:"-"`
 }
@@ -4887,14 +4905,14 @@ func (m *CMsgDOTAMatchHistoryFilter) Reset()         { *m = CMsgDOTAMatchHistory
 func (m *CMsgDOTAMatchHistoryFilter) String() string { return proto.CompactTextString(m) }
 func (*CMsgDOTAMatchHistoryFilter) ProtoMessage()    {}
 
-func (m *CMsgDOTAMatchHistoryFilter) GetMatchIds() []uint32 {
+func (m *CMsgDOTAMatchHistoryFilter) GetMatchIds() []uint64 {
 	if m != nil {
 		return m.MatchIds
 	}
 	return nil
 }
 
-func (m *CMsgDOTAMatchHistoryFilter) GetNewestMatchIdAtLastQuery() uint32 {
+func (m *CMsgDOTAMatchHistoryFilter) GetNewestMatchIdAtLastQuery() uint64 {
 	if m != nil && m.NewestMatchIdAtLastQuery != nil {
 		return *m.NewestMatchIdAtLastQuery
 	}
@@ -4914,7 +4932,7 @@ type CMsgDOTARequestMatches struct {
 	DateMin             *uint32                            `protobuf:"fixed32,6,opt,name=date_min" json:"date_min,omitempty"`
 	DateMax             *uint32                            `protobuf:"fixed32,7,opt,name=date_max" json:"date_max,omitempty"`
 	MatchesRequested    *uint32                            `protobuf:"varint,10,opt,name=matches_requested" json:"matches_requested,omitempty"`
-	StartAtMatchId      *uint32                            `protobuf:"varint,11,opt,name=start_at_match_id" json:"start_at_match_id,omitempty"`
+	StartAtMatchId      *uint64                            `protobuf:"varint,11,opt,name=start_at_match_id" json:"start_at_match_id,omitempty"`
 	MinPlayers          *uint32                            `protobuf:"fixed32,12,opt,name=min_players" json:"min_players,omitempty"`
 	RequestId           *uint32                            `protobuf:"varint,13,opt,name=request_id" json:"request_id,omitempty"`
 	TournamentGamesOnly *bool                              `protobuf:"varint,14,opt,name=tournament_games_only" json:"tournament_games_only,omitempty"`
@@ -4967,7 +4985,7 @@ func (m *CMsgDOTARequestMatches) GetMatchesRequested() uint32 {
 	return 0
 }
 
-func (m *CMsgDOTARequestMatches) GetStartAtMatchId() uint32 {
+func (m *CMsgDOTARequestMatches) GetStartAtMatchId() uint64 {
 	if m != nil && m.StartAtMatchId != nil {
 		return *m.StartAtMatchId
 	}
@@ -5114,6 +5132,7 @@ type CMsgDOTAPopup struct {
 	Id               *CMsgDOTAPopup_PopupID `protobuf:"varint,1,opt,name=id,enum=dota.CMsgDOTAPopup_PopupID,def=0" json:"id,omitempty"`
 	CustomText       *string                `protobuf:"bytes,2,opt,name=custom_text" json:"custom_text,omitempty"`
 	IntData          *int32                 `protobuf:"zigzag32,3,opt,name=int_data" json:"int_data,omitempty"`
+	PopupData        []byte                 `protobuf:"bytes,4,opt,name=popup_data" json:"popup_data,omitempty"`
 	XXX_unrecognized []byte                 `json:"-"`
 }
 
@@ -5142,6 +5161,13 @@ func (m *CMsgDOTAPopup) GetIntData() int32 {
 		return *m.IntData
 	}
 	return 0
+}
+
+func (m *CMsgDOTAPopup) GetPopupData() []byte {
+	if m != nil {
+		return m.PopupData
+	}
+	return nil
 }
 
 type CMsgDOTATeamMemberSDO struct {
@@ -8231,7 +8257,7 @@ func (m *CMsgPartyLeaderWatchGamePrompt) GetGameServerSteamid() uint64 {
 }
 
 type CMsgGCMatchDetailsRequest struct {
-	MatchId          *uint32 `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
+	MatchId          *uint64 `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -8239,7 +8265,7 @@ func (m *CMsgGCMatchDetailsRequest) Reset()         { *m = CMsgGCMatchDetailsReq
 func (m *CMsgGCMatchDetailsRequest) String() string { return proto.CompactTextString(m) }
 func (*CMsgGCMatchDetailsRequest) ProtoMessage()    {}
 
-func (m *CMsgGCMatchDetailsRequest) GetMatchId() uint32 {
+func (m *CMsgGCMatchDetailsRequest) GetMatchId() uint64 {
 	if m != nil && m.MatchId != nil {
 		return *m.MatchId
 	}
@@ -8947,7 +8973,7 @@ func (m *CMsgResponseLeagueInfo) GetLeagues() []*CLeague {
 }
 
 type CMsgDOTAMatchVotes struct {
-	MatchId          *uint32                          `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
+	MatchId          *uint64                          `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
 	Votes            []*CMsgDOTAMatchVotes_PlayerVote `protobuf:"bytes,2,rep,name=votes" json:"votes,omitempty"`
 	XXX_unrecognized []byte                           `json:"-"`
 }
@@ -8956,7 +8982,7 @@ func (m *CMsgDOTAMatchVotes) Reset()         { *m = CMsgDOTAMatchVotes{} }
 func (m *CMsgDOTAMatchVotes) String() string { return proto.CompactTextString(m) }
 func (*CMsgDOTAMatchVotes) ProtoMessage()    {}
 
-func (m *CMsgDOTAMatchVotes) GetMatchId() uint32 {
+func (m *CMsgDOTAMatchVotes) GetMatchId() uint64 {
 	if m != nil && m.MatchId != nil {
 		return *m.MatchId
 	}
@@ -8995,7 +9021,7 @@ func (m *CMsgDOTAMatchVotes_PlayerVote) GetVote() uint32 {
 }
 
 type CMsgCastMatchVote struct {
-	MatchId          *uint32        `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
+	MatchId          *uint64        `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
 	Vote             *DOTAMatchVote `protobuf:"varint,2,opt,name=vote,enum=dota.DOTAMatchVote,def=0" json:"vote,omitempty"`
 	XXX_unrecognized []byte         `json:"-"`
 }
@@ -9006,7 +9032,7 @@ func (*CMsgCastMatchVote) ProtoMessage()    {}
 
 const Default_CMsgCastMatchVote_Vote DOTAMatchVote = DOTAMatchVote_DOTAMatchVote_INVALID
 
-func (m *CMsgCastMatchVote) GetMatchId() uint32 {
+func (m *CMsgCastMatchVote) GetMatchId() uint64 {
 	if m != nil && m.MatchId != nil {
 		return *m.MatchId
 	}
@@ -9021,7 +9047,7 @@ func (m *CMsgCastMatchVote) GetVote() DOTAMatchVote {
 }
 
 type CMsgRetrieveMatchVote struct {
-	MatchId          *uint32 `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
+	MatchId          *uint64 `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
 	Incremental      *uint32 `protobuf:"varint,2,opt,name=incremental" json:"incremental,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
@@ -9030,7 +9056,7 @@ func (m *CMsgRetrieveMatchVote) Reset()         { *m = CMsgRetrieveMatchVote{} }
 func (m *CMsgRetrieveMatchVote) String() string { return proto.CompactTextString(m) }
 func (*CMsgRetrieveMatchVote) ProtoMessage()    {}
 
-func (m *CMsgRetrieveMatchVote) GetMatchId() uint32 {
+func (m *CMsgRetrieveMatchVote) GetMatchId() uint64 {
 	if m != nil && m.MatchId != nil {
 		return *m.MatchId
 	}
@@ -9163,7 +9189,7 @@ type CMsgDOTAHallOfFame_FeaturedFarmer struct {
 	AccountId        *uint32 `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
 	HeroId           *uint32 `protobuf:"varint,2,opt,name=hero_id" json:"hero_id,omitempty"`
 	GoldPerMin       *uint32 `protobuf:"varint,3,opt,name=gold_per_min" json:"gold_per_min,omitempty"`
-	MatchId          *uint32 `protobuf:"varint,4,opt,name=match_id" json:"match_id,omitempty"`
+	MatchId          *uint64 `protobuf:"varint,4,opt,name=match_id" json:"match_id,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -9192,7 +9218,7 @@ func (m *CMsgDOTAHallOfFame_FeaturedFarmer) GetGoldPerMin() uint32 {
 	return 0
 }
 
-func (m *CMsgDOTAHallOfFame_FeaturedFarmer) GetMatchId() uint32 {
+func (m *CMsgDOTAHallOfFame_FeaturedFarmer) GetMatchId() uint64 {
 	if m != nil && m.MatchId != nil {
 		return *m.MatchId
 	}
@@ -9910,7 +9936,7 @@ func (m *CMsgDOTASetProfilePrivacyResponse) GetEresult() uint32 {
 }
 
 type CMsgUpgradeLeagueItem struct {
-	MatchId          *uint32 `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
+	MatchId          *uint64 `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
 	LeagueId         *uint32 `protobuf:"varint,2,opt,name=league_id" json:"league_id,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
@@ -9919,7 +9945,7 @@ func (m *CMsgUpgradeLeagueItem) Reset()         { *m = CMsgUpgradeLeagueItem{} }
 func (m *CMsgUpgradeLeagueItem) String() string { return proto.CompactTextString(m) }
 func (*CMsgUpgradeLeagueItem) ProtoMessage()    {}
 
-func (m *CMsgUpgradeLeagueItem) GetMatchId() uint32 {
+func (m *CMsgUpgradeLeagueItem) GetMatchId() uint64 {
 	if m != nil && m.MatchId != nil {
 		return *m.MatchId
 	}
@@ -11427,7 +11453,7 @@ func (m *CMsgDOTACompendiumDataResponse) GetCompendiumData() *CMsgDOTACompendium
 
 type CMsgDOTAGetPlayerMatchHistory struct {
 	AccountId        *uint32 `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
-	StartAtMatchId   *uint32 `protobuf:"varint,2,opt,name=start_at_match_id" json:"start_at_match_id,omitempty"`
+	StartAtMatchId   *uint64 `protobuf:"varint,2,opt,name=start_at_match_id" json:"start_at_match_id,omitempty"`
 	MatchesRequested *uint32 `protobuf:"varint,3,opt,name=matches_requested" json:"matches_requested,omitempty"`
 	HeroId           *uint32 `protobuf:"varint,4,opt,name=hero_id" json:"hero_id,omitempty"`
 	RequestId        *uint32 `protobuf:"varint,5,opt,name=request_id" json:"request_id,omitempty"`
@@ -11445,7 +11471,7 @@ func (m *CMsgDOTAGetPlayerMatchHistory) GetAccountId() uint32 {
 	return 0
 }
 
-func (m *CMsgDOTAGetPlayerMatchHistory) GetStartAtMatchId() uint32 {
+func (m *CMsgDOTAGetPlayerMatchHistory) GetStartAtMatchId() uint64 {
 	if m != nil && m.StartAtMatchId != nil {
 		return *m.StartAtMatchId
 	}

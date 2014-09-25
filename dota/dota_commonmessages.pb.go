@@ -91,6 +91,19 @@ const (
 	EDOTAChatWheelMessage_k_EDOTA_CW_Relax               EDOTAChatWheelMessage = 70
 	EDOTAChatWheelMessage_k_EDOTA_CW_MissingHero         EDOTAChatWheelMessage = 71
 	EDOTAChatWheelMessage_k_EDOTA_CW_ReturnedHero        EDOTAChatWheelMessage = 72
+	EDOTAChatWheelMessage_k_EDOTA_CW_GG                  EDOTAChatWheelMessage = 73
+	EDOTAChatWheelMessage_k_EDOTA_CW_GGWP                EDOTAChatWheelMessage = 74
+	EDOTAChatWheelMessage_k_EDOTA_CW_All_GG              EDOTAChatWheelMessage = 75
+	EDOTAChatWheelMessage_k_EDOTA_CW_All_GGWP            EDOTAChatWheelMessage = 76
+	EDOTAChatWheelMessage_k_EDOTA_CW_What_To_Buy         EDOTAChatWheelMessage = 77
+	EDOTAChatWheelMessage_k_EDOTA_CW_Im_Retreating       EDOTAChatWheelMessage = 78
+	EDOTAChatWheelMessage_k_EDOTA_CW_Space_Created       EDOTAChatWheelMessage = 79
+	EDOTAChatWheelMessage_k_EDOTA_CW_Whoops              EDOTAChatWheelMessage = 80
+	EDOTAChatWheelMessage_k_EDOTA_CW_Tower_then_Back     EDOTAChatWheelMessage = 81
+	EDOTAChatWheelMessage_k_EDOTA_CW_Barracks_then_Back  EDOTAChatWheelMessage = 82
+	EDOTAChatWheelMessage_k_EDOTA_CW_Ward_Bottom_Rune    EDOTAChatWheelMessage = 83
+	EDOTAChatWheelMessage_k_EDOTA_CW_Ward_Top_Rune       EDOTAChatWheelMessage = 84
+	EDOTAChatWheelMessage_k_EDOTA_CW_Zeus_Ult            EDOTAChatWheelMessage = 85
 )
 
 var EDOTAChatWheelMessage_name = map[int32]string{
@@ -167,6 +180,19 @@ var EDOTAChatWheelMessage_name = map[int32]string{
 	70: "k_EDOTA_CW_Relax",
 	71: "k_EDOTA_CW_MissingHero",
 	72: "k_EDOTA_CW_ReturnedHero",
+	73: "k_EDOTA_CW_GG",
+	74: "k_EDOTA_CW_GGWP",
+	75: "k_EDOTA_CW_All_GG",
+	76: "k_EDOTA_CW_All_GGWP",
+	77: "k_EDOTA_CW_What_To_Buy",
+	78: "k_EDOTA_CW_Im_Retreating",
+	79: "k_EDOTA_CW_Space_Created",
+	80: "k_EDOTA_CW_Whoops",
+	81: "k_EDOTA_CW_Tower_then_Back",
+	82: "k_EDOTA_CW_Barracks_then_Back",
+	83: "k_EDOTA_CW_Ward_Bottom_Rune",
+	84: "k_EDOTA_CW_Ward_Top_Rune",
+	85: "k_EDOTA_CW_Zeus_Ult",
 }
 var EDOTAChatWheelMessage_value = map[string]int32{
 	"k_EDOTA_CW_Ok":                  0,
@@ -242,6 +268,19 @@ var EDOTAChatWheelMessage_value = map[string]int32{
 	"k_EDOTA_CW_Relax":               70,
 	"k_EDOTA_CW_MissingHero":         71,
 	"k_EDOTA_CW_ReturnedHero":        72,
+	"k_EDOTA_CW_GG":                  73,
+	"k_EDOTA_CW_GGWP":                74,
+	"k_EDOTA_CW_All_GG":              75,
+	"k_EDOTA_CW_All_GGWP":            76,
+	"k_EDOTA_CW_What_To_Buy":         77,
+	"k_EDOTA_CW_Im_Retreating":       78,
+	"k_EDOTA_CW_Space_Created":       79,
+	"k_EDOTA_CW_Whoops":              80,
+	"k_EDOTA_CW_Tower_then_Back":     81,
+	"k_EDOTA_CW_Barracks_then_Back":  82,
+	"k_EDOTA_CW_Ward_Bottom_Rune":    83,
+	"k_EDOTA_CW_Ward_Top_Rune":       84,
+	"k_EDOTA_CW_Zeus_Ult":            85,
 }
 
 func (x EDOTAChatWheelMessage) Enum() *EDOTAChatWheelMessage {

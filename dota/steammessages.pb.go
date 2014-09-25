@@ -1467,6 +1467,62 @@ func (m *CGCMsgGetIPLocationResponse) GetInfos() []*CIPLocationInfo {
 	return nil
 }
 
+type CGCMsgGetIPASN struct {
+	Ips              []uint32 `protobuf:"fixed32,1,rep,name=ips" json:"ips,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
+}
+
+func (m *CGCMsgGetIPASN) Reset()         { *m = CGCMsgGetIPASN{} }
+func (m *CGCMsgGetIPASN) String() string { return proto.CompactTextString(m) }
+func (*CGCMsgGetIPASN) ProtoMessage()    {}
+
+func (m *CGCMsgGetIPASN) GetIps() []uint32 {
+	if m != nil {
+		return m.Ips
+	}
+	return nil
+}
+
+type CIPASNInfo struct {
+	Ip               *uint32 `protobuf:"fixed32,1,opt,name=ip" json:"ip,omitempty"`
+	Asn              *uint32 `protobuf:"varint,2,opt,name=asn" json:"asn,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CIPASNInfo) Reset()         { *m = CIPASNInfo{} }
+func (m *CIPASNInfo) String() string { return proto.CompactTextString(m) }
+func (*CIPASNInfo) ProtoMessage()    {}
+
+func (m *CIPASNInfo) GetIp() uint32 {
+	if m != nil && m.Ip != nil {
+		return *m.Ip
+	}
+	return 0
+}
+
+func (m *CIPASNInfo) GetAsn() uint32 {
+	if m != nil && m.Asn != nil {
+		return *m.Asn
+	}
+	return 0
+}
+
+type CGCMsgGetIPASNResponse struct {
+	Infos            []*CIPASNInfo `protobuf:"bytes,1,rep,name=infos" json:"infos,omitempty"`
+	XXX_unrecognized []byte        `json:"-"`
+}
+
+func (m *CGCMsgGetIPASNResponse) Reset()         { *m = CGCMsgGetIPASNResponse{} }
+func (m *CGCMsgGetIPASNResponse) String() string { return proto.CompactTextString(m) }
+func (*CGCMsgGetIPASNResponse) ProtoMessage()    {}
+
+func (m *CGCMsgGetIPASNResponse) GetInfos() []*CIPASNInfo {
+	if m != nil {
+		return m.Infos
+	}
+	return nil
+}
+
 type CGCMsgSystemStatsSchema struct {
 	GcAppId          *uint32 `protobuf:"varint,1,opt,name=gc_app_id" json:"gc_app_id,omitempty"`
 	SchemaKv         []byte  `protobuf:"bytes,2,opt,name=schema_kv" json:"schema_kv,omitempty"`

@@ -1991,7 +1991,7 @@ type CMsgDOTAFantasyTeamScoreRequest struct {
 	FantasyLeagueId  *uint32 `protobuf:"varint,1,opt,name=fantasy_league_id" json:"fantasy_league_id,omitempty"`
 	OwnerAccountId   *uint32 `protobuf:"varint,2,opt,name=owner_account_id" json:"owner_account_id,omitempty"`
 	FantasyTeamIndex *uint32 `protobuf:"varint,3,opt,name=fantasy_team_index" json:"fantasy_team_index,omitempty"`
-	FilterMatchId    *uint32 `protobuf:"varint,4,opt,name=filter_match_id" json:"filter_match_id,omitempty"`
+	FilterMatchId    *uint64 `protobuf:"varint,4,opt,name=filter_match_id" json:"filter_match_id,omitempty"`
 	FilterStartTime  *uint32 `protobuf:"varint,5,opt,name=filter_start_time" json:"filter_start_time,omitempty"`
 	FilterEndTime    *uint32 `protobuf:"varint,6,opt,name=filter_end_time" json:"filter_end_time,omitempty"`
 	IncludeBench     *bool   `protobuf:"varint,7,opt,name=include_bench" json:"include_bench,omitempty"`
@@ -2023,7 +2023,7 @@ func (m *CMsgDOTAFantasyTeamScoreRequest) GetFantasyTeamIndex() uint32 {
 	return 0
 }
 
-func (m *CMsgDOTAFantasyTeamScoreRequest) GetFilterMatchId() uint32 {
+func (m *CMsgDOTAFantasyTeamScoreRequest) GetFilterMatchId() uint64 {
 	if m != nil && m.FilterMatchId != nil {
 		return *m.FilterMatchId
 	}
@@ -2118,7 +2118,7 @@ type CMsgDOTAFantasyTeamStandingsRequest struct {
 	Count            *uint32 `protobuf:"varint,2,opt,name=count" json:"count,omitempty"`
 	FilterStartTime  *uint32 `protobuf:"varint,3,opt,name=filter_start_time" json:"filter_start_time,omitempty"`
 	FilterEndTime    *uint32 `protobuf:"varint,4,opt,name=filter_end_time" json:"filter_end_time,omitempty"`
-	FilterMatchId    *uint32 `protobuf:"varint,5,opt,name=filter_match_id" json:"filter_match_id,omitempty"`
+	FilterMatchId    *uint64 `protobuf:"varint,5,opt,name=filter_match_id" json:"filter_match_id,omitempty"`
 	FilterLastMatch  *bool   `protobuf:"varint,6,opt,name=filter_last_match" json:"filter_last_match,omitempty"`
 	FilterInHall     *bool   `protobuf:"varint,7,opt,name=filter_in_hall" json:"filter_in_hall,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
@@ -2156,7 +2156,7 @@ func (m *CMsgDOTAFantasyTeamStandingsRequest) GetFilterEndTime() uint32 {
 	return 0
 }
 
-func (m *CMsgDOTAFantasyTeamStandingsRequest) GetFilterMatchId() uint32 {
+func (m *CMsgDOTAFantasyTeamStandingsRequest) GetFilterMatchId() uint64 {
 	if m != nil && m.FilterMatchId != nil {
 		return *m.FilterMatchId
 	}
@@ -2308,7 +2308,7 @@ type CMsgDOTAFantasyPlayerScoreRequest struct {
 	PlayerAccountId  *uint32 `protobuf:"varint,2,opt,name=player_account_id" json:"player_account_id,omitempty"`
 	FilterStartTime  *uint32 `protobuf:"varint,3,opt,name=filter_start_time" json:"filter_start_time,omitempty"`
 	FilterEndTime    *uint32 `protobuf:"varint,4,opt,name=filter_end_time" json:"filter_end_time,omitempty"`
-	FilterMatchId    *uint32 `protobuf:"varint,5,opt,name=filter_match_id" json:"filter_match_id,omitempty"`
+	FilterMatchId    *uint64 `protobuf:"varint,5,opt,name=filter_match_id" json:"filter_match_id,omitempty"`
 	FilterLastMatch  *bool   `protobuf:"varint,6,opt,name=filter_last_match" json:"filter_last_match,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
@@ -2345,7 +2345,7 @@ func (m *CMsgDOTAFantasyPlayerScoreRequest) GetFilterEndTime() uint32 {
 	return 0
 }
 
-func (m *CMsgDOTAFantasyPlayerScoreRequest) GetFilterMatchId() uint32 {
+func (m *CMsgDOTAFantasyPlayerScoreRequest) GetFilterMatchId() uint64 {
 	if m != nil && m.FilterMatchId != nil {
 		return *m.FilterMatchId
 	}
@@ -2415,7 +2415,7 @@ type CMsgDOTAFantasyPlayerStandingsRequest struct {
 	Role             *uint32 `protobuf:"varint,3,opt,name=role" json:"role,omitempty"`
 	FilterStartTime  *uint32 `protobuf:"varint,4,opt,name=filter_start_time" json:"filter_start_time,omitempty"`
 	FilterEndTime    *uint32 `protobuf:"varint,5,opt,name=filter_end_time" json:"filter_end_time,omitempty"`
-	FilterMatchId    *uint32 `protobuf:"varint,6,opt,name=filter_match_id" json:"filter_match_id,omitempty"`
+	FilterMatchId    *uint64 `protobuf:"varint,6,opt,name=filter_match_id" json:"filter_match_id,omitempty"`
 	FilterLastMatch  *bool   `protobuf:"varint,7,opt,name=filter_last_match" json:"filter_last_match,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
@@ -2459,7 +2459,7 @@ func (m *CMsgDOTAFantasyPlayerStandingsRequest) GetFilterEndTime() uint32 {
 	return 0
 }
 
-func (m *CMsgDOTAFantasyPlayerStandingsRequest) GetFilterMatchId() uint32 {
+func (m *CMsgDOTAFantasyPlayerStandingsRequest) GetFilterMatchId() uint64 {
 	if m != nil && m.FilterMatchId != nil {
 		return *m.FilterMatchId
 	}
@@ -3908,7 +3908,7 @@ func (m *CMsgDOTAFantasyPlayerScoreDetailsResponse) GetData() []*CMsgDOTAFantasy
 }
 
 type CMsgDOTAFantasyPlayerScoreDetailsResponse_PlayerMatchData struct {
-	MatchId          *uint32                   `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
+	MatchId          *uint64                   `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
 	SeriesId         *uint32                   `protobuf:"varint,2,opt,name=series_id" json:"series_id,omitempty"`
 	SeriesNum        *uint32                   `protobuf:"varint,3,opt,name=series_num" json:"series_num,omitempty"`
 	SeriesType       *uint32                   `protobuf:"varint,4,opt,name=series_type" json:"series_type,omitempty"`
@@ -3931,7 +3931,7 @@ func (m *CMsgDOTAFantasyPlayerScoreDetailsResponse_PlayerMatchData) String() str
 }
 func (*CMsgDOTAFantasyPlayerScoreDetailsResponse_PlayerMatchData) ProtoMessage() {}
 
-func (m *CMsgDOTAFantasyPlayerScoreDetailsResponse_PlayerMatchData) GetMatchId() uint32 {
+func (m *CMsgDOTAFantasyPlayerScoreDetailsResponse_PlayerMatchData) GetMatchId() uint64 {
 	if m != nil && m.MatchId != nil {
 		return *m.MatchId
 	}

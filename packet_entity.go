@@ -1,8 +1,6 @@
-package packet_entities
+package yasha
 
-import (
-	"github.com/dotabuff/yasha/utils"
-)
+import "github.com/dotabuff/yasha/utils"
 
 type UpdateType int
 

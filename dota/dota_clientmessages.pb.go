@@ -50,6 +50,7 @@ const (
 	EDotaClientMessages_DOTA_CM_EnemyItemAlert                         EDotaClientMessages = 30
 	EDotaClientMessages_DOTA_CM_FreeInventory                          EDotaClientMessages = 31
 	EDotaClientMessages_DOTA_CM_BuyBackStateAlert                      EDotaClientMessages = 32
+	EDotaClientMessages_DOTA_CM_QuickBuyAlert                          EDotaClientMessages = 33
 )
 
 var EDotaClientMessages_name = map[int32]string{
@@ -85,6 +86,7 @@ var EDotaClientMessages_name = map[int32]string{
 	30: "DOTA_CM_EnemyItemAlert",
 	31: "DOTA_CM_FreeInventory",
 	32: "DOTA_CM_BuyBackStateAlert",
+	33: "DOTA_CM_QuickBuyAlert",
 }
 var EDotaClientMessages_value = map[string]int32{
 	"DOTA_CM_MapLine":                                1,
@@ -119,6 +121,7 @@ var EDotaClientMessages_value = map[string]int32{
 	"DOTA_CM_EnemyItemAlert":                         30,
 	"DOTA_CM_FreeInventory":                          31,
 	"DOTA_CM_BuyBackStateAlert":                      32,
+	"DOTA_CM_QuickBuyAlert":                          33,
 }
 
 func (x EDotaClientMessages) Enum() *EDotaClientMessages {
@@ -583,8 +586,9 @@ func (m *CDOTAClientMsg_RecordVote) GetChoiceIndex() int32 {
 }
 
 type CDOTAClientMsg_WillPurchaseAlert struct {
-	Itemid           *int32 `protobuf:"varint,1,opt,name=itemid" json:"itemid,omitempty"`
-	XXX_unrecognized []byte `json:"-"`
+	Itemid           *int32  `protobuf:"varint,1,opt,name=itemid" json:"itemid,omitempty"`
+	GoldRemaining    *uint32 `protobuf:"varint,2,opt,name=gold_remaining" json:"gold_remaining,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
 }
 
 func (m *CDOTAClientMsg_WillPurchaseAlert) Reset()         { *m = CDOTAClientMsg_WillPurchaseAlert{} }
@@ -598,6 +602,13 @@ func (m *CDOTAClientMsg_WillPurchaseAlert) GetItemid() int32 {
 	return 0
 }
 
+func (m *CDOTAClientMsg_WillPurchaseAlert) GetGoldRemaining() uint32 {
+	if m != nil && m.GoldRemaining != nil {
+		return *m.GoldRemaining
+	}
+	return 0
+}
+
 type CDOTAClientMsg_BuyBackStateAlert struct {
 	XXX_unrecognized []byte `json:"-"`
 }
@@ -605,6 +616,30 @@ type CDOTAClientMsg_BuyBackStateAlert struct {
 func (m *CDOTAClientMsg_BuyBackStateAlert) Reset()         { *m = CDOTAClientMsg_BuyBackStateAlert{} }
 func (m *CDOTAClientMsg_BuyBackStateAlert) String() string { return proto.CompactTextString(m) }
 func (*CDOTAClientMsg_BuyBackStateAlert) ProtoMessage()    {}
+
+type CDOTAClientMsg_QuickBuyAlert struct {
+	Itemid           *int32 `protobuf:"varint,1,opt,name=itemid" json:"itemid,omitempty"`
+	GoldRequired     *int32 `protobuf:"varint,2,opt,name=gold_required" json:"gold_required,omitempty"`
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *CDOTAClientMsg_QuickBuyAlert) Reset()         { *m = CDOTAClientMsg_QuickBuyAlert{} }
+func (m *CDOTAClientMsg_QuickBuyAlert) String() string { return proto.CompactTextString(m) }
+func (*CDOTAClientMsg_QuickBuyAlert) ProtoMessage()    {}
+
+func (m *CDOTAClientMsg_QuickBuyAlert) GetItemid() int32 {
+	if m != nil && m.Itemid != nil {
+		return *m.Itemid
+	}
+	return 0
+}
+
+func (m *CDOTAClientMsg_QuickBuyAlert) GetGoldRequired() int32 {
+	if m != nil && m.GoldRequired != nil {
+		return *m.GoldRequired
+	}
+	return 0
+}
 
 type CDOTAClientMsg_PlayerShowCase struct {
 	Showcase         *bool  `protobuf:"varint,1,opt,name=showcase" json:"showcase,omitempty"`
