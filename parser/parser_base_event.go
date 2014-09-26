@@ -290,6 +290,8 @@ func (p *Parser) AsBaseEvent(commandName string) (proto.Message, error) {
 		return &dota.CDOTAUserMsg_MiniTaunt{}, nil
 	case "DOTA_UM_BuyBackStateAlert":
 		return &dota.CDOTAUserMsg_BuyBackStateAlert{}, nil
+	case "DOTA_UM_QuickBuyAlert":
+		return &dota.CDOTAUserMsg_QuickBuyAlert{}, nil
 	}
 	return nil, Error("Type not found: " + commandName)
 }
@@ -552,6 +554,8 @@ func (p *Parser) AsBaseEventBUMDUM(value int) (proto.Message, error) {
 		return &dota.CDOTAUserMsg_MiniTaunt{}, nil
 	case 132:
 		return &dota.CDOTAUserMsg_BuyBackStateAlert{}, nil
+	case 133:
+		return &dota.CDOTAUserMsg_QuickBuyAlert{}, nil
 	}
 	return nil, Error("Unknown BUMDUM")
 }

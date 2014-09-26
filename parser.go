@@ -43,6 +43,7 @@ type Parser struct {
 	OnSayText2             func(tick int, obj *dota.CUserMsg_SayText2)
 	OnSounds               func(tick int, obj *dota.CSVCMsg_Sounds)
 	OnSpectatorPlayerClick func(tick int, obj *dota.CDOTAUserMsg_SpectatorPlayerClick)
+	OnChatWheel            func(tick int, obj *dota.CDOTAUserMsg_ChatWheel)
 
 	OnFileInfo  func(obj *dota.CDemoFileInfo)
 	OnSetConVar func(obj *dota.CNETMsg_SetConVar)
@@ -233,6 +234,11 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 		case *dota.CNETMsg_SetConVar:
 			if p.OnSetConVar != nil {
 				p.OnSetConVar(obj)
+			}
+		case *dota.CDOTAUserMsg_ChatWheel:
+			// (chat_message:k_EDOTA_CW_All_GGWP player_id:2 param_hero_id:0 )
+			if p.OnChatWheel != nil {
+				p.OnChatWheel(item.Tick, obj)
 			}
 		case *dota.CDOTAUserMsg_AbilitySteal:
 			/*

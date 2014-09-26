@@ -37,6 +37,7 @@ broken["EDotaUserMessages"] = %w[
   DOTA_UM_GamerulesStateChanged
   DOTA_UM_TournamentDrop
   DOTA_UM_CombatLogData
+  DOTA_UM_StatsHeroDetails
 ]
 broken["EDemoCommands"] = %w[
   DEM_SignonPacket
