@@ -491,6 +491,9 @@ const (
 	EDOTAGCMsg_k_EMsgServerToGCSuspiciousActivity                         EDOTAGCMsg = 7544
 	EDOTAGCMsg_k_EMsgSignOutCommunicationSummary                          EDOTAGCMsg = 7545
 	EDOTAGCMsg_k_EMsgServerToGCRequestStatus_Response                     EDOTAGCMsg = 7546
+	EDOTAGCMsg_k_EMsgGCGCToLANServerRelayConnect                          EDOTAGCMsg = 7549
+	EDOTAGCMsg_k_EMsgGCToGCFantasySetMatchLeague                          EDOTAGCMsg = 7555
+	EDOTAGCMsg_k_EMsgClientToGCRecordCompendiumStats                      EDOTAGCMsg = 7558
 	EDOTAGCMsg_k_EMsgGCDev_GrantWarKill                                   EDOTAGCMsg = 8001
 )
 
@@ -970,6 +973,9 @@ var EDOTAGCMsg_name = map[int32]string{
 	7544: "k_EMsgServerToGCSuspiciousActivity",
 	7545: "k_EMsgSignOutCommunicationSummary",
 	7546: "k_EMsgServerToGCRequestStatus_Response",
+	7549: "k_EMsgGCGCToLANServerRelayConnect",
+	7555: "k_EMsgGCToGCFantasySetMatchLeague",
+	7558: "k_EMsgClientToGCRecordCompendiumStats",
 	8001: "k_EMsgGCDev_GrantWarKill",
 }
 var EDOTAGCMsg_value = map[string]int32{
@@ -1448,6 +1454,9 @@ var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgServerToGCSuspiciousActivity":                         7544,
 	"k_EMsgSignOutCommunicationSummary":                          7545,
 	"k_EMsgServerToGCRequestStatus_Response":                     7546,
+	"k_EMsgGCGCToLANServerRelayConnect":                          7549,
+	"k_EMsgGCToGCFantasySetMatchLeague":                          7555,
+	"k_EMsgClientToGCRecordCompendiumStats":                      7558,
 	"k_EMsgGCDev_GrantWarKill":                                   8001,
 }
 
@@ -5453,6 +5462,30 @@ func (m *CMsgDOTAConsumeFantasyTicketFailure) GetFantasyLeagueId() uint32 {
 	return 0
 }
 
+type CMsgGCToGCFantasySetMatchLeague struct {
+	MatchId          *uint64 `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
+	LeagueId         *uint32 `protobuf:"varint,2,opt,name=league_id" json:"league_id,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgGCToGCFantasySetMatchLeague) Reset()         { *m = CMsgGCToGCFantasySetMatchLeague{} }
+func (m *CMsgGCToGCFantasySetMatchLeague) String() string { return proto.CompactTextString(m) }
+func (*CMsgGCToGCFantasySetMatchLeague) ProtoMessage()    {}
+
+func (m *CMsgGCToGCFantasySetMatchLeague) GetMatchId() uint64 {
+	if m != nil && m.MatchId != nil {
+		return *m.MatchId
+	}
+	return 0
+}
+
+func (m *CMsgGCToGCFantasySetMatchLeague) GetLeagueId() uint32 {
+	if m != nil && m.LeagueId != nil {
+		return *m.LeagueId
+	}
+	return 0
+}
+
 type CSODOTAMapLocationState struct {
 	AccountId        *uint32 `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
 	LocationId       *int32  `protobuf:"varint,2,opt,name=location_id" json:"location_id,omitempty"`
@@ -5488,6 +5521,7 @@ func (m *CSODOTAMapLocationState) GetCompleted() bool {
 type CMsgNexonPartnerUpdate struct {
 	Messagetype      *uint32 `protobuf:"varint,1,opt,name=messagetype" json:"messagetype,omitempty"`
 	Timeremaining    *uint32 `protobuf:"varint,2,opt,name=timeremaining" json:"timeremaining,omitempty"`
+	Terminate        *bool   `protobuf:"varint,3,opt,name=terminate" json:"terminate,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -5507,6 +5541,13 @@ func (m *CMsgNexonPartnerUpdate) GetTimeremaining() uint32 {
 		return *m.Timeremaining
 	}
 	return 0
+}
+
+func (m *CMsgNexonPartnerUpdate) GetTerminate() bool {
+	if m != nil && m.Terminate != nil {
+		return *m.Terminate
+	}
+	return false
 }
 
 type CMsgMakeOffering struct {

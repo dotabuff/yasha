@@ -815,6 +815,7 @@ const (
 	CMsgDOTAPopup_ALL_HERO_CHALLENGE_PROGRESS                           CMsgDOTAPopup_PopupID = 52
 	CMsgDOTAPopup_NEED_INITIAL_SKILL                                    CMsgDOTAPopup_PopupID = 53
 	CMsgDOTAPopup_NEED_INITIAL_SKILL_IN_PARTY                           CMsgDOTAPopup_PopupID = 54
+	CMsgDOTAPopup_TARGET_ENGINE_MISMATCH                                CMsgDOTAPopup_PopupID = 55
 )
 
 var CMsgDOTAPopup_PopupID_name = map[int32]string{
@@ -873,6 +874,7 @@ var CMsgDOTAPopup_PopupID_name = map[int32]string{
 	52: "ALL_HERO_CHALLENGE_PROGRESS",
 	53: "NEED_INITIAL_SKILL",
 	54: "NEED_INITIAL_SKILL_IN_PARTY",
+	55: "TARGET_ENGINE_MISMATCH",
 }
 var CMsgDOTAPopup_PopupID_value = map[string]int32{
 	"KICKED_FROM_LOBBY":                                     0,
@@ -930,6 +932,7 @@ var CMsgDOTAPopup_PopupID_value = map[string]int32{
 	"ALL_HERO_CHALLENGE_PROGRESS":                           52,
 	"NEED_INITIAL_SKILL":                                    53,
 	"NEED_INITIAL_SKILL_IN_PARTY":                           54,
+	"TARGET_ENGINE_MISMATCH":                                55,
 }
 
 func (x CMsgDOTAPopup_PopupID) Enum() *CMsgDOTAPopup_PopupID {
@@ -9802,6 +9805,7 @@ type CMsgDOTAMatchmakingStatsResponse struct {
 	SearchingPlayersByGroup []uint32                          `protobuf:"varint,2,rep,name=searching_players_by_group" json:"searching_players_by_group,omitempty"`
 	DisabledGroups          *uint32                           `protobuf:"varint,3,opt,name=disabled_groups" json:"disabled_groups,omitempty"`
 	GameserverSample        *CMsgMatchmakingGroupServerSample `protobuf:"bytes,4,opt,name=gameserver_sample" json:"gameserver_sample,omitempty"`
+	GameserverSampleSource2 *CMsgMatchmakingGroupServerSample `protobuf:"bytes,6,opt,name=gameserver_sample_source2" json:"gameserver_sample_source2,omitempty"`
 	MaintenanceAlerts       *bool                             `protobuf:"varint,5,opt,name=maintenance_alerts" json:"maintenance_alerts,omitempty"`
 	XXX_unrecognized        []byte                            `json:"-"`
 }
@@ -9834,6 +9838,13 @@ func (m *CMsgDOTAMatchmakingStatsResponse) GetDisabledGroups() uint32 {
 func (m *CMsgDOTAMatchmakingStatsResponse) GetGameserverSample() *CMsgMatchmakingGroupServerSample {
 	if m != nil {
 		return m.GameserverSample
+	}
+	return nil
+}
+
+func (m *CMsgDOTAMatchmakingStatsResponse) GetGameserverSampleSource2() *CMsgMatchmakingGroupServerSample {
+	if m != nil {
+		return m.GameserverSampleSource2
 	}
 	return nil
 }
@@ -12631,6 +12642,62 @@ func (m *CMsgClientToGCSetProfileCardSlot) GetSlotType() uint32 {
 func (m *CMsgClientToGCSetProfileCardSlot) GetSlotValue() uint64 {
 	if m != nil && m.SlotValue != nil {
 		return *m.SlotValue
+	}
+	return 0
+}
+
+type CMsgClientToGCRecordCompendiumStats struct {
+	LeagueId          *uint32 `protobuf:"varint,1,opt,name=league_id" json:"league_id,omitempty"`
+	ViewDurationS     *uint32 `protobuf:"varint,2,opt,name=view_duration_s" json:"view_duration_s,omitempty"`
+	VideosViewed      *uint32 `protobuf:"varint,3,opt,name=videos_viewed" json:"videos_viewed,omitempty"`
+	PageTurns         *uint32 `protobuf:"varint,4,opt,name=page_turns" json:"page_turns,omitempty"`
+	LinksFollowed     *uint32 `protobuf:"varint,5,opt,name=links_followed" json:"links_followed,omitempty"`
+	CompendiumVersion *uint32 `protobuf:"varint,6,opt,name=compendium_version" json:"compendium_version,omitempty"`
+	XXX_unrecognized  []byte  `json:"-"`
+}
+
+func (m *CMsgClientToGCRecordCompendiumStats) Reset()         { *m = CMsgClientToGCRecordCompendiumStats{} }
+func (m *CMsgClientToGCRecordCompendiumStats) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCRecordCompendiumStats) ProtoMessage()    {}
+
+func (m *CMsgClientToGCRecordCompendiumStats) GetLeagueId() uint32 {
+	if m != nil && m.LeagueId != nil {
+		return *m.LeagueId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCRecordCompendiumStats) GetViewDurationS() uint32 {
+	if m != nil && m.ViewDurationS != nil {
+		return *m.ViewDurationS
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCRecordCompendiumStats) GetVideosViewed() uint32 {
+	if m != nil && m.VideosViewed != nil {
+		return *m.VideosViewed
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCRecordCompendiumStats) GetPageTurns() uint32 {
+	if m != nil && m.PageTurns != nil {
+		return *m.PageTurns
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCRecordCompendiumStats) GetLinksFollowed() uint32 {
+	if m != nil && m.LinksFollowed != nil {
+		return *m.LinksFollowed
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCRecordCompendiumStats) GetCompendiumVersion() uint32 {
+	if m != nil && m.CompendiumVersion != nil {
+		return *m.CompendiumVersion
 	}
 	return 0
 }

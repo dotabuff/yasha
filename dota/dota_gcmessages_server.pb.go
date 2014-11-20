@@ -2030,6 +2030,8 @@ func (m *CMsgDOTALiveScoreboardUpdate) GetMatchId() uint64 {
 type CMsgDOTALiveScoreboardUpdate_Team struct {
 	Players          []*CMsgDOTALiveScoreboardUpdate_Team_Player `protobuf:"bytes,1,rep,name=players" json:"players,omitempty"`
 	Score            *uint32                                     `protobuf:"varint,2,opt,name=score" json:"score,omitempty"`
+	TowerState       *uint32                                     `protobuf:"varint,3,opt,name=tower_state" json:"tower_state,omitempty"`
+	BarracksState    *uint32                                     `protobuf:"varint,4,opt,name=barracks_state" json:"barracks_state,omitempty"`
 	XXX_unrecognized []byte                                      `json:"-"`
 }
 
@@ -2047,6 +2049,20 @@ func (m *CMsgDOTALiveScoreboardUpdate_Team) GetPlayers() []*CMsgDOTALiveScoreboa
 func (m *CMsgDOTALiveScoreboardUpdate_Team) GetScore() uint32 {
 	if m != nil && m.Score != nil {
 		return *m.Score
+	}
+	return 0
+}
+
+func (m *CMsgDOTALiveScoreboardUpdate_Team) GetTowerState() uint32 {
+	if m != nil && m.TowerState != nil {
+		return *m.TowerState
+	}
+	return 0
+}
+
+func (m *CMsgDOTALiveScoreboardUpdate_Team) GetBarracksState() uint32 {
+	if m != nil && m.BarracksState != nil {
+		return *m.BarracksState
 	}
 	return 0
 }
@@ -2078,6 +2094,7 @@ type CMsgDOTALiveScoreboardUpdate_Team_Player struct {
 	PositionX        *float32                                                    `protobuf:"fixed32,24,opt,name=position_x" json:"position_x,omitempty"`
 	PositionY        *float32                                                    `protobuf:"fixed32,25,opt,name=position_y" json:"position_y,omitempty"`
 	NetWorth         *uint32                                                     `protobuf:"varint,26,opt,name=net_worth" json:"net_worth,omitempty"`
+	Abilities        []*CMsgDOTALiveScoreboardUpdate_Team_Player_HeroAbility     `protobuf:"bytes,27,rep,name=abilities" json:"abilities,omitempty"`
 	XXX_unrecognized []byte                                                      `json:"-"`
 }
 
@@ -2267,6 +2284,41 @@ func (m *CMsgDOTALiveScoreboardUpdate_Team_Player) GetPositionY() float32 {
 func (m *CMsgDOTALiveScoreboardUpdate_Team_Player) GetNetWorth() uint32 {
 	if m != nil && m.NetWorth != nil {
 		return *m.NetWorth
+	}
+	return 0
+}
+
+func (m *CMsgDOTALiveScoreboardUpdate_Team_Player) GetAbilities() []*CMsgDOTALiveScoreboardUpdate_Team_Player_HeroAbility {
+	if m != nil {
+		return m.Abilities
+	}
+	return nil
+}
+
+type CMsgDOTALiveScoreboardUpdate_Team_Player_HeroAbility struct {
+	AbilityId        *uint32 `protobuf:"varint,1,opt,name=ability_id" json:"ability_id,omitempty"`
+	AbilityLevel     *uint32 `protobuf:"varint,2,opt,name=ability_level" json:"ability_level,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgDOTALiveScoreboardUpdate_Team_Player_HeroAbility) Reset() {
+	*m = CMsgDOTALiveScoreboardUpdate_Team_Player_HeroAbility{}
+}
+func (m *CMsgDOTALiveScoreboardUpdate_Team_Player_HeroAbility) String() string {
+	return proto.CompactTextString(m)
+}
+func (*CMsgDOTALiveScoreboardUpdate_Team_Player_HeroAbility) ProtoMessage() {}
+
+func (m *CMsgDOTALiveScoreboardUpdate_Team_Player_HeroAbility) GetAbilityId() uint32 {
+	if m != nil && m.AbilityId != nil {
+		return *m.AbilityId
+	}
+	return 0
+}
+
+func (m *CMsgDOTALiveScoreboardUpdate_Team_Player_HeroAbility) GetAbilityLevel() uint32 {
+	if m != nil && m.AbilityLevel != nil {
+		return *m.AbilityLevel
 	}
 	return 0
 }
@@ -2504,7 +2556,7 @@ type CMsgGCToRelayConnect struct {
 	GameServerSteamId   *uint64 `protobuf:"varint,4,opt,name=game_server_steam_id" json:"game_server_steam_id,omitempty"`
 	ParentCount         *uint32 `protobuf:"varint,5,opt,name=parent_count" json:"parent_count,omitempty"`
 	TvUniqueSecretCode  *uint64 `protobuf:"fixed64,6,opt,name=tv_unique_secret_code" json:"tv_unique_secret_code,omitempty"`
-	SourceTvSteamid     *uint32 `protobuf:"varint,7,opt,name=source_tv_steamid" json:"source_tv_steamid,omitempty"`
+	SourceTvSteamid     *uint64 `protobuf:"fixed64,7,opt,name=source_tv_steamid" json:"source_tv_steamid,omitempty"`
 	XXX_unrecognized    []byte  `json:"-"`
 }
 
@@ -2554,9 +2606,25 @@ func (m *CMsgGCToRelayConnect) GetTvUniqueSecretCode() uint64 {
 	return 0
 }
 
-func (m *CMsgGCToRelayConnect) GetSourceTvSteamid() uint32 {
+func (m *CMsgGCToRelayConnect) GetSourceTvSteamid() uint64 {
 	if m != nil && m.SourceTvSteamid != nil {
 		return *m.SourceTvSteamid
+	}
+	return 0
+}
+
+type CMsgGCGCToLANServerRelayConnect struct {
+	RelaySteamid     *uint64 `protobuf:"fixed64,1,opt,name=relay_steamid" json:"relay_steamid,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgGCGCToLANServerRelayConnect) Reset()         { *m = CMsgGCGCToLANServerRelayConnect{} }
+func (m *CMsgGCGCToLANServerRelayConnect) String() string { return proto.CompactTextString(m) }
+func (*CMsgGCGCToLANServerRelayConnect) ProtoMessage()    {}
+
+func (m *CMsgGCGCToLANServerRelayConnect) GetRelaySteamid() uint64 {
+	if m != nil && m.RelaySteamid != nil {
+		return *m.RelaySteamid
 	}
 	return 0
 }
@@ -3721,6 +3789,7 @@ type CMsgServerToGCVictoryPredictions_Record struct {
 	AccountId        *uint32 `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
 	ItemId           *uint64 `protobuf:"varint,2,opt,name=item_id" json:"item_id,omitempty"`
 	Victory          *bool   `protobuf:"varint,3,opt,name=victory" json:"victory,omitempty"`
+	MatchId          *uint64 `protobuf:"varint,4,opt,name=match_id" json:"match_id,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -3749,6 +3818,13 @@ func (m *CMsgServerToGCVictoryPredictions_Record) GetVictory() bool {
 		return *m.Victory
 	}
 	return false
+}
+
+func (m *CMsgServerToGCVictoryPredictions_Record) GetMatchId() uint64 {
+	if m != nil && m.MatchId != nil {
+		return *m.MatchId
+	}
+	return 0
 }
 
 type CMsgSuspiciousActivity struct {

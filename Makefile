@@ -1,4 +1,4 @@
-SteamKit := $(wildcard ~/github/manveru/SteamKit/Resources/Protobufs)
+SteamKit := $(wildcard ~/github/SteamRE/SteamKit/Resources/Protobufs)
 
 default : proto
 

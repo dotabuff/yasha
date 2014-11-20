@@ -346,6 +346,7 @@ type CCLCMsg_VoiceData struct {
 	SequenceBytes            *int32            `protobuf:"varint,4,opt,name=sequence_bytes" json:"sequence_bytes,omitempty"`
 	SectionNumber            *uint32           `protobuf:"varint,5,opt,name=section_number" json:"section_number,omitempty"`
 	UncompressedSampleOffset *uint32           `protobuf:"varint,6,opt,name=uncompressed_sample_offset" json:"uncompressed_sample_offset,omitempty"`
+	Tick                     *uint32           `protobuf:"varint,7,opt,name=tick" json:"tick,omitempty"`
 	XXX_unrecognized         []byte            `json:"-"`
 }
 
@@ -393,6 +394,13 @@ func (m *CCLCMsg_VoiceData) GetSectionNumber() uint32 {
 func (m *CCLCMsg_VoiceData) GetUncompressedSampleOffset() uint32 {
 	if m != nil && m.UncompressedSampleOffset != nil {
 		return *m.UncompressedSampleOffset
+	}
+	return 0
+}
+
+func (m *CCLCMsg_VoiceData) GetTick() uint32 {
+	if m != nil && m.Tick != nil {
+		return *m.Tick
 	}
 	return 0
 }
@@ -1635,6 +1643,7 @@ type CSVCMsg_VoiceData struct {
 	SequenceBytes            *int32            `protobuf:"varint,7,opt,name=sequence_bytes" json:"sequence_bytes,omitempty"`
 	SectionNumber            *uint32           `protobuf:"varint,8,opt,name=section_number" json:"section_number,omitempty"`
 	UncompressedSampleOffset *uint32           `protobuf:"varint,9,opt,name=uncompressed_sample_offset" json:"uncompressed_sample_offset,omitempty"`
+	Tick                     *uint32           `protobuf:"varint,10,opt,name=tick" json:"tick,omitempty"`
 	XXX_unrecognized         []byte            `json:"-"`
 }
 
@@ -1703,6 +1712,13 @@ func (m *CSVCMsg_VoiceData) GetSectionNumber() uint32 {
 func (m *CSVCMsg_VoiceData) GetUncompressedSampleOffset() uint32 {
 	if m != nil && m.UncompressedSampleOffset != nil {
 		return *m.UncompressedSampleOffset
+	}
+	return 0
+}
+
+func (m *CSVCMsg_VoiceData) GetTick() uint32 {
+	if m != nil && m.Tick != nil {
+		return *m.Tick
 	}
 	return 0
 }

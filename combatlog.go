@@ -44,6 +44,8 @@ func (c combatLogParser) parse(obj *dota.CSVCMsg_GameEvent) CombatLogEntry {
 	switch t {
 	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_ABILITY:
 		v = &CombatLogAbility{}
+	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_ABILITY_TRIGGER:
+		v = &CombatLogAbilityTrigger{}
 	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_DAMAGE:
 		v = &CombatLogDamage{}
 	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_DEATH:
@@ -134,21 +136,69 @@ func (c CombatLogAbility) Timestamp() float32 {
 	return c.Time
 }
 
+//  2:  4 val_short:12
+//  3:  4 val_short:5
+//  4:  4 val_short:47
+//  5:  6 val_bool:false
+//  6:  6 val_bool:false
+//  7:  4 val_short:3
+//  8:  4 val_short:0
+//  9:  2 val_float:1519.1506
+// 10:  4 val_short:0
+// 11:  2 val_float:1638.1001
+// 12:  6 val_bool:true
+// 13:  6 val_bool:true
+// 14:  6 val_bool:false
+// 15:  6 val_bool:false
+// 16:  4 val_short:4
+// 17:  4 val_short:0
+// 18:  4 val_short:0
+
+type CombatLogAbilityTrigger struct {
+	Target             string  `logIndex:"2" logTable:"CombatLogNames"`  //  2:  4 val_short:12
+	Attacker           string  `logIndex:"3" logTable:"CombatLogNames"`  //  3:  4 val_short:5
+	Ability            string  `logIndex:"4" logTable:"CombatLogNames"`  //  4:  4 val_short:47
+	AttackerIsIllusion bool    `logIndex:"5"`                            //  5:  6 val_bool:false
+	TargetIsIllusion   bool    `logIndex:"6"`                            //  6:  6 val_bool:false
+	IsDebuff           int     `logIndex:"7"`                            //  7:  4 val_short:3  (seen values: 3)
+	Unknown8           int     `logIndex:"8"`                            //  8:  4 val_short:0
+	Time               float32 `logIndex:"9"`                            //  9:  2 val_float:1519.1506
+	TargetSource       string  `logIndex:"10" logTable:"CombatLogNames"` // 10:  4 val_short:0
+	Unknown11          float32 `logIndex:"11"`                           // 11:  2 val_float:1638.1001
+	AttackerIsHero     bool    `logIndex:"12"`                           // 12:  6 val_bool:true
+	TargetIsHero       bool    `logIndex:"13"`                           // 13:  6 val_bool:true
+	Unknown14          bool    `logIndex:"14"`                           // 14:  6 val_bool:false
+	Unknown15          bool    `logIndex:"15"`                           // 15:  6 val_bool:false
+	Unknown16          int     `logIndex:"16"`                           // 16:  4 val_short:4
+	Unknown17          int     `logIndex:"17"`                           // 17:  4 val_short:0
+	Unknown18          int     `logIndex:"18"`                           // 18:  4 val_short:0
+	Unknown19          int     `logIndex:"19"`                           // 18:  4 val_short:0
+
+}
+
+func (c CombatLogAbilityTrigger) Type() dota.DOTA_COMBATLOG_TYPES {
+	return dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_ABILITY_TRIGGER
+}
+
+func (c CombatLogAbilityTrigger) Timestamp() float32 {
+	return c.Time
+}
+
 /*
- 0: val_byte:0 ),
- 1: val_short:3 ),
- 2: val_short:27 ),
- 3: val_short:3 ),
- 4: val_short:0 ),
- 5: val_bool:false ),
- 6: val_bool:false ),
- 7: val_short:70 ),
- 8: val_short:429 ),
- 9: val_float:229.45338 ),
- 10: val_short:27 ),
- 11: val_float:238.43335 ),
- 12: val_bool:true ),
- 13: val_bool:false )
+ 0: val_byte:0
+ 1: val_short:3
+ 2: val_short:27
+ 3: val_short:3
+ 4: val_short:0
+ 5: val_bool:false
+ 6: val_bool:false
+ 7: val_short:70
+ 8: val_short:429
+ 9: val_float:229.45338
+ 10: val_short:27
+ 11: val_float:238.43335
+ 12: val_bool:true
+ 13: val_bool:false
 */
 type CombatLogDamage struct {
 	Source             string  `logIndex:"1" logTable:"CombatLogNames"`

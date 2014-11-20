@@ -13,6 +13,39 @@ var _ = proto.Marshal
 var _ = &json.SyntaxError{}
 var _ = math.Inf
 
+type ESourceEngine int32
+
+const (
+	ESourceEngine_k_ESE_Source1 ESourceEngine = 0
+	ESourceEngine_k_ESE_Source2 ESourceEngine = 1
+)
+
+var ESourceEngine_name = map[int32]string{
+	0: "k_ESE_Source1",
+	1: "k_ESE_Source2",
+}
+var ESourceEngine_value = map[string]int32{
+	"k_ESE_Source1": 0,
+	"k_ESE_Source2": 1,
+}
+
+func (x ESourceEngine) Enum() *ESourceEngine {
+	p := new(ESourceEngine)
+	*p = x
+	return p
+}
+func (x ESourceEngine) String() string {
+	return proto.EnumName(ESourceEngine_name, int32(x))
+}
+func (x *ESourceEngine) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(ESourceEngine_value, data, "ESourceEngine")
+	if err != nil {
+		return err
+	}
+	*x = ESourceEngine(value)
+	return nil
+}
+
 type PartnerAccountType int32
 
 const (
@@ -851,6 +884,7 @@ type CMsgClientHello struct {
 	ClientLauncher      *PartnerAccountType       `protobuf:"varint,4,opt,name=client_launcher,enum=dota.PartnerAccountType,def=0" json:"client_launcher,omitempty"`
 	SecretKey           *string                   `protobuf:"bytes,5,opt,name=secret_key" json:"secret_key,omitempty"`
 	ClientLanguage      *uint32                   `protobuf:"varint,6,opt,name=client_language" json:"client_language,omitempty"`
+	Engine              *ESourceEngine            `protobuf:"varint,7,opt,name=engine,enum=dota.ESourceEngine,def=0" json:"engine,omitempty"`
 	XXX_unrecognized    []byte                    `json:"-"`
 }
 
@@ -859,6 +893,7 @@ func (m *CMsgClientHello) String() string { return proto.CompactTextString(m) }
 func (*CMsgClientHello) ProtoMessage()    {}
 
 const Default_CMsgClientHello_ClientLauncher PartnerAccountType = PartnerAccountType_PARTNER_NONE
+const Default_CMsgClientHello_Engine ESourceEngine = ESourceEngine_k_ESE_Source1
 
 func (m *CMsgClientHello) GetVersion() uint32 {
 	if m != nil && m.Version != nil {
@@ -900,6 +935,13 @@ func (m *CMsgClientHello) GetClientLanguage() uint32 {
 		return *m.ClientLanguage
 	}
 	return 0
+}
+
+func (m *CMsgClientHello) GetEngine() ESourceEngine {
+	if m != nil && m.Engine != nil {
+		return *m.Engine
+	}
+	return Default_CMsgClientHello_Engine
 }
 
 type CMsgClientWelcome struct {
@@ -1451,6 +1493,7 @@ func (m *CWorkshop_SetItemPaymentRules_Response) String() string { return proto.
 func (*CWorkshop_SetItemPaymentRules_Response) ProtoMessage()    {}
 
 func init() {
+	proto.RegisterEnum("dota.ESourceEngine", ESourceEngine_name, ESourceEngine_value)
 	proto.RegisterEnum("dota.PartnerAccountType", PartnerAccountType_name, PartnerAccountType_value)
 	proto.RegisterEnum("dota.GCConnectionStatus", GCConnectionStatus_name, GCConnectionStatus_value)
 }
