@@ -2213,6 +2213,7 @@ const (
 	MatchLanguages_MATCH_LANGUAGE_KOREAN     MatchLanguages = 4
 	MatchLanguages_MATCH_LANGUAGE_SPANISH    MatchLanguages = 5
 	MatchLanguages_MATCH_LANGUAGE_PORTUGUESE MatchLanguages = 6
+	MatchLanguages_MATCH_LANGUAGE_ENGLISH2   MatchLanguages = 7
 )
 
 var MatchLanguages_name = map[int32]string{
@@ -2223,6 +2224,7 @@ var MatchLanguages_name = map[int32]string{
 	4: "MATCH_LANGUAGE_KOREAN",
 	5: "MATCH_LANGUAGE_SPANISH",
 	6: "MATCH_LANGUAGE_PORTUGUESE",
+	7: "MATCH_LANGUAGE_ENGLISH2",
 }
 var MatchLanguages_value = map[string]int32{
 	"MATCH_LANGUAGE_INVALID":    0,
@@ -2232,6 +2234,7 @@ var MatchLanguages_value = map[string]int32{
 	"MATCH_LANGUAGE_KOREAN":     4,
 	"MATCH_LANGUAGE_SPANISH":    5,
 	"MATCH_LANGUAGE_PORTUGUESE": 6,
+	"MATCH_LANGUAGE_ENGLISH2":   7,
 }
 
 func (x MatchLanguages) Enum() *MatchLanguages {
