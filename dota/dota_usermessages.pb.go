@@ -88,6 +88,7 @@ const (
 	EDotaUserMessages_DOTA_UM_BuyBackStateAlert        EDotaUserMessages = 132
 	EDotaUserMessages_DOTA_UM_QuickBuyAlert            EDotaUserMessages = 133
 	EDotaUserMessages_DOTA_UM_StatsHeroDetails         EDotaUserMessages = 134
+	EDotaUserMessages_DOTA_UM_PredictionResult         EDotaUserMessages = 135
 )
 
 var EDotaUserMessages_name = map[int32]string{
@@ -161,6 +162,7 @@ var EDotaUserMessages_name = map[int32]string{
 	132: "DOTA_UM_BuyBackStateAlert",
 	133: "DOTA_UM_QuickBuyAlert",
 	134: "DOTA_UM_StatsHeroDetails",
+	135: "DOTA_UM_PredictionResult",
 }
 var EDotaUserMessages_value = map[string]int32{
 	"DOTA_UM_AddUnitToSelection":       64,
@@ -233,6 +235,7 @@ var EDotaUserMessages_value = map[string]int32{
 	"DOTA_UM_BuyBackStateAlert":        132,
 	"DOTA_UM_QuickBuyAlert":            133,
 	"DOTA_UM_StatsHeroDetails":         134,
+	"DOTA_UM_PredictionResult":         135,
 }
 
 func (x EDotaUserMessages) Enum() *EDotaUserMessages {
@@ -334,6 +337,11 @@ const (
 	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_ABANDON_RANKED_BEFORE_FIRST_BLOOD_PARTY   DOTA_CHAT_MESSAGE = 84
 	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_COMPENDIUM_LEVEL                          DOTA_CHAT_MESSAGE = 85
 	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_VICTORY_PREDICTION_STREAK                 DOTA_CHAT_MESSAGE = 86
+	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_ASSASSIN_ANNOUNCE                         DOTA_CHAT_MESSAGE = 87
+	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_ASSASSIN_SUCCESS                          DOTA_CHAT_MESSAGE = 88
+	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_ASSASSIN_DENIED                           DOTA_CHAT_MESSAGE = 89
+	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_VICTORY_PREDICTION_SINGLE_USER_CONFIRM    DOTA_CHAT_MESSAGE = 90
+	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_EFFIGY_KILL                               DOTA_CHAT_MESSAGE = 91
 )
 
 var DOTA_CHAT_MESSAGE_name = map[int32]string{
@@ -416,6 +424,11 @@ var DOTA_CHAT_MESSAGE_name = map[int32]string{
 	84: "CHAT_MESSAGE_ABANDON_RANKED_BEFORE_FIRST_BLOOD_PARTY",
 	85: "CHAT_MESSAGE_COMPENDIUM_LEVEL",
 	86: "CHAT_MESSAGE_VICTORY_PREDICTION_STREAK",
+	87: "CHAT_MESSAGE_ASSASSIN_ANNOUNCE",
+	88: "CHAT_MESSAGE_ASSASSIN_SUCCESS",
+	89: "CHAT_MESSAGE_ASSASSIN_DENIED",
+	90: "CHAT_MESSAGE_VICTORY_PREDICTION_SINGLE_USER_CONFIRM",
+	91: "CHAT_MESSAGE_EFFIGY_KILL",
 }
 var DOTA_CHAT_MESSAGE_value = map[string]int32{
 	"CHAT_MESSAGE_INVALID":                                   -1,
@@ -497,6 +510,11 @@ var DOTA_CHAT_MESSAGE_value = map[string]int32{
 	"CHAT_MESSAGE_ABANDON_RANKED_BEFORE_FIRST_BLOOD_PARTY":   84,
 	"CHAT_MESSAGE_COMPENDIUM_LEVEL":                          85,
 	"CHAT_MESSAGE_VICTORY_PREDICTION_STREAK":                 86,
+	"CHAT_MESSAGE_ASSASSIN_ANNOUNCE":                         87,
+	"CHAT_MESSAGE_ASSASSIN_SUCCESS":                          88,
+	"CHAT_MESSAGE_ASSASSIN_DENIED":                           89,
+	"CHAT_MESSAGE_VICTORY_PREDICTION_SINGLE_USER_CONFIRM":    90,
+	"CHAT_MESSAGE_EFFIGY_KILL":                               91,
 }
 
 func (x DOTA_CHAT_MESSAGE) Enum() *DOTA_CHAT_MESSAGE {
@@ -912,6 +930,39 @@ func (x *EHeroStatType) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*x = EHeroStatType(value)
+	return nil
+}
+
+type CDOTAUserMsg_PredictionResult_Prediction_EResult int32
+
+const (
+	CDOTAUserMsg_PredictionResult_Prediction_k_eResult_ItemGranted CDOTAUserMsg_PredictionResult_Prediction_EResult = 1
+	CDOTAUserMsg_PredictionResult_Prediction_k_eResult_Destroyed   CDOTAUserMsg_PredictionResult_Prediction_EResult = 2
+)
+
+var CDOTAUserMsg_PredictionResult_Prediction_EResult_name = map[int32]string{
+	1: "k_eResult_ItemGranted",
+	2: "k_eResult_Destroyed",
+}
+var CDOTAUserMsg_PredictionResult_Prediction_EResult_value = map[string]int32{
+	"k_eResult_ItemGranted": 1,
+	"k_eResult_Destroyed":   2,
+}
+
+func (x CDOTAUserMsg_PredictionResult_Prediction_EResult) Enum() *CDOTAUserMsg_PredictionResult_Prediction_EResult {
+	p := new(CDOTAUserMsg_PredictionResult_Prediction_EResult)
+	*p = x
+	return p
+}
+func (x CDOTAUserMsg_PredictionResult_Prediction_EResult) String() string {
+	return proto.EnumName(CDOTAUserMsg_PredictionResult_Prediction_EResult_name, int32(x))
+}
+func (x *CDOTAUserMsg_PredictionResult_Prediction_EResult) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(CDOTAUserMsg_PredictionResult_Prediction_EResult_value, data, "CDOTAUserMsg_PredictionResult_Prediction_EResult")
+	if err != nil {
+		return err
+	}
+	*x = CDOTAUserMsg_PredictionResult_Prediction_EResult(value)
 	return nil
 }
 
@@ -1884,6 +1935,98 @@ func (m *CDOTAUserMsg_HalloweenDrops) GetPlayerIds() []uint32 {
 func (m *CDOTAUserMsg_HalloweenDrops) GetPrizeList() uint32 {
 	if m != nil && m.PrizeList != nil {
 		return *m.PrizeList
+	}
+	return 0
+}
+
+type CDOTAUserMsg_PredictionResult struct {
+	AccountId        *uint32                                     `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	MatchId          *uint64                                     `protobuf:"varint,2,opt,name=match_id" json:"match_id,omitempty"`
+	Correct          *bool                                       `protobuf:"varint,3,opt,name=correct" json:"correct,omitempty"`
+	Predictions      []*CDOTAUserMsg_PredictionResult_Prediction `protobuf:"bytes,4,rep,name=predictions" json:"predictions,omitempty"`
+	XXX_unrecognized []byte                                      `json:"-"`
+}
+
+func (m *CDOTAUserMsg_PredictionResult) Reset()         { *m = CDOTAUserMsg_PredictionResult{} }
+func (m *CDOTAUserMsg_PredictionResult) String() string { return proto.CompactTextString(m) }
+func (*CDOTAUserMsg_PredictionResult) ProtoMessage()    {}
+
+func (m *CDOTAUserMsg_PredictionResult) GetAccountId() uint32 {
+	if m != nil && m.AccountId != nil {
+		return *m.AccountId
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_PredictionResult) GetMatchId() uint64 {
+	if m != nil && m.MatchId != nil {
+		return *m.MatchId
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_PredictionResult) GetCorrect() bool {
+	if m != nil && m.Correct != nil {
+		return *m.Correct
+	}
+	return false
+}
+
+func (m *CDOTAUserMsg_PredictionResult) GetPredictions() []*CDOTAUserMsg_PredictionResult_Prediction {
+	if m != nil {
+		return m.Predictions
+	}
+	return nil
+}
+
+type CDOTAUserMsg_PredictionResult_Prediction struct {
+	ItemDef          *uint32                                           `protobuf:"varint,1,opt,name=item_def" json:"item_def,omitempty"`
+	NumCorrect       *uint32                                           `protobuf:"varint,2,opt,name=num_correct" json:"num_correct,omitempty"`
+	NumFails         *uint32                                           `protobuf:"varint,3,opt,name=num_fails" json:"num_fails,omitempty"`
+	Result           *CDOTAUserMsg_PredictionResult_Prediction_EResult `protobuf:"varint,4,opt,name=result,enum=dota.CDOTAUserMsg_PredictionResult_Prediction_EResult,def=1" json:"result,omitempty"`
+	GrantedItemDef   *uint32                                           `protobuf:"varint,5,opt,name=granted_item_def" json:"granted_item_def,omitempty"`
+	XXX_unrecognized []byte                                            `json:"-"`
+}
+
+func (m *CDOTAUserMsg_PredictionResult_Prediction) Reset() {
+	*m = CDOTAUserMsg_PredictionResult_Prediction{}
+}
+func (m *CDOTAUserMsg_PredictionResult_Prediction) String() string { return proto.CompactTextString(m) }
+func (*CDOTAUserMsg_PredictionResult_Prediction) ProtoMessage()    {}
+
+const Default_CDOTAUserMsg_PredictionResult_Prediction_Result CDOTAUserMsg_PredictionResult_Prediction_EResult = CDOTAUserMsg_PredictionResult_Prediction_k_eResult_ItemGranted
+
+func (m *CDOTAUserMsg_PredictionResult_Prediction) GetItemDef() uint32 {
+	if m != nil && m.ItemDef != nil {
+		return *m.ItemDef
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_PredictionResult_Prediction) GetNumCorrect() uint32 {
+	if m != nil && m.NumCorrect != nil {
+		return *m.NumCorrect
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_PredictionResult_Prediction) GetNumFails() uint32 {
+	if m != nil && m.NumFails != nil {
+		return *m.NumFails
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_PredictionResult_Prediction) GetResult() CDOTAUserMsg_PredictionResult_Prediction_EResult {
+	if m != nil && m.Result != nil {
+		return *m.Result
+	}
+	return Default_CDOTAUserMsg_PredictionResult_Prediction_Result
+}
+
+func (m *CDOTAUserMsg_PredictionResult_Prediction) GetGrantedItemDef() uint32 {
+	if m != nil && m.GrantedItemDef != nil {
+		return *m.GrantedItemDef
 	}
 	return 0
 }
@@ -3651,9 +3794,11 @@ func (m *CDOTAUserMsg_AbilitySteal) GetAbilityLevel() uint32 {
 }
 
 type CDOTAUserMsg_StatsHeroLookup struct {
-	PlayerId         *int32 `protobuf:"varint,1,opt,name=player_id" json:"player_id,omitempty"`
-	HeroId           *int32 `protobuf:"varint,2,opt,name=hero_id" json:"hero_id,omitempty"`
-	XXX_unrecognized []byte `json:"-"`
+	PlayerId         *int32  `protobuf:"varint,1,opt,name=player_id" json:"player_id,omitempty"`
+	HeroId           *int32  `protobuf:"varint,2,opt,name=hero_id" json:"hero_id,omitempty"`
+	HeroName         *string `protobuf:"bytes,3,opt,name=hero_name" json:"hero_name,omitempty"`
+	Persona          *string `protobuf:"bytes,4,opt,name=persona" json:"persona,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
 }
 
 func (m *CDOTAUserMsg_StatsHeroLookup) Reset()         { *m = CDOTAUserMsg_StatsHeroLookup{} }
@@ -3672,6 +3817,20 @@ func (m *CDOTAUserMsg_StatsHeroLookup) GetHeroId() int32 {
 		return *m.HeroId
 	}
 	return 0
+}
+
+func (m *CDOTAUserMsg_StatsHeroLookup) GetHeroName() string {
+	if m != nil && m.HeroName != nil {
+		return *m.HeroName
+	}
+	return ""
+}
+
+func (m *CDOTAUserMsg_StatsHeroLookup) GetPersona() string {
+	if m != nil && m.Persona != nil {
+		return *m.Persona
+	}
+	return ""
 }
 
 type CDOTAUserMsg_StatsHeroMinuteDetails struct {
@@ -3856,6 +4015,7 @@ type CDOTAUserMsg_StatsKillDetails struct {
 	DamageToKill     *uint32                              `protobuf:"varint,3,opt,name=damage_to_kill" json:"damage_to_kill,omitempty"`
 	EffectiveHealth  *uint32                              `protobuf:"varint,4,opt,name=effective_health" json:"effective_health,omitempty"`
 	DeathTime        *float32                             `protobuf:"fixed32,5,opt,name=death_time" json:"death_time,omitempty"`
+	KillerId         *uint32                              `protobuf:"varint,6,opt,name=killer_id" json:"killer_id,omitempty"`
 	XXX_unrecognized []byte                               `json:"-"`
 }
 
@@ -3894,6 +4054,13 @@ func (m *CDOTAUserMsg_StatsKillDetails) GetEffectiveHealth() uint32 {
 func (m *CDOTAUserMsg_StatsKillDetails) GetDeathTime() float32 {
 	if m != nil && m.DeathTime != nil {
 		return *m.DeathTime
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsKillDetails) GetKillerId() uint32 {
+	if m != nil && m.KillerId != nil {
+		return *m.KillerId
 	}
 	return 0
 }
@@ -4054,5 +4221,6 @@ func init() {
 	proto.RegisterEnum("dota.DOTA_PARTICLE_MESSAGE", DOTA_PARTICLE_MESSAGE_name, DOTA_PARTICLE_MESSAGE_value)
 	proto.RegisterEnum("dota.DOTA_OVERHEAD_ALERT", DOTA_OVERHEAD_ALERT_name, DOTA_OVERHEAD_ALERT_value)
 	proto.RegisterEnum("dota.EHeroStatType", EHeroStatType_name, EHeroStatType_value)
+	proto.RegisterEnum("dota.CDOTAUserMsg_PredictionResult_Prediction_EResult", CDOTAUserMsg_PredictionResult_Prediction_EResult_name, CDOTAUserMsg_PredictionResult_Prediction_EResult_value)
 	proto.RegisterEnum("dota.CDOTAResponseQuerySerialized_Fact_ValueType", CDOTAResponseQuerySerialized_Fact_ValueType_name, CDOTAResponseQuerySerialized_Fact_ValueType_value)
 }

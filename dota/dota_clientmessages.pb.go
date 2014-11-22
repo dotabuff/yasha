@@ -51,6 +51,7 @@ const (
 	EDotaClientMessages_DOTA_CM_FreeInventory                          EDotaClientMessages = 31
 	EDotaClientMessages_DOTA_CM_BuyBackStateAlert                      EDotaClientMessages = 32
 	EDotaClientMessages_DOTA_CM_QuickBuyAlert                          EDotaClientMessages = 33
+	EDotaClientMessages_DOTA_CM_HeroStatueLike                         EDotaClientMessages = 34
 )
 
 var EDotaClientMessages_name = map[int32]string{
@@ -87,6 +88,7 @@ var EDotaClientMessages_name = map[int32]string{
 	31: "DOTA_CM_FreeInventory",
 	32: "DOTA_CM_BuyBackStateAlert",
 	33: "DOTA_CM_QuickBuyAlert",
+	34: "DOTA_CM_HeroStatueLike",
 }
 var EDotaClientMessages_value = map[string]int32{
 	"DOTA_CM_MapLine":                                1,
@@ -122,6 +124,7 @@ var EDotaClientMessages_value = map[string]int32{
 	"DOTA_CM_FreeInventory":                          31,
 	"DOTA_CM_BuyBackStateAlert":                      32,
 	"DOTA_CM_QuickBuyAlert":                          33,
+	"DOTA_CM_HeroStatueLike":                         34,
 }
 
 func (x EDotaClientMessages) Enum() *EDotaClientMessages {
@@ -757,6 +760,22 @@ func (m *CDOTAClientMsg_FreeInventory) GetEquips() []*CAdditionalEquipSlotClient
 		return m.Equips
 	}
 	return nil
+}
+
+type CDOTAClientMsg_HeroStatueLike struct {
+	OwnerPlayerId    *uint32 `protobuf:"varint,1,opt,name=owner_player_id" json:"owner_player_id,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CDOTAClientMsg_HeroStatueLike) Reset()         { *m = CDOTAClientMsg_HeroStatueLike{} }
+func (m *CDOTAClientMsg_HeroStatueLike) String() string { return proto.CompactTextString(m) }
+func (*CDOTAClientMsg_HeroStatueLike) ProtoMessage()    {}
+
+func (m *CDOTAClientMsg_HeroStatueLike) GetOwnerPlayerId() uint32 {
+	if m != nil && m.OwnerPlayerId != nil {
+		return *m.OwnerPlayerId
+	}
+	return 0
 }
 
 func init() {

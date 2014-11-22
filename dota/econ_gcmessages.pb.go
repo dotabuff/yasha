@@ -1972,9 +1972,11 @@ func (m *CMsgRedeemCodeResponse) GetResponse() uint32 {
 }
 
 type CMsgDevNewItemRequest struct {
-	ItemDefName      *string `protobuf:"bytes,3,opt,name=item_def_name" json:"item_def_name,omitempty"`
-	LootListName     *string `protobuf:"bytes,4,opt,name=loot_list_name" json:"loot_list_name,omitempty"`
-	XXX_unrecognized []byte  `json:"-"`
+	ItemDefName      *string  `protobuf:"bytes,3,opt,name=item_def_name" json:"item_def_name,omitempty"`
+	LootListName     *string  `protobuf:"bytes,4,opt,name=loot_list_name" json:"loot_list_name,omitempty"`
+	AttrDefName      []string `protobuf:"bytes,5,rep,name=attr_def_name" json:"attr_def_name,omitempty"`
+	AttrValue        []string `protobuf:"bytes,6,rep,name=attr_value" json:"attr_value,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
 }
 
 func (m *CMsgDevNewItemRequest) Reset()         { *m = CMsgDevNewItemRequest{} }
@@ -1993,6 +1995,20 @@ func (m *CMsgDevNewItemRequest) GetLootListName() string {
 		return *m.LootListName
 	}
 	return ""
+}
+
+func (m *CMsgDevNewItemRequest) GetAttrDefName() []string {
+	if m != nil {
+		return m.AttrDefName
+	}
+	return nil
+}
+
+func (m *CMsgDevNewItemRequest) GetAttrValue() []string {
+	if m != nil {
+		return m.AttrValue
+	}
+	return nil
 }
 
 type CMsgDevNewItemRequestResponse struct {

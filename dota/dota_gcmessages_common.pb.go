@@ -485,15 +485,34 @@ const (
 	EDOTAGCMsg_k_EMsgClientToGCSetProfileCardSlot                         EDOTAGCMsg = 7538
 	EDOTAGCMsg_k_EMsgGCToClientProfileCardUpdated                         EDOTAGCMsg = 7539
 	EDOTAGCMsg_k_EMsgServerToGCVictoryPredictions                         EDOTAGCMsg = 7540
-	EDOTAGCMsg_k_EMsgGCToGCProcessVictoryPredictionRecord                 EDOTAGCMsg = 7541
 	EDOTAGCMsg_k_EMsgClientToGCMarkNotificationListRead                   EDOTAGCMsg = 7542
 	EDOTAGCMsg_k_EMsgGCToClientNewNotificationAdded                       EDOTAGCMsg = 7543
 	EDOTAGCMsg_k_EMsgServerToGCSuspiciousActivity                         EDOTAGCMsg = 7544
 	EDOTAGCMsg_k_EMsgSignOutCommunicationSummary                          EDOTAGCMsg = 7545
 	EDOTAGCMsg_k_EMsgServerToGCRequestStatus_Response                     EDOTAGCMsg = 7546
+	EDOTAGCMsg_k_EMsgClientToGCCreateHeroStatue                           EDOTAGCMsg = 7547
+	EDOTAGCMsg_k_EMsgGCToClientHeroStatueCreateResult                     EDOTAGCMsg = 7548
 	EDOTAGCMsg_k_EMsgGCGCToLANServerRelayConnect                          EDOTAGCMsg = 7549
-	EDOTAGCMsg_k_EMsgGCToGCFantasySetMatchLeague                          EDOTAGCMsg = 7555
+	EDOTAGCMsg_k_EMsgSignOutAssassinMiniGameInfo                          EDOTAGCMsg = 7550
+	EDOTAGCMsg_k_EMsgServerToGCGetIngameEventData                         EDOTAGCMsg = 7551
+	EDOTAGCMsg_k_EMsgGCToGCUpdateIngameEventDataBroadcast                 EDOTAGCMsg = 7552
+	EDOTAGCMsg_k_EMsgGCToServerIngameEventData_OraclePA                   EDOTAGCMsg = 7553
+	EDOTAGCMsg_k_EMsgServerToGCReportKillSummaries                        EDOTAGCMsg = 7554
+	EDOTAGCMsg_k_EMsgGCToGCReportKillSummaries                            EDOTAGCMsg = 7555
+	EDOTAGCMsg_k_EMsgGCToGCUpdateAssassinMinigame                         EDOTAGCMsg = 7556
+	EDOTAGCMsg_k_EMsgGCToGCFantasySetMatchLeague                          EDOTAGCMsg = 7557
 	EDOTAGCMsg_k_EMsgClientToGCRecordCompendiumStats                      EDOTAGCMsg = 7558
+	EDOTAGCMsg_k_EMsgGCItemEditorRequestLeagueInfo                        EDOTAGCMsg = 7559
+	EDOTAGCMsg_k_EMsgGCItemEditorLeagueInfoResponse                       EDOTAGCMsg = 7560
+	EDOTAGCMsg_k_EMsgGCToGCUpdatePlayerPredictions                        EDOTAGCMsg = 7561
+	EDOTAGCMsg_k_EMsgGCToServerPredictionResult                           EDOTAGCMsg = 7562
+	EDOTAGCMsg_k_EMsgServerToGCSignoutAwardAdditionalDrops                EDOTAGCMsg = 7563
+	EDOTAGCMsg_k_EMsgGCToGCSignoutAwardAdditionalDrops                    EDOTAGCMsg = 7564
+	EDOTAGCMsg_k_EMsgGCToClientEventStatusChanged                         EDOTAGCMsg = 7565
+	EDOTAGCMsg_k_EMsgGCHasItemDefsQuery                                   EDOTAGCMsg = 7566
+	EDOTAGCMsg_k_EMsgGCHasItemDefsResponse                                EDOTAGCMsg = 7567
+	EDOTAGCMsg_k_EMsgClientToGCRecordStatueStats                          EDOTAGCMsg = 7568
+	EDOTAGCMsg_k_EMsgGCToGCReplayMonitorValidateReplay                    EDOTAGCMsg = 7569
 	EDOTAGCMsg_k_EMsgGCDev_GrantWarKill                                   EDOTAGCMsg = 8001
 )
 
@@ -967,15 +986,34 @@ var EDOTAGCMsg_name = map[int32]string{
 	7538: "k_EMsgClientToGCSetProfileCardSlot",
 	7539: "k_EMsgGCToClientProfileCardUpdated",
 	7540: "k_EMsgServerToGCVictoryPredictions",
-	7541: "k_EMsgGCToGCProcessVictoryPredictionRecord",
 	7542: "k_EMsgClientToGCMarkNotificationListRead",
 	7543: "k_EMsgGCToClientNewNotificationAdded",
 	7544: "k_EMsgServerToGCSuspiciousActivity",
 	7545: "k_EMsgSignOutCommunicationSummary",
 	7546: "k_EMsgServerToGCRequestStatus_Response",
+	7547: "k_EMsgClientToGCCreateHeroStatue",
+	7548: "k_EMsgGCToClientHeroStatueCreateResult",
 	7549: "k_EMsgGCGCToLANServerRelayConnect",
-	7555: "k_EMsgGCToGCFantasySetMatchLeague",
+	7550: "k_EMsgSignOutAssassinMiniGameInfo",
+	7551: "k_EMsgServerToGCGetIngameEventData",
+	7552: "k_EMsgGCToGCUpdateIngameEventDataBroadcast",
+	7553: "k_EMsgGCToServerIngameEventData_OraclePA",
+	7554: "k_EMsgServerToGCReportKillSummaries",
+	7555: "k_EMsgGCToGCReportKillSummaries",
+	7556: "k_EMsgGCToGCUpdateAssassinMinigame",
+	7557: "k_EMsgGCToGCFantasySetMatchLeague",
 	7558: "k_EMsgClientToGCRecordCompendiumStats",
+	7559: "k_EMsgGCItemEditorRequestLeagueInfo",
+	7560: "k_EMsgGCItemEditorLeagueInfoResponse",
+	7561: "k_EMsgGCToGCUpdatePlayerPredictions",
+	7562: "k_EMsgGCToServerPredictionResult",
+	7563: "k_EMsgServerToGCSignoutAwardAdditionalDrops",
+	7564: "k_EMsgGCToGCSignoutAwardAdditionalDrops",
+	7565: "k_EMsgGCToClientEventStatusChanged",
+	7566: "k_EMsgGCHasItemDefsQuery",
+	7567: "k_EMsgGCHasItemDefsResponse",
+	7568: "k_EMsgClientToGCRecordStatueStats",
+	7569: "k_EMsgGCToGCReplayMonitorValidateReplay",
 	8001: "k_EMsgGCDev_GrantWarKill",
 }
 var EDOTAGCMsg_value = map[string]int32{
@@ -1448,15 +1486,34 @@ var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgClientToGCSetProfileCardSlot":                         7538,
 	"k_EMsgGCToClientProfileCardUpdated":                         7539,
 	"k_EMsgServerToGCVictoryPredictions":                         7540,
-	"k_EMsgGCToGCProcessVictoryPredictionRecord":                 7541,
 	"k_EMsgClientToGCMarkNotificationListRead":                   7542,
 	"k_EMsgGCToClientNewNotificationAdded":                       7543,
 	"k_EMsgServerToGCSuspiciousActivity":                         7544,
 	"k_EMsgSignOutCommunicationSummary":                          7545,
 	"k_EMsgServerToGCRequestStatus_Response":                     7546,
+	"k_EMsgClientToGCCreateHeroStatue":                           7547,
+	"k_EMsgGCToClientHeroStatueCreateResult":                     7548,
 	"k_EMsgGCGCToLANServerRelayConnect":                          7549,
-	"k_EMsgGCToGCFantasySetMatchLeague":                          7555,
+	"k_EMsgSignOutAssassinMiniGameInfo":                          7550,
+	"k_EMsgServerToGCGetIngameEventData":                         7551,
+	"k_EMsgGCToGCUpdateIngameEventDataBroadcast":                 7552,
+	"k_EMsgGCToServerIngameEventData_OraclePA":                   7553,
+	"k_EMsgServerToGCReportKillSummaries":                        7554,
+	"k_EMsgGCToGCReportKillSummaries":                            7555,
+	"k_EMsgGCToGCUpdateAssassinMinigame":                         7556,
+	"k_EMsgGCToGCFantasySetMatchLeague":                          7557,
 	"k_EMsgClientToGCRecordCompendiumStats":                      7558,
+	"k_EMsgGCItemEditorRequestLeagueInfo":                        7559,
+	"k_EMsgGCItemEditorLeagueInfoResponse":                       7560,
+	"k_EMsgGCToGCUpdatePlayerPredictions":                        7561,
+	"k_EMsgGCToServerPredictionResult":                           7562,
+	"k_EMsgServerToGCSignoutAwardAdditionalDrops":                7563,
+	"k_EMsgGCToGCSignoutAwardAdditionalDrops":                    7564,
+	"k_EMsgGCToClientEventStatusChanged":                         7565,
+	"k_EMsgGCHasItemDefsQuery":                                   7566,
+	"k_EMsgGCHasItemDefsResponse":                                7567,
+	"k_EMsgClientToGCRecordStatueStats":                          7568,
+	"k_EMsgGCToGCReplayMonitorValidateReplay":                    7569,
 	"k_EMsgGCDev_GrantWarKill":                                   8001,
 }
 
@@ -2317,6 +2374,36 @@ func (x *ETournamentType) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*x = ETournamentType(value)
+	return nil
+}
+
+type EIngameEvent int32
+
+const (
+	EIngameEvent_k_EIngameEvent_OraclePA EIngameEvent = 0
+)
+
+var EIngameEvent_name = map[int32]string{
+	0: "k_EIngameEvent_OraclePA",
+}
+var EIngameEvent_value = map[string]int32{
+	"k_EIngameEvent_OraclePA": 0,
+}
+
+func (x EIngameEvent) Enum() *EIngameEvent {
+	p := new(EIngameEvent)
+	*p = x
+	return p
+}
+func (x EIngameEvent) String() string {
+	return proto.EnumName(EIngameEvent_name, int32(x))
+}
+func (x *EIngameEvent) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(EIngameEvent_value, data, "EIngameEvent")
+	if err != nil {
+		return err
+	}
+	*x = EIngameEvent(value)
 	return nil
 }
 
@@ -4190,6 +4277,7 @@ type CLobbyTimedRewardDetails struct {
 	IsSupplyCrate    *bool   `protobuf:"varint,3,opt,name=is_supply_crate" json:"is_supply_crate,omitempty"`
 	IsTimedDrop      *bool   `protobuf:"varint,4,opt,name=is_timed_drop" json:"is_timed_drop,omitempty"`
 	AccountId        *uint32 `protobuf:"varint,5,opt,name=account_id" json:"account_id,omitempty"`
+	Origin           *uint32 `protobuf:"varint,6,opt,name=origin" json:"origin,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -4221,6 +4309,13 @@ func (m *CLobbyTimedRewardDetails) GetIsTimedDrop() bool {
 func (m *CLobbyTimedRewardDetails) GetAccountId() uint32 {
 	if m != nil && m.AccountId != nil {
 		return *m.AccountId
+	}
+	return 0
+}
+
+func (m *CLobbyTimedRewardDetails) GetOrigin() uint32 {
+	if m != nil && m.Origin != nil {
+		return *m.Origin
 	}
 	return 0
 }
@@ -4321,6 +4416,7 @@ type CSODOTALobby struct {
 	DiscardMatchResults  *bool                         `protobuf:"varint,66,opt,name=discard_match_results" json:"discard_match_results,omitempty"`
 	MassDisconnect       *bool                         `protobuf:"varint,67,opt,name=mass_disconnect" json:"mass_disconnect,omitempty"`
 	CustomGameId         *uint64                       `protobuf:"varint,68,opt,name=custom_game_id" json:"custom_game_id,omitempty"`
+	ActiveIngameEvents   []EIngameEvent                `protobuf:"varint,69,rep,name=active_ingame_events,enum=dota.EIngameEvent" json:"active_ingame_events,omitempty"`
 	XXX_unrecognized     []byte                        `json:"-"`
 }
 
@@ -4727,6 +4823,13 @@ func (m *CSODOTALobby) GetCustomGameId() uint64 {
 	return 0
 }
 
+func (m *CSODOTALobby) GetActiveIngameEvents() []EIngameEvent {
+	if m != nil {
+		return m.ActiveIngameEvents
+	}
+	return nil
+}
+
 type CSODOTALobby_CExtraMsg struct {
 	Id               *uint32 `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
 	Contents         []byte  `protobuf:"bytes,2,opt,name=contents" json:"contents,omitempty"`
@@ -4911,6 +5014,70 @@ func (m *CAttribute_ItemDynamicRecipeComponent) GetFulfilledItemId() uint64 {
 		return *m.FulfilledItemId
 	}
 	return 0
+}
+
+type CProtoItemHeroStatue struct {
+	HeroId            *uint32  `protobuf:"varint,1,opt,name=hero_id" json:"hero_id,omitempty"`
+	StatusEffectIndex *uint32  `protobuf:"varint,2,opt,name=status_effect_index" json:"status_effect_index,omitempty"`
+	SequenceName      *string  `protobuf:"bytes,3,opt,name=sequence_name" json:"sequence_name,omitempty"`
+	Cycle             *float32 `protobuf:"fixed32,4,opt,name=cycle" json:"cycle,omitempty"`
+	Wearable          []uint32 `protobuf:"varint,5,rep,name=wearable" json:"wearable,omitempty"`
+	Inscription       *string  `protobuf:"bytes,6,opt,name=inscription" json:"inscription,omitempty"`
+	Style             []uint32 `protobuf:"varint,7,rep,name=style" json:"style,omitempty"`
+	XXX_unrecognized  []byte   `json:"-"`
+}
+
+func (m *CProtoItemHeroStatue) Reset()         { *m = CProtoItemHeroStatue{} }
+func (m *CProtoItemHeroStatue) String() string { return proto.CompactTextString(m) }
+func (*CProtoItemHeroStatue) ProtoMessage()    {}
+
+func (m *CProtoItemHeroStatue) GetHeroId() uint32 {
+	if m != nil && m.HeroId != nil {
+		return *m.HeroId
+	}
+	return 0
+}
+
+func (m *CProtoItemHeroStatue) GetStatusEffectIndex() uint32 {
+	if m != nil && m.StatusEffectIndex != nil {
+		return *m.StatusEffectIndex
+	}
+	return 0
+}
+
+func (m *CProtoItemHeroStatue) GetSequenceName() string {
+	if m != nil && m.SequenceName != nil {
+		return *m.SequenceName
+	}
+	return ""
+}
+
+func (m *CProtoItemHeroStatue) GetCycle() float32 {
+	if m != nil && m.Cycle != nil {
+		return *m.Cycle
+	}
+	return 0
+}
+
+func (m *CProtoItemHeroStatue) GetWearable() []uint32 {
+	if m != nil {
+		return m.Wearable
+	}
+	return nil
+}
+
+func (m *CProtoItemHeroStatue) GetInscription() string {
+	if m != nil && m.Inscription != nil {
+		return *m.Inscription
+	}
+	return ""
+}
+
+func (m *CProtoItemHeroStatue) GetStyle() []uint32 {
+	if m != nil {
+		return m.Style
+	}
+	return nil
 }
 
 type CProtoItemSocket struct {
@@ -5397,6 +5564,46 @@ func (*CMsgDOTAHasItemResponse) ProtoMessage()    {}
 func (m *CMsgDOTAHasItemResponse) GetHasItem() bool {
 	if m != nil && m.HasItem != nil {
 		return *m.HasItem
+	}
+	return false
+}
+
+type CMsgDOTAHasItemDefsQuery struct {
+	AccountId        *uint32  `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	ItemdefIds       []uint32 `protobuf:"varint,2,rep,name=itemdef_ids" json:"itemdef_ids,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
+}
+
+func (m *CMsgDOTAHasItemDefsQuery) Reset()         { *m = CMsgDOTAHasItemDefsQuery{} }
+func (m *CMsgDOTAHasItemDefsQuery) String() string { return proto.CompactTextString(m) }
+func (*CMsgDOTAHasItemDefsQuery) ProtoMessage()    {}
+
+func (m *CMsgDOTAHasItemDefsQuery) GetAccountId() uint32 {
+	if m != nil && m.AccountId != nil {
+		return *m.AccountId
+	}
+	return 0
+}
+
+func (m *CMsgDOTAHasItemDefsQuery) GetItemdefIds() []uint32 {
+	if m != nil {
+		return m.ItemdefIds
+	}
+	return nil
+}
+
+type CMsgDOTAHasItemDefsResponse struct {
+	HasItems         *bool  `protobuf:"varint,1,opt,name=has_items" json:"has_items,omitempty"`
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *CMsgDOTAHasItemDefsResponse) Reset()         { *m = CMsgDOTAHasItemDefsResponse{} }
+func (m *CMsgDOTAHasItemDefsResponse) String() string { return proto.CompactTextString(m) }
+func (*CMsgDOTAHasItemDefsResponse) ProtoMessage()    {}
+
+func (m *CMsgDOTAHasItemDefsResponse) GetHasItems() bool {
+	if m != nil && m.HasItems != nil {
+		return *m.HasItems
 	}
 	return false
 }
@@ -6223,6 +6430,7 @@ func init() {
 	proto.RegisterEnum("dota.MatchLanguages", MatchLanguages_name, MatchLanguages_value)
 	proto.RegisterEnum("dota.ETournamentTemplate", ETournamentTemplate_name, ETournamentTemplate_value)
 	proto.RegisterEnum("dota.ETournamentType", ETournamentType_name, ETournamentType_value)
+	proto.RegisterEnum("dota.EIngameEvent", EIngameEvent_name, EIngameEvent_value)
 	proto.RegisterEnum("dota.LobbyDotaTVDelay", LobbyDotaTVDelay_name, LobbyDotaTVDelay_value)
 	proto.RegisterEnum("dota.EDOTAGCSessionNeed", EDOTAGCSessionNeed_name, EDOTAGCSessionNeed_value)
 	proto.RegisterEnum("dota.Fantasy_Roles", Fantasy_Roles_name, Fantasy_Roles_value)

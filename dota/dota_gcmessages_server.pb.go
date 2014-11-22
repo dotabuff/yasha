@@ -13,6 +13,45 @@ var _ = proto.Marshal
 var _ = &json.SyntaxError{}
 var _ = math.Inf
 
+type EPoorNetworkConditionsType int32
+
+const (
+	EPoorNetworkConditionsType_k_EPoorNetworkConditions_None                  EPoorNetworkConditionsType = 0
+	EPoorNetworkConditionsType_k_EPoorNetworkConditions_Unknown               EPoorNetworkConditionsType = 1
+	EPoorNetworkConditionsType_k_EPoorNetworkConditions_MassDisconnect        EPoorNetworkConditionsType = 2
+	EPoorNetworkConditionsType_k_EPoorNetworkConditions_ExcessBadQosIntervals EPoorNetworkConditionsType = 3
+)
+
+var EPoorNetworkConditionsType_name = map[int32]string{
+	0: "k_EPoorNetworkConditions_None",
+	1: "k_EPoorNetworkConditions_Unknown",
+	2: "k_EPoorNetworkConditions_MassDisconnect",
+	3: "k_EPoorNetworkConditions_ExcessBadQosIntervals",
+}
+var EPoorNetworkConditionsType_value = map[string]int32{
+	"k_EPoorNetworkConditions_None":                  0,
+	"k_EPoorNetworkConditions_Unknown":               1,
+	"k_EPoorNetworkConditions_MassDisconnect":        2,
+	"k_EPoorNetworkConditions_ExcessBadQosIntervals": 3,
+}
+
+func (x EPoorNetworkConditionsType) Enum() *EPoorNetworkConditionsType {
+	p := new(EPoorNetworkConditionsType)
+	*p = x
+	return p
+}
+func (x EPoorNetworkConditionsType) String() string {
+	return proto.EnumName(EPoorNetworkConditionsType_name, int32(x))
+}
+func (x *EPoorNetworkConditionsType) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(EPoorNetworkConditionsType_value, data, "EPoorNetworkConditionsType")
+	if err != nil {
+		return err
+	}
+	*x = EPoorNetworkConditionsType(value)
+	return nil
+}
+
 type EAbilityAbuseType int32
 
 const (
@@ -385,6 +424,39 @@ func (x *CMsgGameServerSaveGameResult_Result) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type CMsgGCToServerPredictionResult_Prediction_EResult int32
+
+const (
+	CMsgGCToServerPredictionResult_Prediction_k_eResult_ItemGranted CMsgGCToServerPredictionResult_Prediction_EResult = 1
+	CMsgGCToServerPredictionResult_Prediction_k_eResult_Destroyed   CMsgGCToServerPredictionResult_Prediction_EResult = 2
+)
+
+var CMsgGCToServerPredictionResult_Prediction_EResult_name = map[int32]string{
+	1: "k_eResult_ItemGranted",
+	2: "k_eResult_Destroyed",
+}
+var CMsgGCToServerPredictionResult_Prediction_EResult_value = map[string]int32{
+	"k_eResult_ItemGranted": 1,
+	"k_eResult_Destroyed":   2,
+}
+
+func (x CMsgGCToServerPredictionResult_Prediction_EResult) Enum() *CMsgGCToServerPredictionResult_Prediction_EResult {
+	p := new(CMsgGCToServerPredictionResult_Prediction_EResult)
+	*p = x
+	return p
+}
+func (x CMsgGCToServerPredictionResult_Prediction_EResult) String() string {
+	return proto.EnumName(CMsgGCToServerPredictionResult_Prediction_EResult_name, int32(x))
+}
+func (x *CMsgGCToServerPredictionResult_Prediction_EResult) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(CMsgGCToServerPredictionResult_Prediction_EResult_value, data, "CMsgGCToServerPredictionResult_Prediction_EResult")
+	if err != nil {
+		return err
+	}
+	*x = CMsgGCToServerPredictionResult_Prediction_EResult(value)
+	return nil
+}
+
 type CMsgSpawnLootGreevil struct {
 	Rare             *bool  `protobuf:"varint,1,opt,name=rare" json:"rare,omitempty"`
 	XXX_unrecognized []byte `json:"-"`
@@ -433,14 +505,84 @@ func (m *CMsgDismissLootGreevilResponse) Reset()         { *m = CMsgDismissLootG
 func (m *CMsgDismissLootGreevilResponse) String() string { return proto.CompactTextString(m) }
 func (*CMsgDismissLootGreevilResponse) ProtoMessage()    {}
 
+type CMsgPoorNetworkConditions struct {
+	DetectionType    *EPoorNetworkConditionsType         `protobuf:"varint,1,opt,name=detection_type,enum=dota.EPoorNetworkConditionsType,def=0" json:"detection_type,omitempty"`
+	Players          []*CMsgPoorNetworkConditions_Player `protobuf:"bytes,2,rep,name=players" json:"players,omitempty"`
+	XXX_unrecognized []byte                              `json:"-"`
+}
+
+func (m *CMsgPoorNetworkConditions) Reset()         { *m = CMsgPoorNetworkConditions{} }
+func (m *CMsgPoorNetworkConditions) String() string { return proto.CompactTextString(m) }
+func (*CMsgPoorNetworkConditions) ProtoMessage()    {}
+
+const Default_CMsgPoorNetworkConditions_DetectionType EPoorNetworkConditionsType = EPoorNetworkConditionsType_k_EPoorNetworkConditions_None
+
+func (m *CMsgPoorNetworkConditions) GetDetectionType() EPoorNetworkConditionsType {
+	if m != nil && m.DetectionType != nil {
+		return *m.DetectionType
+	}
+	return Default_CMsgPoorNetworkConditions_DetectionType
+}
+
+func (m *CMsgPoorNetworkConditions) GetPlayers() []*CMsgPoorNetworkConditions_Player {
+	if m != nil {
+		return m.Players
+	}
+	return nil
+}
+
+type CMsgPoorNetworkConditions_Player struct {
+	AccountId        *uint32                      `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	DisconnectReason *ENetworkDisconnectionReason `protobuf:"varint,2,opt,name=disconnect_reason,enum=dota.ENetworkDisconnectionReason,def=0" json:"disconnect_reason,omitempty"`
+	NumBadIntervals  *uint32                      `protobuf:"varint,3,opt,name=num_bad_intervals" json:"num_bad_intervals,omitempty"`
+	PeakLossPct      *uint32                      `protobuf:"varint,4,opt,name=peak_loss_pct" json:"peak_loss_pct,omitempty"`
+	XXX_unrecognized []byte                       `json:"-"`
+}
+
+func (m *CMsgPoorNetworkConditions_Player) Reset()         { *m = CMsgPoorNetworkConditions_Player{} }
+func (m *CMsgPoorNetworkConditions_Player) String() string { return proto.CompactTextString(m) }
+func (*CMsgPoorNetworkConditions_Player) ProtoMessage()    {}
+
+const Default_CMsgPoorNetworkConditions_Player_DisconnectReason ENetworkDisconnectionReason = ENetworkDisconnectionReason_NETWORK_DISCONNECT_INVALID
+
+func (m *CMsgPoorNetworkConditions_Player) GetAccountId() uint32 {
+	if m != nil && m.AccountId != nil {
+		return *m.AccountId
+	}
+	return 0
+}
+
+func (m *CMsgPoorNetworkConditions_Player) GetDisconnectReason() ENetworkDisconnectionReason {
+	if m != nil && m.DisconnectReason != nil {
+		return *m.DisconnectReason
+	}
+	return Default_CMsgPoorNetworkConditions_Player_DisconnectReason
+}
+
+func (m *CMsgPoorNetworkConditions_Player) GetNumBadIntervals() uint32 {
+	if m != nil && m.NumBadIntervals != nil {
+		return *m.NumBadIntervals
+	}
+	return 0
+}
+
+func (m *CMsgPoorNetworkConditions_Player) GetPeakLossPct() uint32 {
+	if m != nil && m.PeakLossPct != nil {
+		return *m.PeakLossPct
+	}
+	return 0
+}
+
 type CMsgConnectedPlayers struct {
-	ConnectedPlayers    []*CMsgConnectedPlayers_Player   `protobuf:"bytes,1,rep,name=connected_players" json:"connected_players,omitempty"`
-	DisconnectedPlayers []*CMsgConnectedPlayers_Player   `protobuf:"bytes,7,rep,name=disconnected_players" json:"disconnected_players,omitempty"`
-	GameState           *DOTA_GameState                  `protobuf:"varint,2,opt,name=game_state,enum=dota.DOTA_GameState,def=0" json:"game_state,omitempty"`
-	TowerState          *uint32                          `protobuf:"varint,4,opt,name=tower_state" json:"tower_state,omitempty"`
-	FirstBloodHappened  *bool                            `protobuf:"varint,6,opt,name=first_blood_happened" json:"first_blood_happened,omitempty"`
-	SendReason          *CMsgConnectedPlayers_SendReason `protobuf:"varint,8,opt,name=send_reason,enum=dota.CMsgConnectedPlayers_SendReason,def=0" json:"send_reason,omitempty"`
-	XXX_unrecognized    []byte                           `json:"-"`
+	ConnectedPlayers      []*CMsgConnectedPlayers_Player   `protobuf:"bytes,1,rep,name=connected_players" json:"connected_players,omitempty"`
+	DisconnectedPlayers   []*CMsgConnectedPlayers_Player   `protobuf:"bytes,7,rep,name=disconnected_players" json:"disconnected_players,omitempty"`
+	GameState             *DOTA_GameState                  `protobuf:"varint,2,opt,name=game_state,enum=dota.DOTA_GameState,def=0" json:"game_state,omitempty"`
+	TowerState            *uint32                          `protobuf:"varint,4,opt,name=tower_state" json:"tower_state,omitempty"`
+	FirstBloodHappened    *bool                            `protobuf:"varint,6,opt,name=first_blood_happened" json:"first_blood_happened,omitempty"`
+	LegacyMassDisconnect  *bool                            `protobuf:"varint,9,opt,name=legacy_mass_disconnect" json:"legacy_mass_disconnect,omitempty"`
+	PoorNetworkConditions *CMsgPoorNetworkConditions       `protobuf:"bytes,10,opt,name=poor_network_conditions" json:"poor_network_conditions,omitempty"`
+	SendReason            *CMsgConnectedPlayers_SendReason `protobuf:"varint,8,opt,name=send_reason,enum=dota.CMsgConnectedPlayers_SendReason,def=0" json:"send_reason,omitempty"`
+	XXX_unrecognized      []byte                           `json:"-"`
 }
 
 func (m *CMsgConnectedPlayers) Reset()         { *m = CMsgConnectedPlayers{} }
@@ -483,6 +625,20 @@ func (m *CMsgConnectedPlayers) GetFirstBloodHappened() bool {
 		return *m.FirstBloodHappened
 	}
 	return false
+}
+
+func (m *CMsgConnectedPlayers) GetLegacyMassDisconnect() bool {
+	if m != nil && m.LegacyMassDisconnect != nil {
+		return *m.LegacyMassDisconnect
+	}
+	return false
+}
+
+func (m *CMsgConnectedPlayers) GetPoorNetworkConditions() *CMsgPoorNetworkConditions {
+	if m != nil {
+		return m.PoorNetworkConditions
+	}
+	return nil
 }
 
 func (m *CMsgConnectedPlayers) GetSendReason() CMsgConnectedPlayers_SendReason {
@@ -705,12 +861,13 @@ func (m *CMsgGameServerInfo) GetServerCluster() uint32 {
 }
 
 type CMsgLeaverDetected struct {
-	SteamId          *uint64                      `protobuf:"fixed64,1,opt,name=steam_id" json:"steam_id,omitempty"`
-	LeaverStatus     *DOTALeaverStatusT           `protobuf:"varint,2,opt,name=leaver_status,enum=dota.DOTALeaverStatusT,def=0" json:"leaver_status,omitempty"`
-	LeaverState      *CMsgLeaverState             `protobuf:"bytes,4,opt,name=leaver_state" json:"leaver_state,omitempty"`
-	ServerCluster    *uint32                      `protobuf:"varint,5,opt,name=server_cluster" json:"server_cluster,omitempty"`
-	DisconnectReason *ENetworkDisconnectionReason `protobuf:"varint,6,opt,name=disconnect_reason,enum=dota.ENetworkDisconnectionReason,def=0" json:"disconnect_reason,omitempty"`
-	XXX_unrecognized []byte                       `json:"-"`
+	SteamId               *uint64                      `protobuf:"fixed64,1,opt,name=steam_id" json:"steam_id,omitempty"`
+	LeaverStatus          *DOTALeaverStatusT           `protobuf:"varint,2,opt,name=leaver_status,enum=dota.DOTALeaverStatusT,def=0" json:"leaver_status,omitempty"`
+	LeaverState           *CMsgLeaverState             `protobuf:"bytes,4,opt,name=leaver_state" json:"leaver_state,omitempty"`
+	ServerCluster         *uint32                      `protobuf:"varint,5,opt,name=server_cluster" json:"server_cluster,omitempty"`
+	DisconnectReason      *ENetworkDisconnectionReason `protobuf:"varint,6,opt,name=disconnect_reason,enum=dota.ENetworkDisconnectionReason,def=0" json:"disconnect_reason,omitempty"`
+	PoorNetworkConditions *CMsgPoorNetworkConditions   `protobuf:"bytes,7,opt,name=poor_network_conditions" json:"poor_network_conditions,omitempty"`
+	XXX_unrecognized      []byte                       `json:"-"`
 }
 
 func (m *CMsgLeaverDetected) Reset()         { *m = CMsgLeaverDetected{} }
@@ -753,6 +910,13 @@ func (m *CMsgLeaverDetected) GetDisconnectReason() ENetworkDisconnectionReason {
 		return *m.DisconnectReason
 	}
 	return Default_CMsgLeaverDetected_DisconnectReason
+}
+
+func (m *CMsgLeaverDetected) GetPoorNetworkConditions() *CMsgPoorNetworkConditions {
+	if m != nil {
+		return m.PoorNetworkConditions
+	}
+	return nil
 }
 
 type CMsgLeaverDetectedResponse struct {
@@ -1006,11 +1170,22 @@ type CMsgGameMatchSignOut struct {
 	PlayerStrangeCountAdjustments []*CMsgEconPlayerStrangeCountAdjustment       `protobuf:"bytes,17,rep,name=player_strange_count_adjustments" json:"player_strange_count_adjustments,omitempty"`
 	AutomaticSurrender            *bool                                         `protobuf:"varint,18,opt,name=automatic_surrender" json:"automatic_surrender,omitempty"`
 	ServerVersion                 *uint32                                       `protobuf:"varint,19,opt,name=server_version" json:"server_version,omitempty"`
-	MassDisconnect                *bool                                         `protobuf:"varint,21,opt,name=mass_disconnect" json:"mass_disconnect,omitempty"`
+	LegacyMassDisconnect          *bool                                         `protobuf:"varint,21,opt,name=legacy_mass_disconnect" json:"legacy_mass_disconnect,omitempty"`
+	PoorNetworkConditions         *CMsgPoorNetworkConditions                    `protobuf:"bytes,35,opt,name=poor_network_conditions" json:"poor_network_conditions,omitempty"`
 	AdditionalMsgs                []*CMsgGameMatchSignOut_CAdditionalSignoutMsg `protobuf:"bytes,20,rep,name=additional_msgs" json:"additional_msgs,omitempty"`
 	AverageNetworthDelta          *int32                                        `protobuf:"zigzag32,22,opt,name=average_networth_delta" json:"average_networth_delta,omitempty"`
 	NetworthDeltaMin10            *int32                                        `protobuf:"zigzag32,23,opt,name=networth_delta_min10" json:"networth_delta_min10,omitempty"`
 	NetworthDeltaMin20            *int32                                        `protobuf:"zigzag32,24,opt,name=networth_delta_min20" json:"networth_delta_min20,omitempty"`
+	MaximumLosingNetworthLead     *int32                                        `protobuf:"zigzag32,25,opt,name=maximum_losing_networth_lead" json:"maximum_losing_networth_lead,omitempty"`
+	AverageExperienceDelta        *int32                                        `protobuf:"zigzag32,26,opt,name=average_experience_delta" json:"average_experience_delta,omitempty"`
+	ExperienceDeltaMin10          *int32                                        `protobuf:"zigzag32,27,opt,name=experience_delta_min10" json:"experience_delta_min10,omitempty"`
+	ExperienceDeltaMin20          *int32                                        `protobuf:"zigzag32,28,opt,name=experience_delta_min20" json:"experience_delta_min20,omitempty"`
+	BonusGoldWinnerMin10          *int32                                        `protobuf:"zigzag32,29,opt,name=bonus_gold_winner_min10" json:"bonus_gold_winner_min10,omitempty"`
+	BonusGoldWinnerMin20          *int32                                        `protobuf:"zigzag32,30,opt,name=bonus_gold_winner_min20" json:"bonus_gold_winner_min20,omitempty"`
+	BonusGoldWinnerTotal          *uint32                                       `protobuf:"varint,31,opt,name=bonus_gold_winner_total" json:"bonus_gold_winner_total,omitempty"`
+	BonusGoldLoserMin10           *int32                                        `protobuf:"zigzag32,32,opt,name=bonus_gold_loser_min10" json:"bonus_gold_loser_min10,omitempty"`
+	BonusGoldLoserMin20           *int32                                        `protobuf:"zigzag32,33,opt,name=bonus_gold_loser_min20" json:"bonus_gold_loser_min20,omitempty"`
+	BonusGoldLoserTotal           *uint32                                       `protobuf:"varint,34,opt,name=bonus_gold_loser_total" json:"bonus_gold_loser_total,omitempty"`
 	XXX_unrecognized              []byte                                        `json:"-"`
 }
 
@@ -1144,11 +1319,18 @@ func (m *CMsgGameMatchSignOut) GetServerVersion() uint32 {
 	return 0
 }
 
-func (m *CMsgGameMatchSignOut) GetMassDisconnect() bool {
-	if m != nil && m.MassDisconnect != nil {
-		return *m.MassDisconnect
+func (m *CMsgGameMatchSignOut) GetLegacyMassDisconnect() bool {
+	if m != nil && m.LegacyMassDisconnect != nil {
+		return *m.LegacyMassDisconnect
 	}
 	return false
+}
+
+func (m *CMsgGameMatchSignOut) GetPoorNetworkConditions() *CMsgPoorNetworkConditions {
+	if m != nil {
+		return m.PoorNetworkConditions
+	}
+	return nil
 }
 
 func (m *CMsgGameMatchSignOut) GetAdditionalMsgs() []*CMsgGameMatchSignOut_CAdditionalSignoutMsg {
@@ -1175,6 +1357,76 @@ func (m *CMsgGameMatchSignOut) GetNetworthDeltaMin10() int32 {
 func (m *CMsgGameMatchSignOut) GetNetworthDeltaMin20() int32 {
 	if m != nil && m.NetworthDeltaMin20 != nil {
 		return *m.NetworthDeltaMin20
+	}
+	return 0
+}
+
+func (m *CMsgGameMatchSignOut) GetMaximumLosingNetworthLead() int32 {
+	if m != nil && m.MaximumLosingNetworthLead != nil {
+		return *m.MaximumLosingNetworthLead
+	}
+	return 0
+}
+
+func (m *CMsgGameMatchSignOut) GetAverageExperienceDelta() int32 {
+	if m != nil && m.AverageExperienceDelta != nil {
+		return *m.AverageExperienceDelta
+	}
+	return 0
+}
+
+func (m *CMsgGameMatchSignOut) GetExperienceDeltaMin10() int32 {
+	if m != nil && m.ExperienceDeltaMin10 != nil {
+		return *m.ExperienceDeltaMin10
+	}
+	return 0
+}
+
+func (m *CMsgGameMatchSignOut) GetExperienceDeltaMin20() int32 {
+	if m != nil && m.ExperienceDeltaMin20 != nil {
+		return *m.ExperienceDeltaMin20
+	}
+	return 0
+}
+
+func (m *CMsgGameMatchSignOut) GetBonusGoldWinnerMin10() int32 {
+	if m != nil && m.BonusGoldWinnerMin10 != nil {
+		return *m.BonusGoldWinnerMin10
+	}
+	return 0
+}
+
+func (m *CMsgGameMatchSignOut) GetBonusGoldWinnerMin20() int32 {
+	if m != nil && m.BonusGoldWinnerMin20 != nil {
+		return *m.BonusGoldWinnerMin20
+	}
+	return 0
+}
+
+func (m *CMsgGameMatchSignOut) GetBonusGoldWinnerTotal() uint32 {
+	if m != nil && m.BonusGoldWinnerTotal != nil {
+		return *m.BonusGoldWinnerTotal
+	}
+	return 0
+}
+
+func (m *CMsgGameMatchSignOut) GetBonusGoldLoserMin10() int32 {
+	if m != nil && m.BonusGoldLoserMin10 != nil {
+		return *m.BonusGoldLoserMin10
+	}
+	return 0
+}
+
+func (m *CMsgGameMatchSignOut) GetBonusGoldLoserMin20() int32 {
+	if m != nil && m.BonusGoldLoserMin20 != nil {
+		return *m.BonusGoldLoserMin20
+	}
+	return 0
+}
+
+func (m *CMsgGameMatchSignOut) GetBonusGoldLoserTotal() uint32 {
+	if m != nil && m.BonusGoldLoserTotal != nil {
+		return *m.BonusGoldLoserTotal
 	}
 	return 0
 }
@@ -2032,6 +2284,8 @@ type CMsgDOTALiveScoreboardUpdate_Team struct {
 	Score            *uint32                                     `protobuf:"varint,2,opt,name=score" json:"score,omitempty"`
 	TowerState       *uint32                                     `protobuf:"varint,3,opt,name=tower_state" json:"tower_state,omitempty"`
 	BarracksState    *uint32                                     `protobuf:"varint,4,opt,name=barracks_state" json:"barracks_state,omitempty"`
+	HeroPicks        []uint32                                    `protobuf:"varint,5,rep,name=hero_picks" json:"hero_picks,omitempty"`
+	HeroBans         []uint32                                    `protobuf:"varint,6,rep,name=hero_bans" json:"hero_bans,omitempty"`
 	XXX_unrecognized []byte                                      `json:"-"`
 }
 
@@ -2065,6 +2319,20 @@ func (m *CMsgDOTALiveScoreboardUpdate_Team) GetBarracksState() uint32 {
 		return *m.BarracksState
 	}
 	return 0
+}
+
+func (m *CMsgDOTALiveScoreboardUpdate_Team) GetHeroPicks() []uint32 {
+	if m != nil {
+		return m.HeroPicks
+	}
+	return nil
+}
+
+func (m *CMsgDOTALiveScoreboardUpdate_Team) GetHeroBans() []uint32 {
+	if m != nil {
+		return m.HeroBans
+	}
+	return nil
 }
 
 type CMsgDOTALiveScoreboardUpdate_Team_Player struct {
@@ -3119,6 +3387,76 @@ func (m *CMsgDOTAAwardEventPoints_AwardPoints) GetTradeBanTime() uint32 {
 	return 0
 }
 
+type CMsgServerToGCSignoutAwardAdditionalDrops struct {
+	Drops            []*CMsgServerToGCSignoutAwardAdditionalDrops_AdditionalDrops `protobuf:"bytes,1,rep,name=drops" json:"drops,omitempty"`
+	MatchId          *uint64                                                      `protobuf:"varint,2,opt,name=match_id" json:"match_id,omitempty"`
+	XXX_unrecognized []byte                                                       `json:"-"`
+}
+
+func (m *CMsgServerToGCSignoutAwardAdditionalDrops) Reset() {
+	*m = CMsgServerToGCSignoutAwardAdditionalDrops{}
+}
+func (m *CMsgServerToGCSignoutAwardAdditionalDrops) String() string { return proto.CompactTextString(m) }
+func (*CMsgServerToGCSignoutAwardAdditionalDrops) ProtoMessage()    {}
+
+func (m *CMsgServerToGCSignoutAwardAdditionalDrops) GetDrops() []*CMsgServerToGCSignoutAwardAdditionalDrops_AdditionalDrops {
+	if m != nil {
+		return m.Drops
+	}
+	return nil
+}
+
+func (m *CMsgServerToGCSignoutAwardAdditionalDrops) GetMatchId() uint64 {
+	if m != nil && m.MatchId != nil {
+		return *m.MatchId
+	}
+	return 0
+}
+
+type CMsgServerToGCSignoutAwardAdditionalDrops_AdditionalDrops struct {
+	LootList         *string  `protobuf:"bytes,1,opt,name=loot_list" json:"loot_list,omitempty"`
+	PlayerAccountIds []uint32 `protobuf:"varint,2,rep,name=player_account_ids" json:"player_account_ids,omitempty"`
+	NoTrade          *bool    `protobuf:"varint,3,opt,name=no_trade" json:"no_trade,omitempty"`
+	RandomizeReward  *bool    `protobuf:"varint,4,opt,name=randomize_reward" json:"randomize_reward,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
+}
+
+func (m *CMsgServerToGCSignoutAwardAdditionalDrops_AdditionalDrops) Reset() {
+	*m = CMsgServerToGCSignoutAwardAdditionalDrops_AdditionalDrops{}
+}
+func (m *CMsgServerToGCSignoutAwardAdditionalDrops_AdditionalDrops) String() string {
+	return proto.CompactTextString(m)
+}
+func (*CMsgServerToGCSignoutAwardAdditionalDrops_AdditionalDrops) ProtoMessage() {}
+
+func (m *CMsgServerToGCSignoutAwardAdditionalDrops_AdditionalDrops) GetLootList() string {
+	if m != nil && m.LootList != nil {
+		return *m.LootList
+	}
+	return ""
+}
+
+func (m *CMsgServerToGCSignoutAwardAdditionalDrops_AdditionalDrops) GetPlayerAccountIds() []uint32 {
+	if m != nil {
+		return m.PlayerAccountIds
+	}
+	return nil
+}
+
+func (m *CMsgServerToGCSignoutAwardAdditionalDrops_AdditionalDrops) GetNoTrade() bool {
+	if m != nil && m.NoTrade != nil {
+		return *m.NoTrade
+	}
+	return false
+}
+
+func (m *CMsgServerToGCSignoutAwardAdditionalDrops_AdditionalDrops) GetRandomizeReward() bool {
+	if m != nil && m.RandomizeReward != nil {
+		return *m.RandomizeReward
+	}
+	return false
+}
+
 type CMsgDOTAUpdateTI4HeroQuest struct {
 	Players          []*CMsgDOTAUpdateTI4HeroQuest_Player `protobuf:"bytes,1,rep,name=players" json:"players,omitempty"`
 	MatchStartTime   *uint32                              `protobuf:"fixed32,2,opt,name=match_start_time" json:"match_start_time,omitempty"`
@@ -3521,7 +3859,6 @@ type CMsgServerToGCMatchConnectionStats_Player struct {
 	AccountId        *uint32  `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
 	Ip               *uint32  `protobuf:"fixed32,2,opt,name=ip" json:"ip,omitempty"`
 	AvgPingMs        *uint32  `protobuf:"varint,3,opt,name=avg_ping_ms" json:"avg_ping_ms,omitempty"`
-	PeakPingMs       *uint32  `protobuf:"varint,4,opt,name=peak_ping_ms" json:"peak_ping_ms,omitempty"`
 	PacketLoss       *float32 `protobuf:"fixed32,5,opt,name=packet_loss" json:"packet_loss,omitempty"`
 	PingDeviation    *float32 `protobuf:"fixed32,6,opt,name=ping_deviation" json:"ping_deviation,omitempty"`
 	FullResends      *uint32  `protobuf:"varint,7,opt,name=full_resends" json:"full_resends,omitempty"`
@@ -3551,13 +3888,6 @@ func (m *CMsgServerToGCMatchConnectionStats_Player) GetIp() uint32 {
 func (m *CMsgServerToGCMatchConnectionStats_Player) GetAvgPingMs() uint32 {
 	if m != nil && m.AvgPingMs != nil {
 		return *m.AvgPingMs
-	}
-	return 0
-}
-
-func (m *CMsgServerToGCMatchConnectionStats_Player) GetPeakPingMs() uint32 {
-	if m != nil && m.PeakPingMs != nil {
-		return *m.PeakPingMs
 	}
 	return 0
 }
@@ -3786,11 +4116,10 @@ func (m *CMsgServerToGCVictoryPredictions) GetRecords() []*CMsgServerToGCVictory
 }
 
 type CMsgServerToGCVictoryPredictions_Record struct {
-	AccountId        *uint32 `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
-	ItemId           *uint64 `protobuf:"varint,2,opt,name=item_id" json:"item_id,omitempty"`
-	Victory          *bool   `protobuf:"varint,3,opt,name=victory" json:"victory,omitempty"`
-	MatchId          *uint64 `protobuf:"varint,4,opt,name=match_id" json:"match_id,omitempty"`
-	XXX_unrecognized []byte  `json:"-"`
+	AccountId        *uint32  `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	ItemId           *uint64  `protobuf:"varint,2,opt,name=item_id" json:"item_id,omitempty"`
+	ItemIds          []uint64 `protobuf:"varint,5,rep,name=item_ids" json:"item_ids,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
 }
 
 func (m *CMsgServerToGCVictoryPredictions_Record) Reset() {
@@ -3813,18 +4142,11 @@ func (m *CMsgServerToGCVictoryPredictions_Record) GetItemId() uint64 {
 	return 0
 }
 
-func (m *CMsgServerToGCVictoryPredictions_Record) GetVictory() bool {
-	if m != nil && m.Victory != nil {
-		return *m.Victory
+func (m *CMsgServerToGCVictoryPredictions_Record) GetItemIds() []uint64 {
+	if m != nil {
+		return m.ItemIds
 	}
-	return false
-}
-
-func (m *CMsgServerToGCVictoryPredictions_Record) GetMatchId() uint64 {
-	if m != nil && m.MatchId != nil {
-		return *m.MatchId
-	}
-	return 0
+	return nil
 }
 
 type CMsgSuspiciousActivity struct {
@@ -3901,7 +4223,264 @@ func (m *CMsgServerToGCRequestStatus_Response) GetResponse() uint32 {
 	return 0
 }
 
+type CMsgSignOutAssassinMiniGameInfo struct {
+	WinningPlayers       []uint64 `protobuf:"fixed64,1,rep,name=winning_players" json:"winning_players,omitempty"`
+	LosingPlayers        []uint64 `protobuf:"fixed64,2,rep,name=losing_players" json:"losing_players,omitempty"`
+	ArcanaOwners         []uint64 `protobuf:"fixed64,3,rep,name=arcana_owners" json:"arcana_owners,omitempty"`
+	AssassinWon          *bool    `protobuf:"varint,4,opt,name=assassin_won" json:"assassin_won,omitempty"`
+	TargetHeroId         *uint32  `protobuf:"varint,5,opt,name=target_hero_id" json:"target_hero_id,omitempty"`
+	ContractCompleted    *bool    `protobuf:"varint,6,opt,name=contract_completed" json:"contract_completed,omitempty"`
+	ContractCompleteTime *float32 `protobuf:"fixed32,7,opt,name=contract_complete_time" json:"contract_complete_time,omitempty"`
+	PaIsRadiant          *bool    `protobuf:"varint,8,opt,name=pa_is_radiant" json:"pa_is_radiant,omitempty"`
+	XXX_unrecognized     []byte   `json:"-"`
+}
+
+func (m *CMsgSignOutAssassinMiniGameInfo) Reset()         { *m = CMsgSignOutAssassinMiniGameInfo{} }
+func (m *CMsgSignOutAssassinMiniGameInfo) String() string { return proto.CompactTextString(m) }
+func (*CMsgSignOutAssassinMiniGameInfo) ProtoMessage()    {}
+
+func (m *CMsgSignOutAssassinMiniGameInfo) GetWinningPlayers() []uint64 {
+	if m != nil {
+		return m.WinningPlayers
+	}
+	return nil
+}
+
+func (m *CMsgSignOutAssassinMiniGameInfo) GetLosingPlayers() []uint64 {
+	if m != nil {
+		return m.LosingPlayers
+	}
+	return nil
+}
+
+func (m *CMsgSignOutAssassinMiniGameInfo) GetArcanaOwners() []uint64 {
+	if m != nil {
+		return m.ArcanaOwners
+	}
+	return nil
+}
+
+func (m *CMsgSignOutAssassinMiniGameInfo) GetAssassinWon() bool {
+	if m != nil && m.AssassinWon != nil {
+		return *m.AssassinWon
+	}
+	return false
+}
+
+func (m *CMsgSignOutAssassinMiniGameInfo) GetTargetHeroId() uint32 {
+	if m != nil && m.TargetHeroId != nil {
+		return *m.TargetHeroId
+	}
+	return 0
+}
+
+func (m *CMsgSignOutAssassinMiniGameInfo) GetContractCompleted() bool {
+	if m != nil && m.ContractCompleted != nil {
+		return *m.ContractCompleted
+	}
+	return false
+}
+
+func (m *CMsgSignOutAssassinMiniGameInfo) GetContractCompleteTime() float32 {
+	if m != nil && m.ContractCompleteTime != nil {
+		return *m.ContractCompleteTime
+	}
+	return 0
+}
+
+func (m *CMsgSignOutAssassinMiniGameInfo) GetPaIsRadiant() bool {
+	if m != nil && m.PaIsRadiant != nil {
+		return *m.PaIsRadiant
+	}
+	return false
+}
+
+type CMsgServerToGCGetIngameEventData struct {
+	Event            *EIngameEvent `protobuf:"varint,1,opt,name=event,enum=dota.EIngameEvent,def=0" json:"event,omitempty"`
+	XXX_unrecognized []byte        `json:"-"`
+}
+
+func (m *CMsgServerToGCGetIngameEventData) Reset()         { *m = CMsgServerToGCGetIngameEventData{} }
+func (m *CMsgServerToGCGetIngameEventData) String() string { return proto.CompactTextString(m) }
+func (*CMsgServerToGCGetIngameEventData) ProtoMessage()    {}
+
+const Default_CMsgServerToGCGetIngameEventData_Event EIngameEvent = EIngameEvent_k_EIngameEvent_OraclePA
+
+func (m *CMsgServerToGCGetIngameEventData) GetEvent() EIngameEvent {
+	if m != nil && m.Event != nil {
+		return *m.Event
+	}
+	return Default_CMsgServerToGCGetIngameEventData_Event
+}
+
+type CMsgGCToServerIngameEventDataOraclePA struct {
+	TargetHeroIds    []uint32 `protobuf:"varint,1,rep,name=target_hero_ids" json:"target_hero_ids,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
+}
+
+func (m *CMsgGCToServerIngameEventDataOraclePA) Reset()         { *m = CMsgGCToServerIngameEventDataOraclePA{} }
+func (m *CMsgGCToServerIngameEventDataOraclePA) String() string { return proto.CompactTextString(m) }
+func (*CMsgGCToServerIngameEventDataOraclePA) ProtoMessage()    {}
+
+func (m *CMsgGCToServerIngameEventDataOraclePA) GetTargetHeroIds() []uint32 {
+	if m != nil {
+		return m.TargetHeroIds
+	}
+	return nil
+}
+
+type CMsgServerToGCKillSummaries struct {
+	IngameeventId    *uint32                                    `protobuf:"varint,1,opt,name=ingameevent_id" json:"ingameevent_id,omitempty"`
+	Summaries        []*CMsgServerToGCKillSummaries_KillSummary `protobuf:"bytes,2,rep,name=summaries" json:"summaries,omitempty"`
+	XXX_unrecognized []byte                                     `json:"-"`
+}
+
+func (m *CMsgServerToGCKillSummaries) Reset()         { *m = CMsgServerToGCKillSummaries{} }
+func (m *CMsgServerToGCKillSummaries) String() string { return proto.CompactTextString(m) }
+func (*CMsgServerToGCKillSummaries) ProtoMessage()    {}
+
+func (m *CMsgServerToGCKillSummaries) GetIngameeventId() uint32 {
+	if m != nil && m.IngameeventId != nil {
+		return *m.IngameeventId
+	}
+	return 0
+}
+
+func (m *CMsgServerToGCKillSummaries) GetSummaries() []*CMsgServerToGCKillSummaries_KillSummary {
+	if m != nil {
+		return m.Summaries
+	}
+	return nil
+}
+
+type CMsgServerToGCKillSummaries_KillSummary struct {
+	KillerHeroId     *uint32 `protobuf:"varint,1,opt,name=killer_hero_id" json:"killer_hero_id,omitempty"`
+	VictimHeroId     *uint32 `protobuf:"varint,2,opt,name=victim_hero_id" json:"victim_hero_id,omitempty"`
+	KillCount        *uint32 `protobuf:"varint,3,opt,name=kill_count" json:"kill_count,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgServerToGCKillSummaries_KillSummary) Reset() {
+	*m = CMsgServerToGCKillSummaries_KillSummary{}
+}
+func (m *CMsgServerToGCKillSummaries_KillSummary) String() string { return proto.CompactTextString(m) }
+func (*CMsgServerToGCKillSummaries_KillSummary) ProtoMessage()    {}
+
+func (m *CMsgServerToGCKillSummaries_KillSummary) GetKillerHeroId() uint32 {
+	if m != nil && m.KillerHeroId != nil {
+		return *m.KillerHeroId
+	}
+	return 0
+}
+
+func (m *CMsgServerToGCKillSummaries_KillSummary) GetVictimHeroId() uint32 {
+	if m != nil && m.VictimHeroId != nil {
+		return *m.VictimHeroId
+	}
+	return 0
+}
+
+func (m *CMsgServerToGCKillSummaries_KillSummary) GetKillCount() uint32 {
+	if m != nil && m.KillCount != nil {
+		return *m.KillCount
+	}
+	return 0
+}
+
+type CMsgGCToServerPredictionResult struct {
+	AccountId        *uint32                                      `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	MatchId          *uint64                                      `protobuf:"varint,2,opt,name=match_id" json:"match_id,omitempty"`
+	Correct          *bool                                        `protobuf:"varint,3,opt,name=correct" json:"correct,omitempty"`
+	Predictions      []*CMsgGCToServerPredictionResult_Prediction `protobuf:"bytes,4,rep,name=predictions" json:"predictions,omitempty"`
+	XXX_unrecognized []byte                                       `json:"-"`
+}
+
+func (m *CMsgGCToServerPredictionResult) Reset()         { *m = CMsgGCToServerPredictionResult{} }
+func (m *CMsgGCToServerPredictionResult) String() string { return proto.CompactTextString(m) }
+func (*CMsgGCToServerPredictionResult) ProtoMessage()    {}
+
+func (m *CMsgGCToServerPredictionResult) GetAccountId() uint32 {
+	if m != nil && m.AccountId != nil {
+		return *m.AccountId
+	}
+	return 0
+}
+
+func (m *CMsgGCToServerPredictionResult) GetMatchId() uint64 {
+	if m != nil && m.MatchId != nil {
+		return *m.MatchId
+	}
+	return 0
+}
+
+func (m *CMsgGCToServerPredictionResult) GetCorrect() bool {
+	if m != nil && m.Correct != nil {
+		return *m.Correct
+	}
+	return false
+}
+
+func (m *CMsgGCToServerPredictionResult) GetPredictions() []*CMsgGCToServerPredictionResult_Prediction {
+	if m != nil {
+		return m.Predictions
+	}
+	return nil
+}
+
+type CMsgGCToServerPredictionResult_Prediction struct {
+	ItemDef          *uint32                                            `protobuf:"varint,1,opt,name=item_def" json:"item_def,omitempty"`
+	NumCorrect       *uint32                                            `protobuf:"varint,2,opt,name=num_correct" json:"num_correct,omitempty"`
+	NumFails         *uint32                                            `protobuf:"varint,3,opt,name=num_fails" json:"num_fails,omitempty"`
+	Result           *CMsgGCToServerPredictionResult_Prediction_EResult `protobuf:"varint,4,opt,name=result,enum=dota.CMsgGCToServerPredictionResult_Prediction_EResult,def=1" json:"result,omitempty"`
+	GrantedItemDef   *uint32                                            `protobuf:"varint,5,opt,name=granted_item_def" json:"granted_item_def,omitempty"`
+	XXX_unrecognized []byte                                             `json:"-"`
+}
+
+func (m *CMsgGCToServerPredictionResult_Prediction) Reset() {
+	*m = CMsgGCToServerPredictionResult_Prediction{}
+}
+func (m *CMsgGCToServerPredictionResult_Prediction) String() string { return proto.CompactTextString(m) }
+func (*CMsgGCToServerPredictionResult_Prediction) ProtoMessage()    {}
+
+const Default_CMsgGCToServerPredictionResult_Prediction_Result CMsgGCToServerPredictionResult_Prediction_EResult = CMsgGCToServerPredictionResult_Prediction_k_eResult_ItemGranted
+
+func (m *CMsgGCToServerPredictionResult_Prediction) GetItemDef() uint32 {
+	if m != nil && m.ItemDef != nil {
+		return *m.ItemDef
+	}
+	return 0
+}
+
+func (m *CMsgGCToServerPredictionResult_Prediction) GetNumCorrect() uint32 {
+	if m != nil && m.NumCorrect != nil {
+		return *m.NumCorrect
+	}
+	return 0
+}
+
+func (m *CMsgGCToServerPredictionResult_Prediction) GetNumFails() uint32 {
+	if m != nil && m.NumFails != nil {
+		return *m.NumFails
+	}
+	return 0
+}
+
+func (m *CMsgGCToServerPredictionResult_Prediction) GetResult() CMsgGCToServerPredictionResult_Prediction_EResult {
+	if m != nil && m.Result != nil {
+		return *m.Result
+	}
+	return Default_CMsgGCToServerPredictionResult_Prediction_Result
+}
+
+func (m *CMsgGCToServerPredictionResult_Prediction) GetGrantedItemDef() uint32 {
+	if m != nil && m.GrantedItemDef != nil {
+		return *m.GrantedItemDef
+	}
+	return 0
+}
+
 func init() {
+	proto.RegisterEnum("dota.EPoorNetworkConditionsType", EPoorNetworkConditionsType_name, EPoorNetworkConditionsType_value)
 	proto.RegisterEnum("dota.EAbilityAbuseType", EAbilityAbuseType_name, EAbilityAbuseType_value)
 	proto.RegisterEnum("dota.EIntentionalFeedingType", EIntentionalFeedingType_name, EIntentionalFeedingType_value)
 	proto.RegisterEnum("dota.ESuspiciousActivity", ESuspiciousActivity_name, ESuspiciousActivity_value)
@@ -3910,4 +4489,5 @@ func init() {
 	proto.RegisterEnum("dota.CMsgGameServerInfo_ServerType", CMsgGameServerInfo_ServerType_name, CMsgGameServerInfo_ServerType_value)
 	proto.RegisterEnum("dota.CMsgDOTALiveScoreboardUpdate_Team_Player_DOTAUltimateState", CMsgDOTALiveScoreboardUpdate_Team_Player_DOTAUltimateState_name, CMsgDOTALiveScoreboardUpdate_Team_Player_DOTAUltimateState_value)
 	proto.RegisterEnum("dota.CMsgGameServerSaveGameResult_Result", CMsgGameServerSaveGameResult_Result_name, CMsgGameServerSaveGameResult_Result_value)
+	proto.RegisterEnum("dota.CMsgGCToServerPredictionResult_Prediction_EResult", CMsgGCToServerPredictionResult_Prediction_EResult_name, CMsgGCToServerPredictionResult_Prediction_EResult_value)
 }

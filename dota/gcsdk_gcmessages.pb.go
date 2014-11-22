@@ -52,17 +52,20 @@ const (
 	PartnerAccountType_PARTNER_NONE          PartnerAccountType = 0
 	PartnerAccountType_PARTNER_PERFECT_WORLD PartnerAccountType = 1
 	PartnerAccountType_PARTNER_NEXON         PartnerAccountType = 2
+	PartnerAccountType_PARTNER_INVALID       PartnerAccountType = 3
 )
 
 var PartnerAccountType_name = map[int32]string{
 	0: "PARTNER_NONE",
 	1: "PARTNER_PERFECT_WORLD",
 	2: "PARTNER_NEXON",
+	3: "PARTNER_INVALID",
 }
 var PartnerAccountType_value = map[string]int32{
 	"PARTNER_NONE":          0,
 	"PARTNER_PERFECT_WORLD": 1,
 	"PARTNER_NEXON":         2,
+	"PARTNER_INVALID":       3,
 }
 
 func (x PartnerAccountType) Enum() *PartnerAccountType {

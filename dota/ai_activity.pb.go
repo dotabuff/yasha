@@ -21,6 +21,7 @@ It is generated from these files:
 	econ_gcmessages.proto
 	gcsdk_gcmessages.proto
 	gcsystemmsgs.proto
+	htmlmessages.proto
 	netmessages.proto
 	networkbasetypes.proto
 	network_connection.proto

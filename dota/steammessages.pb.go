@@ -181,9 +181,9 @@ const (
 	CMsgDPPartnerMicroTxnsResponse_k_MsgNoTransactions          CMsgDPPartnerMicroTxnsResponse_EErrorCode = 3
 	CMsgDPPartnerMicroTxnsResponse_k_MsgSQLFailure              CMsgDPPartnerMicroTxnsResponse_EErrorCode = 4
 	CMsgDPPartnerMicroTxnsResponse_k_MsgPartnerInfoDiscrepancy  CMsgDPPartnerMicroTxnsResponse_EErrorCode = 5
-	CMsgDPPartnerMicroTxnsResponse_k_MsgTransactionDeleteFailed CMsgDPPartnerMicroTxnsResponse_EErrorCode = 6
 	CMsgDPPartnerMicroTxnsResponse_k_MsgTransactionInsertFailed CMsgDPPartnerMicroTxnsResponse_EErrorCode = 7
 	CMsgDPPartnerMicroTxnsResponse_k_MsgAlreadyRunning          CMsgDPPartnerMicroTxnsResponse_EErrorCode = 8
+	CMsgDPPartnerMicroTxnsResponse_k_MsgInvalidTransactionData  CMsgDPPartnerMicroTxnsResponse_EErrorCode = 9
 )
 
 var CMsgDPPartnerMicroTxnsResponse_EErrorCode_name = map[int32]string{
@@ -193,9 +193,9 @@ var CMsgDPPartnerMicroTxnsResponse_EErrorCode_name = map[int32]string{
 	3: "k_MsgNoTransactions",
 	4: "k_MsgSQLFailure",
 	5: "k_MsgPartnerInfoDiscrepancy",
-	6: "k_MsgTransactionDeleteFailed",
 	7: "k_MsgTransactionInsertFailed",
 	8: "k_MsgAlreadyRunning",
+	9: "k_MsgInvalidTransactionData",
 }
 var CMsgDPPartnerMicroTxnsResponse_EErrorCode_value = map[string]int32{
 	"k_MsgValid":                   0,
@@ -204,9 +204,9 @@ var CMsgDPPartnerMicroTxnsResponse_EErrorCode_value = map[string]int32{
 	"k_MsgNoTransactions":          3,
 	"k_MsgSQLFailure":              4,
 	"k_MsgPartnerInfoDiscrepancy":  5,
-	"k_MsgTransactionDeleteFailed": 6,
 	"k_MsgTransactionInsertFailed": 7,
 	"k_MsgAlreadyRunning":          8,
+	"k_MsgInvalidTransactionData":  9,
 }
 
 func (x CMsgDPPartnerMicroTxnsResponse_EErrorCode) Enum() *CMsgDPPartnerMicroTxnsResponse_EErrorCode {
