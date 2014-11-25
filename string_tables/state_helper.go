@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"code.google.com/p/gogoprotobuf/proto"
+	"github.com/golang/protobuf/proto"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/dotabuff/yasha/dota"
 	"github.com/dotabuff/yasha/parser"

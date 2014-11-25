@@ -3,7 +3,7 @@ package parser
 import (
 	"io/ioutil"
 
-	"code.google.com/p/gogoprotobuf/proto"
+	"github.com/golang/protobuf/proto"
 	"code.google.com/p/snappy-go/snappy"
 	"github.com/dotabuff/yasha/dota"
 )
