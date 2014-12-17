@@ -1,8 +1,5 @@
 package dota;
 
-import "google/protobuf/descriptor.proto";
-import "networkbasetypes.proto";
-
 enum EDotaBroadcastMessages {
 	DOTA_BM_LANLobbyRequest = 1;
 	DOTA_BM_LANLobbyReply = 2;

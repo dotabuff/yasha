@@ -4,13 +4,11 @@
 
 package dota
 
-import proto "github.com/golang/protobuf/proto"
-import json "encoding/json"
+import proto "code.google.com/p/goprotobuf/proto"
 import math "math"
 
-// Reference proto, json, and math imports to suppress error if they are not otherwise used.
+// Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
-var _ = &json.SyntaxError{}
 var _ = math.Inf
 
 type EPoorNetworkConditionsType int32
@@ -3820,6 +3818,7 @@ type CMsgServerToGCMatchConnectionStats struct {
 	RegionId         *uint32                                      `protobuf:"varint,2,opt,name=region_id" json:"region_id,omitempty"`
 	LeagueId         *uint32                                      `protobuf:"varint,3,opt,name=league_id" json:"league_id,omitempty"`
 	Players          []*CMsgServerToGCMatchConnectionStats_Player `protobuf:"bytes,4,rep,name=players" json:"players,omitempty"`
+	ClusterId        *uint32                                      `protobuf:"varint,5,opt,name=cluster_id" json:"cluster_id,omitempty"`
 	XXX_unrecognized []byte                                       `json:"-"`
 }
 
@@ -3853,6 +3852,13 @@ func (m *CMsgServerToGCMatchConnectionStats) GetPlayers() []*CMsgServerToGCMatch
 		return m.Players
 	}
 	return nil
+}
+
+func (m *CMsgServerToGCMatchConnectionStats) GetClusterId() uint32 {
+	if m != nil && m.ClusterId != nil {
+		return *m.ClusterId
+	}
+	return 0
 }
 
 type CMsgServerToGCMatchConnectionStats_Player struct {

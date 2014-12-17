@@ -4,13 +4,11 @@
 
 package dota
 
-import proto "github.com/golang/protobuf/proto"
-import json "encoding/json"
+import proto "code.google.com/p/goprotobuf/proto"
 import math "math"
 
-// Reference proto, json, and math imports to suppress error if they are not otherwise used.
+// Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
-var _ = &json.SyntaxError{}
 var _ = math.Inf
 
 type EGCItemMsg int32
@@ -104,6 +102,11 @@ const (
 	EGCItemMsg_k_EMsgGCRequestCrateItems                      EGCItemMsg = 1092
 	EGCItemMsg_k_EMsgGCRequestCrateItemsResponse              EGCItemMsg = 1093
 	EGCItemMsg_k_EMsgGCServerUseItemRequest                   EGCItemMsg = 1103
+	EGCItemMsg_k_EMsgGCAddGiftItem                            EGCItemMsg = 1104
+	EGCItemMsg_k_EMsgGCRemoveItemGiftMessage                  EGCItemMsg = 1105
+	EGCItemMsg_k_EMsgGCRemoveItemGiftMessageResponse          EGCItemMsg = 1106
+	EGCItemMsg_k_EMsgGCRemoveItemGifterAccountId              EGCItemMsg = 1107
+	EGCItemMsg_k_EMsgGCRemoveItemGifterAccountIdResponse      EGCItemMsg = 1108
 	EGCItemMsg_k_EMsgGCTradingBase                            EGCItemMsg = 1500
 	EGCItemMsg_k_EMsgGCTrading_InitiateTradeRequest           EGCItemMsg = 1501
 	EGCItemMsg_k_EMsgGCTrading_InitiateTradeResponse          EGCItemMsg = 1502
@@ -267,6 +270,11 @@ var EGCItemMsg_name = map[int32]string{
 	1092: "k_EMsgGCRequestCrateItems",
 	1093: "k_EMsgGCRequestCrateItemsResponse",
 	1103: "k_EMsgGCServerUseItemRequest",
+	1104: "k_EMsgGCAddGiftItem",
+	1105: "k_EMsgGCRemoveItemGiftMessage",
+	1106: "k_EMsgGCRemoveItemGiftMessageResponse",
+	1107: "k_EMsgGCRemoveItemGifterAccountId",
+	1108: "k_EMsgGCRemoveItemGifterAccountIdResponse",
 	1500: "k_EMsgGCTradingBase",
 	1501: "k_EMsgGCTrading_InitiateTradeRequest",
 	1502: "k_EMsgGCTrading_InitiateTradeResponse",
@@ -429,6 +437,11 @@ var EGCItemMsg_value = map[string]int32{
 	"k_EMsgGCRequestCrateItems":                      1092,
 	"k_EMsgGCRequestCrateItemsResponse":              1093,
 	"k_EMsgGCServerUseItemRequest":                   1103,
+	"k_EMsgGCAddGiftItem":                            1104,
+	"k_EMsgGCRemoveItemGiftMessage":                  1105,
+	"k_EMsgGCRemoveItemGiftMessageResponse":          1106,
+	"k_EMsgGCRemoveItemGifterAccountId":              1107,
+	"k_EMsgGCRemoveItemGifterAccountIdResponse":      1108,
 	"k_EMsgGCTradingBase":                            1500,
 	"k_EMsgGCTrading_InitiateTradeRequest":           1501,
 	"k_EMsgGCTrading_InitiateTradeResponse":          1502,
@@ -2025,6 +2038,30 @@ func (m *CMsgDevNewItemRequestResponse) GetSuccess() bool {
 		return *m.Success
 	}
 	return false
+}
+
+type CMsgGCAddGiftItem struct {
+	AccountId        *uint32 `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	ItemId           *uint64 `protobuf:"varint,2,opt,name=item_id" json:"item_id,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgGCAddGiftItem) Reset()         { *m = CMsgGCAddGiftItem{} }
+func (m *CMsgGCAddGiftItem) String() string { return proto.CompactTextString(m) }
+func (*CMsgGCAddGiftItem) ProtoMessage()    {}
+
+func (m *CMsgGCAddGiftItem) GetAccountId() uint32 {
+	if m != nil && m.AccountId != nil {
+		return *m.AccountId
+	}
+	return 0
+}
+
+func (m *CMsgGCAddGiftItem) GetItemId() uint64 {
+	if m != nil && m.ItemId != nil {
+		return *m.ItemId
+	}
+	return 0
 }
 
 func init() {

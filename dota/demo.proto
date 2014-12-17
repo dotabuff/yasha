@@ -1,7 +1,5 @@
 package dota;
 
-import "google/protobuf/descriptor.proto";
-
 enum EDemoCommands {
 	DEM_Error = -1;
 	DEM_Stop = 0;

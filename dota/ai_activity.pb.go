@@ -12,8 +12,8 @@ It is generated from these files:
 	dota_broadcastmessages.proto
 	dota_clientmessages.proto
 	dota_commonmessages.proto
-	dota_gcmessages_client_fantasy.proto
 	dota_gcmessages_client.proto
+	dota_gcmessages_client_fantasy.proto
 	dota_gcmessages_common.proto
 	dota_gcmessages_server.proto
 	dota_modifiers.proto
@@ -23,8 +23,8 @@ It is generated from these files:
 	gcsystemmsgs.proto
 	htmlmessages.proto
 	netmessages.proto
-	networkbasetypes.proto
 	network_connection.proto
+	networkbasetypes.proto
 	steammessages.proto
 	usermessages.proto
 
@@ -32,13 +32,11 @@ It has these top-level messages:
 */
 package dota
 
-import proto "github.com/golang/protobuf/proto"
-import json "encoding/json"
+import proto "code.google.com/p/goprotobuf/proto"
 import math "math"
 
-// Reference proto, json, and math imports to suppress error if they are not otherwise used.
+// Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
-var _ = &json.SyntaxError{}
 var _ = math.Inf
 
 type Activity int32

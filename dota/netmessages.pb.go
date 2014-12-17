@@ -4,15 +4,11 @@
 
 package dota
 
-import proto "github.com/golang/protobuf/proto"
-import json "encoding/json"
+import proto "code.google.com/p/goprotobuf/proto"
 import math "math"
 
-// discarding unused import google_protobuf "github.com/dotabuff/yasha/dota/google/protobuf/descriptor.pb"
-
-// Reference proto, json, and math imports to suppress error if they are not otherwise used.
+// Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
-var _ = &json.SyntaxError{}
 var _ = math.Inf
 
 type CLC_Messages int32
@@ -240,6 +236,42 @@ func (x *ESplitScreenMessageType) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*x = ESplitScreenMessageType(value)
+	return nil
+}
+
+type ENetworkSystemLimitReport int32
+
+const (
+	ENetworkSystemLimitReport_NSLR_GlobalPacketRateExceeded  ENetworkSystemLimitReport = 0
+	ENetworkSystemLimitReport_NSLR_ConnectionLessRateLimited ENetworkSystemLimitReport = 1
+	ENetworkSystemLimitReport_NSLR_NetChannelRateLimited     ENetworkSystemLimitReport = 2
+)
+
+var ENetworkSystemLimitReport_name = map[int32]string{
+	0: "NSLR_GlobalPacketRateExceeded",
+	1: "NSLR_ConnectionLessRateLimited",
+	2: "NSLR_NetChannelRateLimited",
+}
+var ENetworkSystemLimitReport_value = map[string]int32{
+	"NSLR_GlobalPacketRateExceeded":  0,
+	"NSLR_ConnectionLessRateLimited": 1,
+	"NSLR_NetChannelRateLimited":     2,
+}
+
+func (x ENetworkSystemLimitReport) Enum() *ENetworkSystemLimitReport {
+	p := new(ENetworkSystemLimitReport)
+	*p = x
+	return p
+}
+func (x ENetworkSystemLimitReport) String() string {
+	return proto.EnumName(ENetworkSystemLimitReport_name, int32(x))
+}
+func (x *ENetworkSystemLimitReport) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(ENetworkSystemLimitReport_value, data, "ENetworkSystemLimitReport")
+	if err != nil {
+		return err
+	}
+	*x = ENetworkSystemLimitReport(value)
 	return nil
 }
 
@@ -1792,4 +1824,5 @@ func init() {
 	proto.RegisterEnum("dota.SVC_Messages", SVC_Messages_name, SVC_Messages_value)
 	proto.RegisterEnum("dota.VoiceDataFormatT", VoiceDataFormatT_name, VoiceDataFormatT_value)
 	proto.RegisterEnum("dota.ESplitScreenMessageType", ESplitScreenMessageType_name, ESplitScreenMessageType_value)
+	proto.RegisterEnum("dota.ENetworkSystemLimitReport", ENetworkSystemLimitReport_name, ENetworkSystemLimitReport_value)
 }

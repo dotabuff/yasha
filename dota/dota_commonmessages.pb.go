@@ -4,15 +4,11 @@
 
 package dota
 
-import proto "github.com/golang/protobuf/proto"
-import json "encoding/json"
+import proto "code.google.com/p/goprotobuf/proto"
 import math "math"
 
-// discarding unused import google_protobuf "github.com/dotabuff/yasha/dota/google/protobuf/descriptor.pb"
-
-// Reference proto, json, and math imports to suppress error if they are not otherwise used.
+// Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
-var _ = &json.SyntaxError{}
 var _ = math.Inf
 
 type EDOTAChatWheelMessage int32
@@ -413,30 +409,6 @@ func (m *CDOTAMsg_ItemAlert) GetY() int32 {
 }
 
 func (m *CDOTAMsg_ItemAlert) GetItemid() int32 {
-	if m != nil && m.Itemid != nil {
-		return *m.Itemid
-	}
-	return 0
-}
-
-type CDOTAMsg_EnemyItemAlert struct {
-	PlayerId         *uint32 `protobuf:"varint,1,opt,name=player_id" json:"player_id,omitempty"`
-	Itemid           *int32  `protobuf:"varint,2,opt,name=itemid" json:"itemid,omitempty"`
-	XXX_unrecognized []byte  `json:"-"`
-}
-
-func (m *CDOTAMsg_EnemyItemAlert) Reset()         { *m = CDOTAMsg_EnemyItemAlert{} }
-func (m *CDOTAMsg_EnemyItemAlert) String() string { return proto.CompactTextString(m) }
-func (*CDOTAMsg_EnemyItemAlert) ProtoMessage()    {}
-
-func (m *CDOTAMsg_EnemyItemAlert) GetPlayerId() uint32 {
-	if m != nil && m.PlayerId != nil {
-		return *m.PlayerId
-	}
-	return 0
-}
-
-func (m *CDOTAMsg_EnemyItemAlert) GetItemid() int32 {
 	if m != nil && m.Itemid != nil {
 		return *m.Itemid
 	}

@@ -4,15 +4,11 @@
 
 package dota
 
-import proto "github.com/golang/protobuf/proto"
-import json "encoding/json"
+import proto "code.google.com/p/goprotobuf/proto"
 import math "math"
 
-// discarding unused import google_protobuf "github.com/dotabuff/yasha/dota/google/protobuf/descriptor.pb"
-
-// Reference proto, json, and math imports to suppress error if they are not otherwise used.
+// Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
-var _ = &json.SyntaxError{}
 var _ = math.Inf
 
 type EDotaUserMessages int32
@@ -89,6 +85,9 @@ const (
 	EDotaUserMessages_DOTA_UM_QuickBuyAlert            EDotaUserMessages = 133
 	EDotaUserMessages_DOTA_UM_StatsHeroDetails         EDotaUserMessages = 134
 	EDotaUserMessages_DOTA_UM_PredictionResult         EDotaUserMessages = 135
+	EDotaUserMessages_DOTA_UM_ModifierAlert            EDotaUserMessages = 136
+	EDotaUserMessages_DOTA_UM_HPManaAlert              EDotaUserMessages = 137
+	EDotaUserMessages_DOTA_UM_GlyphAlert               EDotaUserMessages = 138
 )
 
 var EDotaUserMessages_name = map[int32]string{
@@ -163,6 +162,9 @@ var EDotaUserMessages_name = map[int32]string{
 	133: "DOTA_UM_QuickBuyAlert",
 	134: "DOTA_UM_StatsHeroDetails",
 	135: "DOTA_UM_PredictionResult",
+	136: "DOTA_UM_ModifierAlert",
+	137: "DOTA_UM_HPManaAlert",
+	138: "DOTA_UM_GlyphAlert",
 }
 var EDotaUserMessages_value = map[string]int32{
 	"DOTA_UM_AddUnitToSelection":       64,
@@ -236,6 +238,9 @@ var EDotaUserMessages_value = map[string]int32{
 	"DOTA_UM_QuickBuyAlert":            133,
 	"DOTA_UM_StatsHeroDetails":         134,
 	"DOTA_UM_PredictionResult":         135,
+	"DOTA_UM_ModifierAlert":            136,
+	"DOTA_UM_HPManaAlert":              137,
+	"DOTA_UM_GlyphAlert":               138,
 }
 
 func (x EDotaUserMessages) Enum() *EDotaUserMessages {
@@ -342,6 +347,7 @@ const (
 	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_ASSASSIN_DENIED                           DOTA_CHAT_MESSAGE = 89
 	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_VICTORY_PREDICTION_SINGLE_USER_CONFIRM    DOTA_CHAT_MESSAGE = 90
 	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_EFFIGY_KILL                               DOTA_CHAT_MESSAGE = 91
+	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_VOICE_TEXT_BANNED_OVERFLOW                DOTA_CHAT_MESSAGE = 92
 )
 
 var DOTA_CHAT_MESSAGE_name = map[int32]string{
@@ -429,6 +435,7 @@ var DOTA_CHAT_MESSAGE_name = map[int32]string{
 	89: "CHAT_MESSAGE_ASSASSIN_DENIED",
 	90: "CHAT_MESSAGE_VICTORY_PREDICTION_SINGLE_USER_CONFIRM",
 	91: "CHAT_MESSAGE_EFFIGY_KILL",
+	92: "CHAT_MESSAGE_VOICE_TEXT_BANNED_OVERFLOW",
 }
 var DOTA_CHAT_MESSAGE_value = map[string]int32{
 	"CHAT_MESSAGE_INVALID":                                   -1,
@@ -515,6 +522,7 @@ var DOTA_CHAT_MESSAGE_value = map[string]int32{
 	"CHAT_MESSAGE_ASSASSIN_DENIED":                           89,
 	"CHAT_MESSAGE_VICTORY_PREDICTION_SINGLE_USER_CONFIRM":    90,
 	"CHAT_MESSAGE_EFFIGY_KILL":                               91,
+	"CHAT_MESSAGE_VOICE_TEXT_BANNED_OVERFLOW":                92,
 }
 
 func (x DOTA_CHAT_MESSAGE) Enum() *DOTA_CHAT_MESSAGE {
@@ -615,10 +623,11 @@ func (x *DOTA_CHAT_INFORMATIONAL) UnmarshalJSON(data []byte) error {
 type DOTA_ABILITY_PING_TYPE int32
 
 const (
-	DOTA_ABILITY_PING_TYPE_ABILITY_PING_READY    DOTA_ABILITY_PING_TYPE = 1
-	DOTA_ABILITY_PING_TYPE_ABILITY_PING_MANA     DOTA_ABILITY_PING_TYPE = 2
-	DOTA_ABILITY_PING_TYPE_ABILITY_PING_COOLDOWN DOTA_ABILITY_PING_TYPE = 3
-	DOTA_ABILITY_PING_TYPE_ABILITY_PING_ENEMY    DOTA_ABILITY_PING_TYPE = 4
+	DOTA_ABILITY_PING_TYPE_ABILITY_PING_READY     DOTA_ABILITY_PING_TYPE = 1
+	DOTA_ABILITY_PING_TYPE_ABILITY_PING_MANA      DOTA_ABILITY_PING_TYPE = 2
+	DOTA_ABILITY_PING_TYPE_ABILITY_PING_COOLDOWN  DOTA_ABILITY_PING_TYPE = 3
+	DOTA_ABILITY_PING_TYPE_ABILITY_PING_ENEMY     DOTA_ABILITY_PING_TYPE = 4
+	DOTA_ABILITY_PING_TYPE_ABILITY_PING_UNLEARNED DOTA_ABILITY_PING_TYPE = 5
 )
 
 var DOTA_ABILITY_PING_TYPE_name = map[int32]string{
@@ -626,12 +635,14 @@ var DOTA_ABILITY_PING_TYPE_name = map[int32]string{
 	2: "ABILITY_PING_MANA",
 	3: "ABILITY_PING_COOLDOWN",
 	4: "ABILITY_PING_ENEMY",
+	5: "ABILITY_PING_UNLEARNED",
 }
 var DOTA_ABILITY_PING_TYPE_value = map[string]int32{
-	"ABILITY_PING_READY":    1,
-	"ABILITY_PING_MANA":     2,
-	"ABILITY_PING_COOLDOWN": 3,
-	"ABILITY_PING_ENEMY":    4,
+	"ABILITY_PING_READY":     1,
+	"ABILITY_PING_MANA":      2,
+	"ABILITY_PING_COOLDOWN":  3,
+	"ABILITY_PING_ENEMY":     4,
+	"ABILITY_PING_UNLEARNED": 5,
 }
 
 func (x DOTA_ABILITY_PING_TYPE) Enum() *DOTA_ABILITY_PING_TYPE {
@@ -837,6 +848,78 @@ func (x *DOTA_OVERHEAD_ALERT) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*x = DOTA_OVERHEAD_ALERT(value)
+	return nil
+}
+
+type DOTA_POSITION_CATEGORY int32
+
+const (
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_NONE                DOTA_POSITION_CATEGORY = 0
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_BOTTOM_LANE         DOTA_POSITION_CATEGORY = 1
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_MID_LANE            DOTA_POSITION_CATEGORY = 2
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_TOP_LANE            DOTA_POSITION_CATEGORY = 3
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_RADIANT_JUNGLE      DOTA_POSITION_CATEGORY = 4
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_DIRE_JUNGLE         DOTA_POSITION_CATEGORY = 5
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_RADIANT_ANCIENTS    DOTA_POSITION_CATEGORY = 6
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_DIRE_ANCIENTS       DOTA_POSITION_CATEGORY = 7
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_RADIANT_SECRET_SHOP DOTA_POSITION_CATEGORY = 8
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_DIRE_SECRET_SHOP    DOTA_POSITION_CATEGORY = 9
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_RIVER               DOTA_POSITION_CATEGORY = 10
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_ROSHAN_PIT          DOTA_POSITION_CATEGORY = 11
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_RADIANT_BASE        DOTA_POSITION_CATEGORY = 12
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_DIRE_BASE           DOTA_POSITION_CATEGORY = 13
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_OTHER               DOTA_POSITION_CATEGORY = 14
+)
+
+var DOTA_POSITION_CATEGORY_name = map[int32]string{
+	0:  "DOTA_POSITION_NONE",
+	1:  "DOTA_POSITION_BOTTOM_LANE",
+	2:  "DOTA_POSITION_MID_LANE",
+	3:  "DOTA_POSITION_TOP_LANE",
+	4:  "DOTA_POSITION_RADIANT_JUNGLE",
+	5:  "DOTA_POSITION_DIRE_JUNGLE",
+	6:  "DOTA_POSITION_RADIANT_ANCIENTS",
+	7:  "DOTA_POSITION_DIRE_ANCIENTS",
+	8:  "DOTA_POSITION_RADIANT_SECRET_SHOP",
+	9:  "DOTA_POSITION_DIRE_SECRET_SHOP",
+	10: "DOTA_POSITION_RIVER",
+	11: "DOTA_POSITION_ROSHAN_PIT",
+	12: "DOTA_POSITION_RADIANT_BASE",
+	13: "DOTA_POSITION_DIRE_BASE",
+	14: "DOTA_POSITION_OTHER",
+}
+var DOTA_POSITION_CATEGORY_value = map[string]int32{
+	"DOTA_POSITION_NONE":                0,
+	"DOTA_POSITION_BOTTOM_LANE":         1,
+	"DOTA_POSITION_MID_LANE":            2,
+	"DOTA_POSITION_TOP_LANE":            3,
+	"DOTA_POSITION_RADIANT_JUNGLE":      4,
+	"DOTA_POSITION_DIRE_JUNGLE":         5,
+	"DOTA_POSITION_RADIANT_ANCIENTS":    6,
+	"DOTA_POSITION_DIRE_ANCIENTS":       7,
+	"DOTA_POSITION_RADIANT_SECRET_SHOP": 8,
+	"DOTA_POSITION_DIRE_SECRET_SHOP":    9,
+	"DOTA_POSITION_RIVER":               10,
+	"DOTA_POSITION_ROSHAN_PIT":          11,
+	"DOTA_POSITION_RADIANT_BASE":        12,
+	"DOTA_POSITION_DIRE_BASE":           13,
+	"DOTA_POSITION_OTHER":               14,
+}
+
+func (x DOTA_POSITION_CATEGORY) Enum() *DOTA_POSITION_CATEGORY {
+	p := new(DOTA_POSITION_CATEGORY)
+	*p = x
+	return p
+}
+func (x DOTA_POSITION_CATEGORY) String() string {
+	return proto.EnumName(DOTA_POSITION_CATEGORY_name, int32(x))
+}
+func (x *DOTA_POSITION_CATEGORY) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(DOTA_POSITION_CATEGORY_value, data, "DOTA_POSITION_CATEGORY")
+	if err != nil {
+		return err
+	}
+	*x = DOTA_POSITION_CATEGORY(value)
 	return nil
 }
 
@@ -1388,9 +1471,11 @@ func (m *CDOTAUserMsg_ItemAlert) GetItemAlert() *CDOTAMsg_ItemAlert {
 }
 
 type CDOTAUserMsg_EnemyItemAlert struct {
-	PlayerId         *uint32                  `protobuf:"varint,1,opt,name=player_id" json:"player_id,omitempty"`
-	EnemyItemAlert   *CDOTAMsg_EnemyItemAlert `protobuf:"bytes,2,opt,name=enemy_item_alert" json:"enemy_item_alert,omitempty"`
-	XXX_unrecognized []byte                   `json:"-"`
+	PlayerId         *uint32 `protobuf:"varint,1,opt,name=player_id" json:"player_id,omitempty"`
+	TargetPlayerId   *uint32 `protobuf:"varint,2,opt,name=target_player_id" json:"target_player_id,omitempty"`
+	Itemid           *int32  `protobuf:"varint,3,opt,name=itemid" json:"itemid,omitempty"`
+	RuneType         *uint32 `protobuf:"varint,4,opt,name=rune_type" json:"rune_type,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
 }
 
 func (m *CDOTAUserMsg_EnemyItemAlert) Reset()         { *m = CDOTAUserMsg_EnemyItemAlert{} }
@@ -1404,11 +1489,113 @@ func (m *CDOTAUserMsg_EnemyItemAlert) GetPlayerId() uint32 {
 	return 0
 }
 
-func (m *CDOTAUserMsg_EnemyItemAlert) GetEnemyItemAlert() *CDOTAMsg_EnemyItemAlert {
-	if m != nil {
-		return m.EnemyItemAlert
+func (m *CDOTAUserMsg_EnemyItemAlert) GetTargetPlayerId() uint32 {
+	if m != nil && m.TargetPlayerId != nil {
+		return *m.TargetPlayerId
 	}
-	return nil
+	return 0
+}
+
+func (m *CDOTAUserMsg_EnemyItemAlert) GetItemid() int32 {
+	if m != nil && m.Itemid != nil {
+		return *m.Itemid
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_EnemyItemAlert) GetRuneType() uint32 {
+	if m != nil && m.RuneType != nil {
+		return *m.RuneType
+	}
+	return 0
+}
+
+type CDOTAUserMsg_ModifierAlert struct {
+	PlayerId         *uint32 `protobuf:"varint,1,opt,name=player_id" json:"player_id,omitempty"`
+	ClassName        *string `protobuf:"bytes,2,opt,name=class_name" json:"class_name,omitempty"`
+	StackCount       *uint32 `protobuf:"varint,3,opt,name=stack_count" json:"stack_count,omitempty"`
+	IsDebuff         *bool   `protobuf:"varint,4,opt,name=is_debuff" json:"is_debuff,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CDOTAUserMsg_ModifierAlert) Reset()         { *m = CDOTAUserMsg_ModifierAlert{} }
+func (m *CDOTAUserMsg_ModifierAlert) String() string { return proto.CompactTextString(m) }
+func (*CDOTAUserMsg_ModifierAlert) ProtoMessage()    {}
+
+func (m *CDOTAUserMsg_ModifierAlert) GetPlayerId() uint32 {
+	if m != nil && m.PlayerId != nil {
+		return *m.PlayerId
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_ModifierAlert) GetClassName() string {
+	if m != nil && m.ClassName != nil {
+		return *m.ClassName
+	}
+	return ""
+}
+
+func (m *CDOTAUserMsg_ModifierAlert) GetStackCount() uint32 {
+	if m != nil && m.StackCount != nil {
+		return *m.StackCount
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_ModifierAlert) GetIsDebuff() bool {
+	if m != nil && m.IsDebuff != nil {
+		return *m.IsDebuff
+	}
+	return false
+}
+
+type CDOTAUserMsg_HPManaAlert struct {
+	PlayerId         *uint32 `protobuf:"varint,1,opt,name=player_id" json:"player_id,omitempty"`
+	TargetEntindex   *uint32 `protobuf:"varint,2,opt,name=target_entindex" json:"target_entindex,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CDOTAUserMsg_HPManaAlert) Reset()         { *m = CDOTAUserMsg_HPManaAlert{} }
+func (m *CDOTAUserMsg_HPManaAlert) String() string { return proto.CompactTextString(m) }
+func (*CDOTAUserMsg_HPManaAlert) ProtoMessage()    {}
+
+func (m *CDOTAUserMsg_HPManaAlert) GetPlayerId() uint32 {
+	if m != nil && m.PlayerId != nil {
+		return *m.PlayerId
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_HPManaAlert) GetTargetEntindex() uint32 {
+	if m != nil && m.TargetEntindex != nil {
+		return *m.TargetEntindex
+	}
+	return 0
+}
+
+type CDOTAUserMsg_GlyphAlert struct {
+	PlayerId         *uint32 `protobuf:"varint,1,opt,name=player_id" json:"player_id,omitempty"`
+	Negative         *bool   `protobuf:"varint,2,opt,name=negative" json:"negative,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CDOTAUserMsg_GlyphAlert) Reset()         { *m = CDOTAUserMsg_GlyphAlert{} }
+func (m *CDOTAUserMsg_GlyphAlert) String() string { return proto.CompactTextString(m) }
+func (*CDOTAUserMsg_GlyphAlert) ProtoMessage()    {}
+
+func (m *CDOTAUserMsg_GlyphAlert) GetPlayerId() uint32 {
+	if m != nil && m.PlayerId != nil {
+		return *m.PlayerId
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_GlyphAlert) GetNegative() bool {
+	if m != nil && m.Negative != nil {
+		return *m.Negative
+	}
+	return false
 }
 
 type CDOTAUserMsg_WillPurchaseAlert struct {
@@ -2592,10 +2779,11 @@ func (m *CDOTAUserMsg_ParticleManager_ReleaseParticleIndex) String() string {
 func (*CDOTAUserMsg_ParticleManager_ReleaseParticleIndex) ProtoMessage() {}
 
 type CDOTAUserMsg_ParticleManager_CreateParticle struct {
-	ParticleNameIndex *int32 `protobuf:"varint,1,opt,name=particle_name_index" json:"particle_name_index,omitempty"`
-	AttachType        *int32 `protobuf:"varint,2,opt,name=attach_type" json:"attach_type,omitempty"`
-	EntityHandle      *int32 `protobuf:"varint,3,opt,name=entity_handle" json:"entity_handle,omitempty"`
-	XXX_unrecognized  []byte `json:"-"`
+	ParticleNameIndex        *int32 `protobuf:"varint,1,opt,name=particle_name_index" json:"particle_name_index,omitempty"`
+	AttachType               *int32 `protobuf:"varint,2,opt,name=attach_type" json:"attach_type,omitempty"`
+	EntityHandle             *int32 `protobuf:"varint,3,opt,name=entity_handle" json:"entity_handle,omitempty"`
+	EntityHandleForModifiers *int32 `protobuf:"varint,4,opt,name=entity_handle_for_modifiers" json:"entity_handle_for_modifiers,omitempty"`
+	XXX_unrecognized         []byte `json:"-"`
 }
 
 func (m *CDOTAUserMsg_ParticleManager_CreateParticle) Reset() {
@@ -2623,6 +2811,13 @@ func (m *CDOTAUserMsg_ParticleManager_CreateParticle) GetAttachType() int32 {
 func (m *CDOTAUserMsg_ParticleManager_CreateParticle) GetEntityHandle() int32 {
 	if m != nil && m.EntityHandle != nil {
 		return *m.EntityHandle
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_ParticleManager_CreateParticle) GetEntityHandleForModifiers() int32 {
+	if m != nil && m.EntityHandleForModifiers != nil {
+		return *m.EntityHandleForModifiers
 	}
 	return 0
 }
@@ -3516,6 +3711,9 @@ type CDOTAUserMsg_AbilityPing struct {
 	AbilityId        *uint32                 `protobuf:"varint,2,opt,name=ability_id" json:"ability_id,omitempty"`
 	Type             *DOTA_ABILITY_PING_TYPE `protobuf:"varint,3,opt,name=type,enum=dota.DOTA_ABILITY_PING_TYPE,def=1" json:"type,omitempty"`
 	CooldownSeconds  *uint32                 `protobuf:"varint,4,opt,name=cooldown_seconds" json:"cooldown_seconds,omitempty"`
+	Level            *uint32                 `protobuf:"varint,5,opt,name=level" json:"level,omitempty"`
+	Passive          *bool                   `protobuf:"varint,6,opt,name=passive" json:"passive,omitempty"`
+	ManaNeeded       *uint32                 `protobuf:"varint,7,opt,name=mana_needed" json:"mana_needed,omitempty"`
 	XXX_unrecognized []byte                  `json:"-"`
 }
 
@@ -3549,6 +3747,27 @@ func (m *CDOTAUserMsg_AbilityPing) GetType() DOTA_ABILITY_PING_TYPE {
 func (m *CDOTAUserMsg_AbilityPing) GetCooldownSeconds() uint32 {
 	if m != nil && m.CooldownSeconds != nil {
 		return *m.CooldownSeconds
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_AbilityPing) GetLevel() uint32 {
+	if m != nil && m.Level != nil {
+		return *m.Level
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_AbilityPing) GetPassive() bool {
+	if m != nil && m.Passive != nil {
+		return *m.Passive
+	}
+	return false
+}
+
+func (m *CDOTAUserMsg_AbilityPing) GetManaNeeded() uint32 {
+	if m != nil && m.ManaNeeded != nil {
+		return *m.ManaNeeded
 	}
 	return 0
 }
@@ -3833,16 +4052,70 @@ func (m *CDOTAUserMsg_StatsHeroLookup) GetPersona() string {
 	return ""
 }
 
+type CDOTAUserMsg_StatsHeroPositionInfo struct {
+	AveragePosition  *float32                                           `protobuf:"fixed32,1,opt,name=average_position" json:"average_position,omitempty"`
+	PositionDetails  []*CDOTAUserMsg_StatsHeroPositionInfo_PositionPair `protobuf:"bytes,2,rep,name=position_details" json:"position_details,omitempty"`
+	XXX_unrecognized []byte                                             `json:"-"`
+}
+
+func (m *CDOTAUserMsg_StatsHeroPositionInfo) Reset()         { *m = CDOTAUserMsg_StatsHeroPositionInfo{} }
+func (m *CDOTAUserMsg_StatsHeroPositionInfo) String() string { return proto.CompactTextString(m) }
+func (*CDOTAUserMsg_StatsHeroPositionInfo) ProtoMessage()    {}
+
+func (m *CDOTAUserMsg_StatsHeroPositionInfo) GetAveragePosition() float32 {
+	if m != nil && m.AveragePosition != nil {
+		return *m.AveragePosition
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsHeroPositionInfo) GetPositionDetails() []*CDOTAUserMsg_StatsHeroPositionInfo_PositionPair {
+	if m != nil {
+		return m.PositionDetails
+	}
+	return nil
+}
+
+type CDOTAUserMsg_StatsHeroPositionInfo_PositionPair struct {
+	PositionCategory *DOTA_POSITION_CATEGORY `protobuf:"varint,1,opt,name=position_category,enum=dota.DOTA_POSITION_CATEGORY,def=0" json:"position_category,omitempty"`
+	PositionCount    *uint32                 `protobuf:"varint,2,opt,name=position_count" json:"position_count,omitempty"`
+	XXX_unrecognized []byte                  `json:"-"`
+}
+
+func (m *CDOTAUserMsg_StatsHeroPositionInfo_PositionPair) Reset() {
+	*m = CDOTAUserMsg_StatsHeroPositionInfo_PositionPair{}
+}
+func (m *CDOTAUserMsg_StatsHeroPositionInfo_PositionPair) String() string {
+	return proto.CompactTextString(m)
+}
+func (*CDOTAUserMsg_StatsHeroPositionInfo_PositionPair) ProtoMessage() {}
+
+const Default_CDOTAUserMsg_StatsHeroPositionInfo_PositionPair_PositionCategory DOTA_POSITION_CATEGORY = DOTA_POSITION_CATEGORY_DOTA_POSITION_NONE
+
+func (m *CDOTAUserMsg_StatsHeroPositionInfo_PositionPair) GetPositionCategory() DOTA_POSITION_CATEGORY {
+	if m != nil && m.PositionCategory != nil {
+		return *m.PositionCategory
+	}
+	return Default_CDOTAUserMsg_StatsHeroPositionInfo_PositionPair_PositionCategory
+}
+
+func (m *CDOTAUserMsg_StatsHeroPositionInfo_PositionPair) GetPositionCount() uint32 {
+	if m != nil && m.PositionCount != nil {
+		return *m.PositionCount
+	}
+	return 0
+}
+
 type CDOTAUserMsg_StatsHeroMinuteDetails struct {
-	LastHits           *uint32  `protobuf:"varint,1,opt,name=last_hits" json:"last_hits,omitempty"`
-	HeroKills          *uint32  `protobuf:"varint,2,opt,name=hero_kills" json:"hero_kills,omitempty"`
-	HeroDamage         *uint32  `protobuf:"varint,3,opt,name=hero_damage" json:"hero_damage,omitempty"`
-	TowerDamage        *uint32  `protobuf:"varint,4,opt,name=tower_damage" json:"tower_damage,omitempty"`
-	AveragePosition    *float32 `protobuf:"fixed32,5,opt,name=average_position" json:"average_position,omitempty"`
-	TotalXp            *uint32  `protobuf:"varint,6,opt,name=total_xp" json:"total_xp,omitempty"`
-	NetWorth           *uint32  `protobuf:"varint,7,opt,name=net_worth" json:"net_worth,omitempty"`
-	HarvestedCreepGold *uint32  `protobuf:"varint,8,opt,name=harvested_creep_gold" json:"harvested_creep_gold,omitempty"`
-	XXX_unrecognized   []byte   `json:"-"`
+	LastHits           *uint32                             `protobuf:"varint,1,opt,name=last_hits" json:"last_hits,omitempty"`
+	HeroKills          *uint32                             `protobuf:"varint,2,opt,name=hero_kills" json:"hero_kills,omitempty"`
+	HeroDamage         *uint32                             `protobuf:"varint,3,opt,name=hero_damage" json:"hero_damage,omitempty"`
+	TowerDamage        *uint32                             `protobuf:"varint,4,opt,name=tower_damage" json:"tower_damage,omitempty"`
+	PositionInfo       *CDOTAUserMsg_StatsHeroPositionInfo `protobuf:"bytes,5,opt,name=position_info" json:"position_info,omitempty"`
+	TotalXp            *uint32                             `protobuf:"varint,6,opt,name=total_xp" json:"total_xp,omitempty"`
+	NetWorth           *uint32                             `protobuf:"varint,7,opt,name=net_worth" json:"net_worth,omitempty"`
+	HarvestedCreepGold *uint32                             `protobuf:"varint,8,opt,name=harvested_creep_gold" json:"harvested_creep_gold,omitempty"`
+	XXX_unrecognized   []byte                              `json:"-"`
 }
 
 func (m *CDOTAUserMsg_StatsHeroMinuteDetails) Reset()         { *m = CDOTAUserMsg_StatsHeroMinuteDetails{} }
@@ -3877,11 +4150,11 @@ func (m *CDOTAUserMsg_StatsHeroMinuteDetails) GetTowerDamage() uint32 {
 	return 0
 }
 
-func (m *CDOTAUserMsg_StatsHeroMinuteDetails) GetAveragePosition() float32 {
-	if m != nil && m.AveragePosition != nil {
-		return *m.AveragePosition
+func (m *CDOTAUserMsg_StatsHeroMinuteDetails) GetPositionInfo() *CDOTAUserMsg_StatsHeroPositionInfo {
+	if m != nil {
+		return m.PositionInfo
 	}
-	return 0
+	return nil
 }
 
 func (m *CDOTAUserMsg_StatsHeroMinuteDetails) GetTotalXp() uint32 {
@@ -3906,16 +4179,17 @@ func (m *CDOTAUserMsg_StatsHeroMinuteDetails) GetHarvestedCreepGold() uint32 {
 }
 
 type CDOTAUserMsg_StatsTeamMinuteDetails struct {
-	PlayerStats            []*CDOTAUserMsg_StatsHeroMinuteDetails `protobuf:"bytes,1,rep,name=player_stats" json:"player_stats,omitempty"`
-	TowerKills             *uint32                                `protobuf:"varint,2,opt,name=tower_kills" json:"tower_kills,omitempty"`
-	BarrackKills           *uint32                                `protobuf:"varint,3,opt,name=barrack_kills" json:"barrack_kills,omitempty"`
-	AvailableLaneCreepGold *uint32                                `protobuf:"varint,4,opt,name=available_lane_creep_gold" json:"available_lane_creep_gold,omitempty"`
-	BalanceKillValue       *uint32                                `protobuf:"varint,5,opt,name=balance_kill_value" json:"balance_kill_value,omitempty"`
-	BalanceTowerValue      *uint32                                `protobuf:"varint,6,opt,name=balance_tower_value" json:"balance_tower_value,omitempty"`
-	BalanceBarracksValue   *uint32                                `protobuf:"varint,7,opt,name=balance_barracks_value" json:"balance_barracks_value,omitempty"`
-	BalanceGoldValue       *uint32                                `protobuf:"varint,8,opt,name=balance_gold_value" json:"balance_gold_value,omitempty"`
-	BalanceXpValue         *uint32                                `protobuf:"varint,9,opt,name=balance_xp_value" json:"balance_xp_value,omitempty"`
-	XXX_unrecognized       []byte                                 `json:"-"`
+	PlayerStats            []*CDOTAUserMsg_StatsHeroMinuteDetails                     `protobuf:"bytes,1,rep,name=player_stats" json:"player_stats,omitempty"`
+	TowerKills             *uint32                                                    `protobuf:"varint,2,opt,name=tower_kills" json:"tower_kills,omitempty"`
+	BarrackKills           *uint32                                                    `protobuf:"varint,3,opt,name=barrack_kills" json:"barrack_kills,omitempty"`
+	AvailableLaneCreepGold *uint32                                                    `protobuf:"varint,4,opt,name=available_lane_creep_gold" json:"available_lane_creep_gold,omitempty"`
+	BalanceKillValue       *uint32                                                    `protobuf:"varint,5,opt,name=balance_kill_value" json:"balance_kill_value,omitempty"`
+	BalanceTowerValue      *uint32                                                    `protobuf:"varint,6,opt,name=balance_tower_value" json:"balance_tower_value,omitempty"`
+	BalanceBarracksValue   *uint32                                                    `protobuf:"varint,7,opt,name=balance_barracks_value" json:"balance_barracks_value,omitempty"`
+	BalanceGoldValue       *uint32                                                    `protobuf:"varint,8,opt,name=balance_gold_value" json:"balance_gold_value,omitempty"`
+	BalanceXpValue         *uint32                                                    `protobuf:"varint,9,opt,name=balance_xp_value" json:"balance_xp_value,omitempty"`
+	LanePerformance        []*CDOTAUserMsg_StatsTeamMinuteDetails_LocationPerformance `protobuf:"bytes,10,rep,name=lane_performance" json:"lane_performance,omitempty"`
+	XXX_unrecognized       []byte                                                     `json:"-"`
 }
 
 func (m *CDOTAUserMsg_StatsTeamMinuteDetails) Reset()         { *m = CDOTAUserMsg_StatsTeamMinuteDetails{} }
@@ -3981,6 +4255,49 @@ func (m *CDOTAUserMsg_StatsTeamMinuteDetails) GetBalanceGoldValue() uint32 {
 func (m *CDOTAUserMsg_StatsTeamMinuteDetails) GetBalanceXpValue() uint32 {
 	if m != nil && m.BalanceXpValue != nil {
 		return *m.BalanceXpValue
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsTeamMinuteDetails) GetLanePerformance() []*CDOTAUserMsg_StatsTeamMinuteDetails_LocationPerformance {
+	if m != nil {
+		return m.LanePerformance
+	}
+	return nil
+}
+
+type CDOTAUserMsg_StatsTeamMinuteDetails_LocationPerformance struct {
+	LocationCategory *uint32 `protobuf:"varint,1,opt,name=location_category" json:"location_category,omitempty"`
+	StatType         *uint32 `protobuf:"varint,2,opt,name=stat_type" json:"stat_type,omitempty"`
+	Value            *uint32 `protobuf:"varint,3,opt,name=value" json:"value,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CDOTAUserMsg_StatsTeamMinuteDetails_LocationPerformance) Reset() {
+	*m = CDOTAUserMsg_StatsTeamMinuteDetails_LocationPerformance{}
+}
+func (m *CDOTAUserMsg_StatsTeamMinuteDetails_LocationPerformance) String() string {
+	return proto.CompactTextString(m)
+}
+func (*CDOTAUserMsg_StatsTeamMinuteDetails_LocationPerformance) ProtoMessage() {}
+
+func (m *CDOTAUserMsg_StatsTeamMinuteDetails_LocationPerformance) GetLocationCategory() uint32 {
+	if m != nil && m.LocationCategory != nil {
+		return *m.LocationCategory
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsTeamMinuteDetails_LocationPerformance) GetStatType() uint32 {
+	if m != nil && m.StatType != nil {
+		return *m.StatType
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsTeamMinuteDetails_LocationPerformance) GetValue() uint32 {
+	if m != nil && m.Value != nil {
+		return *m.Value
 	}
 	return 0
 }
@@ -4220,6 +4537,7 @@ func init() {
 	proto.RegisterEnum("dota.EDotaEntityMessages", EDotaEntityMessages_name, EDotaEntityMessages_value)
 	proto.RegisterEnum("dota.DOTA_PARTICLE_MESSAGE", DOTA_PARTICLE_MESSAGE_name, DOTA_PARTICLE_MESSAGE_value)
 	proto.RegisterEnum("dota.DOTA_OVERHEAD_ALERT", DOTA_OVERHEAD_ALERT_name, DOTA_OVERHEAD_ALERT_value)
+	proto.RegisterEnum("dota.DOTA_POSITION_CATEGORY", DOTA_POSITION_CATEGORY_name, DOTA_POSITION_CATEGORY_value)
 	proto.RegisterEnum("dota.EHeroStatType", EHeroStatType_name, EHeroStatType_value)
 	proto.RegisterEnum("dota.CDOTAUserMsg_PredictionResult_Prediction_EResult", CDOTAUserMsg_PredictionResult_Prediction_EResult_name, CDOTAUserMsg_PredictionResult_Prediction_EResult_value)
 	proto.RegisterEnum("dota.CDOTAResponseQuerySerialized_Fact_ValueType", CDOTAResponseQuerySerialized_Fact_ValueType_name, CDOTAResponseQuerySerialized_Fact_ValueType_value)
