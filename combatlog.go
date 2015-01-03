@@ -343,7 +343,7 @@ func (c CombatLogPurchase) Timestamp() float32 {
 }
 
 type CombatLogGold struct {
-	Target int     `logIndex:"2"`
+	Target string  `logIndex:"2" logTable:"CombatLogNames"`
 	Value  int     `logIndex:"7"`
 	Time   float32 `logIndex:"9"`
 }
