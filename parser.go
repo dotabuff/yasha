@@ -44,6 +44,7 @@ type Parser struct {
 	OnSounds               func(tick int, obj *dota.CSVCMsg_Sounds)
 	OnSpectatorPlayerClick func(tick int, obj *dota.CDOTAUserMsg_SpectatorPlayerClick)
 	OnChatWheel            func(tick int, obj *dota.CDOTAUserMsg_ChatWheel)
+	OnEnemyItemAlert       func(tick int, obj *dota.CDOTAUserMsg_EnemyItemAlert)
 
 	OnFileInfo  func(obj *dota.CDemoFileInfo)
 	OnSetConVar func(obj *dota.CNETMsg_SetConVar)
@@ -239,6 +240,11 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 			// (chat_message:k_EDOTA_CW_All_GGWP player_id:2 param_hero_id:0 )
 			if p.OnChatWheel != nil {
 				p.OnChatWheel(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_EnemyItemAlert:
+			// (player_id:13 target_player_id:9 itemid:751 rune_type:4294967295 )
+			if p.OnEnemyItemAlert != nil {
+				p.OnEnemyItemAlert(item.Tick, obj)
 			}
 		case *dota.CDOTAUserMsg_AbilitySteal:
 			/*
