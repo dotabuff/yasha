@@ -4,7 +4,7 @@
 
 package dota
 
-import proto "code.google.com/p/goprotobuf/proto"
+import proto "github.com/golang/protobuf/proto"
 import math "math"
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -815,6 +815,9 @@ const (
 	CMsgDOTAPopup_NEED_INITIAL_SKILL_IN_PARTY                           CMsgDOTAPopup_PopupID = 54
 	CMsgDOTAPopup_TARGET_ENGINE_MISMATCH                                CMsgDOTAPopup_PopupID = 55
 	CMsgDOTAPopup_VAC_NOT_VERIFIED                                      CMsgDOTAPopup_PopupID = 56
+	CMsgDOTAPopup_KICKED_FROM_QUEUE_EVENT_STARTING                      CMsgDOTAPopup_PopupID = 57
+	CMsgDOTAPopup_KICKED_FROM_QUEUE_EVENT_ENDING                        CMsgDOTAPopup_PopupID = 58
+	CMsgDOTAPopup_EVENT_NO_LOW_PRIORITY                                 CMsgDOTAPopup_PopupID = 59
 )
 
 var CMsgDOTAPopup_PopupID_name = map[int32]string{
@@ -875,6 +878,9 @@ var CMsgDOTAPopup_PopupID_name = map[int32]string{
 	54: "NEED_INITIAL_SKILL_IN_PARTY",
 	55: "TARGET_ENGINE_MISMATCH",
 	56: "VAC_NOT_VERIFIED",
+	57: "KICKED_FROM_QUEUE_EVENT_STARTING",
+	58: "KICKED_FROM_QUEUE_EVENT_ENDING",
+	59: "EVENT_NO_LOW_PRIORITY",
 }
 var CMsgDOTAPopup_PopupID_value = map[string]int32{
 	"KICKED_FROM_LOBBY":                                     0,
@@ -934,6 +940,9 @@ var CMsgDOTAPopup_PopupID_value = map[string]int32{
 	"NEED_INITIAL_SKILL_IN_PARTY":                           54,
 	"TARGET_ENGINE_MISMATCH":                                55,
 	"VAC_NOT_VERIFIED":                                      56,
+	"KICKED_FROM_QUEUE_EVENT_STARTING":                      57,
+	"KICKED_FROM_QUEUE_EVENT_ENDING":                        58,
+	"EVENT_NO_LOW_PRIORITY":                                 59,
 }
 
 func (x CMsgDOTAPopup_PopupID) Enum() *CMsgDOTAPopup_PopupID {
@@ -1967,6 +1976,45 @@ func (x *CMsgGCPlayerInfoSubmitResponse_EResult) UnmarshalJSON(data []byte) erro
 		return err
 	}
 	*x = CMsgGCPlayerInfoSubmitResponse_EResult(value)
+	return nil
+}
+
+type CMsgClientToGCExchangeItemsForOfferingResponse_EResponse int32
+
+const (
+	CMsgClientToGCExchangeItemsForOfferingResponse_eResponse_Success          CMsgClientToGCExchangeItemsForOfferingResponse_EResponse = 0
+	CMsgClientToGCExchangeItemsForOfferingResponse_eResponse_OfferingDisabled CMsgClientToGCExchangeItemsForOfferingResponse_EResponse = 1
+	CMsgClientToGCExchangeItemsForOfferingResponse_eResponse_InvalidItems     CMsgClientToGCExchangeItemsForOfferingResponse_EResponse = 2
+	CMsgClientToGCExchangeItemsForOfferingResponse_eResponse_InternalError    CMsgClientToGCExchangeItemsForOfferingResponse_EResponse = 3
+)
+
+var CMsgClientToGCExchangeItemsForOfferingResponse_EResponse_name = map[int32]string{
+	0: "eResponse_Success",
+	1: "eResponse_OfferingDisabled",
+	2: "eResponse_InvalidItems",
+	3: "eResponse_InternalError",
+}
+var CMsgClientToGCExchangeItemsForOfferingResponse_EResponse_value = map[string]int32{
+	"eResponse_Success":          0,
+	"eResponse_OfferingDisabled": 1,
+	"eResponse_InvalidItems":     2,
+	"eResponse_InternalError":    3,
+}
+
+func (x CMsgClientToGCExchangeItemsForOfferingResponse_EResponse) Enum() *CMsgClientToGCExchangeItemsForOfferingResponse_EResponse {
+	p := new(CMsgClientToGCExchangeItemsForOfferingResponse_EResponse)
+	*p = x
+	return p
+}
+func (x CMsgClientToGCExchangeItemsForOfferingResponse_EResponse) String() string {
+	return proto.EnumName(CMsgClientToGCExchangeItemsForOfferingResponse_EResponse_name, int32(x))
+}
+func (x *CMsgClientToGCExchangeItemsForOfferingResponse_EResponse) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(CMsgClientToGCExchangeItemsForOfferingResponse_EResponse_value, data, "CMsgClientToGCExchangeItemsForOfferingResponse_EResponse")
+	if err != nil {
+		return err
+	}
+	*x = CMsgClientToGCExchangeItemsForOfferingResponse_EResponse(value)
 	return nil
 }
 
@@ -3357,6 +3405,7 @@ type CMsgJoinableCustomLobbiesResponseEntry struct {
 	MemberCount      *uint32 `protobuf:"varint,4,opt,name=member_count" json:"member_count,omitempty"`
 	LeaderAccountId  *uint32 `protobuf:"varint,5,opt,name=leader_account_id" json:"leader_account_id,omitempty"`
 	LeaderName       *string `protobuf:"bytes,6,opt,name=leader_name" json:"leader_name,omitempty"`
+	CustomMapName    *string `protobuf:"bytes,7,opt,name=custom_map_name" json:"custom_map_name,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -3404,6 +3453,13 @@ func (m *CMsgJoinableCustomLobbiesResponseEntry) GetLeaderAccountId() uint32 {
 func (m *CMsgJoinableCustomLobbiesResponseEntry) GetLeaderName() string {
 	if m != nil && m.LeaderName != nil {
 		return *m.LeaderName
+	}
+	return ""
+}
+
+func (m *CMsgJoinableCustomLobbiesResponseEntry) GetCustomMapName() string {
+	if m != nil && m.CustomMapName != nil {
+		return *m.CustomMapName
 	}
 	return ""
 }
@@ -8652,6 +8708,7 @@ type CMsgDOTAWelcome struct {
 	LocalizationDigests         []*CMsgDOTAWelcome_LocalizationDigest `protobuf:"bytes,23,rep,name=localization_digests" json:"localization_digests,omitempty"`
 	IsPerfectWorldTestAccount   *bool                                 `protobuf:"varint,24,opt,name=is_perfect_world_test_account" json:"is_perfect_world_test_account,omitempty"`
 	ActiveEvents                []EIngameEvent                        `protobuf:"varint,25,rep,name=active_events,enum=dota.EIngameEvent" json:"active_events,omitempty"`
+	ExtraMessages               []*CMsgDOTAWelcome_CExtraMsg          `protobuf:"bytes,26,rep,name=extra_messages" json:"extra_messages,omitempty"`
 	XXX_unrecognized            []byte                                `json:"-"`
 }
 
@@ -8808,6 +8865,13 @@ func (m *CMsgDOTAWelcome) GetActiveEvents() []EIngameEvent {
 	return nil
 }
 
+func (m *CMsgDOTAWelcome) GetExtraMessages() []*CMsgDOTAWelcome_CExtraMsg {
+	if m != nil {
+		return m.ExtraMessages
+	}
+	return nil
+}
+
 type CMsgDOTAWelcome_LocalizationDigest struct {
 	Context                 *string         `protobuf:"bytes,1,opt,name=context" json:"context,omitempty"`
 	EnglishLanguageFileSha1 *CMsgSHA1Digest `protobuf:"bytes,2,opt,name=english_language_file_sha1" json:"english_language_file_sha1,omitempty"`
@@ -8836,6 +8900,30 @@ func (m *CMsgDOTAWelcome_LocalizationDigest) GetEnglishLanguageFileSha1() *CMsgS
 func (m *CMsgDOTAWelcome_LocalizationDigest) GetClientLanguageFileSha1() *CMsgSHA1Digest {
 	if m != nil {
 		return m.ClientLanguageFileSha1
+	}
+	return nil
+}
+
+type CMsgDOTAWelcome_CExtraMsg struct {
+	Id               *uint32 `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
+	Contents         []byte  `protobuf:"bytes,2,opt,name=contents" json:"contents,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgDOTAWelcome_CExtraMsg) Reset()         { *m = CMsgDOTAWelcome_CExtraMsg{} }
+func (m *CMsgDOTAWelcome_CExtraMsg) String() string { return proto.CompactTextString(m) }
+func (*CMsgDOTAWelcome_CExtraMsg) ProtoMessage()    {}
+
+func (m *CMsgDOTAWelcome_CExtraMsg) GetId() uint32 {
+	if m != nil && m.Id != nil {
+		return *m.Id
+	}
+	return 0
+}
+
+func (m *CMsgDOTAWelcome_CExtraMsg) GetContents() []byte {
+	if m != nil {
+		return m.Contents
 	}
 	return nil
 }
@@ -9762,16 +9850,24 @@ func (m *CMsgSockAddrList) GetPort() []uint32 {
 }
 
 type CMsgMatchmakingGroupServerSample struct {
-	ServersByGroup    []*CMsgSockAddrList `protobuf:"bytes,1,rep,name=servers_by_group" json:"servers_by_group,omitempty"`
-	ServersToPing     *uint32             `protobuf:"varint,2,opt,name=servers_to_ping" json:"servers_to_ping,omitempty"`
-	ReplyOdds         *uint32             `protobuf:"varint,3,opt,name=reply_odds" json:"reply_odds,omitempty"`
-	ReplyDetailedOdds *uint32             `protobuf:"varint,4,opt,name=reply_detailed_odds" json:"reply_detailed_odds,omitempty"`
-	XXX_unrecognized  []byte              `json:"-"`
+	ServersByGroupLegacySwapped []*CMsgSockAddrList `protobuf:"bytes,1,rep,name=servers_by_group_legacy_swapped" json:"servers_by_group_legacy_swapped,omitempty"`
+	ServersByGroup              []*CMsgSockAddrList `protobuf:"bytes,5,rep,name=servers_by_group" json:"servers_by_group,omitempty"`
+	ServersToPing               *uint32             `protobuf:"varint,2,opt,name=servers_to_ping" json:"servers_to_ping,omitempty"`
+	ReplyOdds                   *uint32             `protobuf:"varint,3,opt,name=reply_odds" json:"reply_odds,omitempty"`
+	ReplyDetailedOdds           *uint32             `protobuf:"varint,4,opt,name=reply_detailed_odds" json:"reply_detailed_odds,omitempty"`
+	XXX_unrecognized            []byte              `json:"-"`
 }
 
 func (m *CMsgMatchmakingGroupServerSample) Reset()         { *m = CMsgMatchmakingGroupServerSample{} }
 func (m *CMsgMatchmakingGroupServerSample) String() string { return proto.CompactTextString(m) }
 func (*CMsgMatchmakingGroupServerSample) ProtoMessage()    {}
+
+func (m *CMsgMatchmakingGroupServerSample) GetServersByGroupLegacySwapped() []*CMsgSockAddrList {
+	if m != nil {
+		return m.ServersByGroupLegacySwapped
+	}
+	return nil
+}
 
 func (m *CMsgMatchmakingGroupServerSample) GetServersByGroup() []*CMsgSockAddrList {
 	if m != nil {
@@ -9866,12 +9962,13 @@ func (m *CMsgDOTAMatchmakingStatsRequest) String() string { return proto.Compact
 func (*CMsgDOTAMatchmakingStatsRequest) ProtoMessage()    {}
 
 type CMsgDOTAMatchmakingStatsResponse struct {
-	SearchingPlayersByGroup []uint32                          `protobuf:"varint,2,rep,name=searching_players_by_group" json:"searching_players_by_group,omitempty"`
-	DisabledGroups          *uint32                           `protobuf:"varint,3,opt,name=disabled_groups" json:"disabled_groups,omitempty"`
-	GameserverSample        *CMsgMatchmakingGroupServerSample `protobuf:"bytes,4,opt,name=gameserver_sample" json:"gameserver_sample,omitempty"`
-	GameserverSampleSource2 *CMsgMatchmakingGroupServerSample `protobuf:"bytes,6,opt,name=gameserver_sample_source2" json:"gameserver_sample_source2,omitempty"`
-	MaintenanceAlerts       *bool                             `protobuf:"varint,5,opt,name=maintenance_alerts" json:"maintenance_alerts,omitempty"`
-	XXX_unrecognized        []byte                            `json:"-"`
+	SearchingPlayersByGroup        []uint32                          `protobuf:"varint,2,rep,name=searching_players_by_group" json:"searching_players_by_group,omitempty"`
+	SearchingPlayersByGroupSource2 []uint32                          `protobuf:"varint,7,rep,name=searching_players_by_group_source2" json:"searching_players_by_group_source2,omitempty"`
+	DisabledGroups                 *uint32                           `protobuf:"varint,3,opt,name=disabled_groups" json:"disabled_groups,omitempty"`
+	GameserverSample               *CMsgMatchmakingGroupServerSample `protobuf:"bytes,4,opt,name=gameserver_sample" json:"gameserver_sample,omitempty"`
+	GameserverSampleSource2        *CMsgMatchmakingGroupServerSample `protobuf:"bytes,6,opt,name=gameserver_sample_source2" json:"gameserver_sample_source2,omitempty"`
+	MaintenanceAlerts              *bool                             `protobuf:"varint,5,opt,name=maintenance_alerts" json:"maintenance_alerts,omitempty"`
+	XXX_unrecognized               []byte                            `json:"-"`
 }
 
 func (m *CMsgDOTAMatchmakingStatsResponse) Reset()         { *m = CMsgDOTAMatchmakingStatsResponse{} }
@@ -9881,6 +9978,13 @@ func (*CMsgDOTAMatchmakingStatsResponse) ProtoMessage()    {}
 func (m *CMsgDOTAMatchmakingStatsResponse) GetSearchingPlayersByGroup() []uint32 {
 	if m != nil {
 		return m.SearchingPlayersByGroup
+	}
+	return nil
+}
+
+func (m *CMsgDOTAMatchmakingStatsResponse) GetSearchingPlayersByGroupSource2() []uint32 {
+	if m != nil {
+		return m.SearchingPlayersByGroupSource2
 	}
 	return nil
 }
@@ -13001,30 +13105,6 @@ func (m *CMsgClientToGCRecordCompendiumStats) GetLinksFollowed() uint32 {
 	return 0
 }
 
-type CMsgClientToGCRecordStatueStats struct {
-	ViewDurationS    *uint32 `protobuf:"varint,1,opt,name=view_duration_s" json:"view_duration_s,omitempty"`
-	CreatedStatue    *bool   `protobuf:"varint,2,opt,name=created_statue" json:"created_statue,omitempty"`
-	XXX_unrecognized []byte  `json:"-"`
-}
-
-func (m *CMsgClientToGCRecordStatueStats) Reset()         { *m = CMsgClientToGCRecordStatueStats{} }
-func (m *CMsgClientToGCRecordStatueStats) String() string { return proto.CompactTextString(m) }
-func (*CMsgClientToGCRecordStatueStats) ProtoMessage()    {}
-
-func (m *CMsgClientToGCRecordStatueStats) GetViewDurationS() uint32 {
-	if m != nil && m.ViewDurationS != nil {
-		return *m.ViewDurationS
-	}
-	return 0
-}
-
-func (m *CMsgClientToGCRecordStatueStats) GetCreatedStatue() bool {
-	if m != nil && m.CreatedStatue != nil {
-		return *m.CreatedStatue
-	}
-	return false
-}
-
 type CMsgGCToClientEventStatusChanged struct {
 	ActiveEvents     []EIngameEvent `protobuf:"varint,1,rep,name=active_events,enum=dota.EIngameEvent" json:"active_events,omitempty"`
 	XXX_unrecognized []byte         `json:"-"`
@@ -13039,6 +13119,46 @@ func (m *CMsgGCToClientEventStatusChanged) GetActiveEvents() []EIngameEvent {
 		return m.ActiveEvents
 	}
 	return nil
+}
+
+type CMsgClientToGCExchangeItemsForOffering struct {
+	ItemIds          []uint64 `protobuf:"varint,1,rep,name=item_ids" json:"item_ids,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
+}
+
+func (m *CMsgClientToGCExchangeItemsForOffering) Reset() {
+	*m = CMsgClientToGCExchangeItemsForOffering{}
+}
+func (m *CMsgClientToGCExchangeItemsForOffering) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCExchangeItemsForOffering) ProtoMessage()    {}
+
+func (m *CMsgClientToGCExchangeItemsForOffering) GetItemIds() []uint64 {
+	if m != nil {
+		return m.ItemIds
+	}
+	return nil
+}
+
+type CMsgClientToGCExchangeItemsForOfferingResponse struct {
+	Response         *CMsgClientToGCExchangeItemsForOfferingResponse_EResponse `protobuf:"varint,1,opt,name=response,enum=dota.CMsgClientToGCExchangeItemsForOfferingResponse_EResponse,def=0" json:"response,omitempty"`
+	XXX_unrecognized []byte                                                    `json:"-"`
+}
+
+func (m *CMsgClientToGCExchangeItemsForOfferingResponse) Reset() {
+	*m = CMsgClientToGCExchangeItemsForOfferingResponse{}
+}
+func (m *CMsgClientToGCExchangeItemsForOfferingResponse) String() string {
+	return proto.CompactTextString(m)
+}
+func (*CMsgClientToGCExchangeItemsForOfferingResponse) ProtoMessage() {}
+
+const Default_CMsgClientToGCExchangeItemsForOfferingResponse_Response CMsgClientToGCExchangeItemsForOfferingResponse_EResponse = CMsgClientToGCExchangeItemsForOfferingResponse_eResponse_Success
+
+func (m *CMsgClientToGCExchangeItemsForOfferingResponse) GetResponse() CMsgClientToGCExchangeItemsForOfferingResponse_EResponse {
+	if m != nil && m.Response != nil {
+		return *m.Response
+	}
+	return Default_CMsgClientToGCExchangeItemsForOfferingResponse_Response
 }
 
 func init() {
@@ -13078,4 +13198,5 @@ func init() {
 	proto.RegisterEnum("dota.CMsgDOTARedeemEventPrizeResponse_ResultCode", CMsgDOTARedeemEventPrizeResponse_ResultCode_name, CMsgDOTARedeemEventPrizeResponse_ResultCode_value)
 	proto.RegisterEnum("dota.CMsgGCNotificationsResponse_EResult", CMsgGCNotificationsResponse_EResult_name, CMsgGCNotificationsResponse_EResult_value)
 	proto.RegisterEnum("dota.CMsgGCPlayerInfoSubmitResponse_EResult", CMsgGCPlayerInfoSubmitResponse_EResult_name, CMsgGCPlayerInfoSubmitResponse_EResult_value)
+	proto.RegisterEnum("dota.CMsgClientToGCExchangeItemsForOfferingResponse_EResponse", CMsgClientToGCExchangeItemsForOfferingResponse_EResponse_name, CMsgClientToGCExchangeItemsForOfferingResponse_EResponse_value)
 }

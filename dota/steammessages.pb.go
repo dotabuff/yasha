@@ -4,7 +4,7 @@
 
 package dota
 
-import proto "code.google.com/p/goprotobuf/proto"
+import proto "github.com/golang/protobuf/proto"
 import math "math"
 import google_protobuf "github.com/dotabuff/yasha/dota/google/protobuf"
 
@@ -2288,6 +2288,46 @@ func (m *CMsgGCCheckFriendship_Response) GetFoundFriendship() bool {
 		return *m.FoundFriendship
 	}
 	return false
+}
+
+type CMsgGCGetAppFriendsList struct {
+	Steamid          *uint64 `protobuf:"fixed64,1,opt,name=steamid" json:"steamid,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgGCGetAppFriendsList) Reset()         { *m = CMsgGCGetAppFriendsList{} }
+func (m *CMsgGCGetAppFriendsList) String() string { return proto.CompactTextString(m) }
+func (*CMsgGCGetAppFriendsList) ProtoMessage()    {}
+
+func (m *CMsgGCGetAppFriendsList) GetSteamid() uint64 {
+	if m != nil && m.Steamid != nil {
+		return *m.Steamid
+	}
+	return 0
+}
+
+type CMsgGCGetAppFriendsList_Response struct {
+	Success          *bool    `protobuf:"varint,1,opt,name=success" json:"success,omitempty"`
+	Steamids         []uint64 `protobuf:"fixed64,2,rep,name=steamids" json:"steamids,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
+}
+
+func (m *CMsgGCGetAppFriendsList_Response) Reset()         { *m = CMsgGCGetAppFriendsList_Response{} }
+func (m *CMsgGCGetAppFriendsList_Response) String() string { return proto.CompactTextString(m) }
+func (*CMsgGCGetAppFriendsList_Response) ProtoMessage()    {}
+
+func (m *CMsgGCGetAppFriendsList_Response) GetSuccess() bool {
+	if m != nil && m.Success != nil {
+		return *m.Success
+	}
+	return false
+}
+
+func (m *CMsgGCGetAppFriendsList_Response) GetSteamids() []uint64 {
+	if m != nil {
+		return m.Steamids
+	}
+	return nil
 }
 
 type CMsgGCMsgMasterSetDirectory struct {

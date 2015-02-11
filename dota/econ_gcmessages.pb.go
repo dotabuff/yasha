@@ -4,7 +4,7 @@
 
 package dota
 
-import proto "code.google.com/p/goprotobuf/proto"
+import proto "github.com/golang/protobuf/proto"
 import math "math"
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -44,11 +44,6 @@ const (
 	EGCItemMsg_k_EMsgGCGiftedItems                            EGCItemMsg = 1027
 	EGCItemMsg_k_EMsgGCRemoveItemName                         EGCItemMsg = 1030
 	EGCItemMsg_k_EMsgGCRemoveItemPaint                        EGCItemMsg = 1031
-	EGCItemMsg_k_EMsgGCGiftWrapItem                           EGCItemMsg = 1032
-	EGCItemMsg_k_EMsgGCGiftWrapItemResponse                   EGCItemMsg = 1033
-	EGCItemMsg_k_EMsgGCDeliverGift                            EGCItemMsg = 1034
-	EGCItemMsg_k_EMsgGCDeliverGiftResponseGiver               EGCItemMsg = 1035
-	EGCItemMsg_k_EMsgGCDeliverGiftResponseReceiver            EGCItemMsg = 1036
 	EGCItemMsg_k_EMsgGCUnwrapGiftRequest                      EGCItemMsg = 1037
 	EGCItemMsg_k_EMsgGCUnwrapGiftResponse                     EGCItemMsg = 1038
 	EGCItemMsg_k_EMsgGCSetItemStyle                           EGCItemMsg = 1039
@@ -179,6 +174,8 @@ const (
 	EGCItemMsg_k_EMsgGCRedeemCode                             EGCItemMsg = 2562
 	EGCItemMsg_k_EMsgGCRedeemCodeResponse                     EGCItemMsg = 2563
 	EGCItemMsg_k_EMsgGCToGCItemConsumptionRollback            EGCItemMsg = 2564
+	EGCItemMsg_k_EMsgClientToGCWrapAndDeliverGift             EGCItemMsg = 2565
+	EGCItemMsg_k_EMsgClientToGCWrapAndDeliverGiftResponse     EGCItemMsg = 2566
 )
 
 var EGCItemMsg_name = map[int32]string{
@@ -212,11 +209,6 @@ var EGCItemMsg_name = map[int32]string{
 	1027: "k_EMsgGCGiftedItems",
 	1030: "k_EMsgGCRemoveItemName",
 	1031: "k_EMsgGCRemoveItemPaint",
-	1032: "k_EMsgGCGiftWrapItem",
-	1033: "k_EMsgGCGiftWrapItemResponse",
-	1034: "k_EMsgGCDeliverGift",
-	1035: "k_EMsgGCDeliverGiftResponseGiver",
-	1036: "k_EMsgGCDeliverGiftResponseReceiver",
 	1037: "k_EMsgGCUnwrapGiftRequest",
 	1038: "k_EMsgGCUnwrapGiftResponse",
 	1039: "k_EMsgGCSetItemStyle",
@@ -347,6 +339,8 @@ var EGCItemMsg_name = map[int32]string{
 	2562: "k_EMsgGCRedeemCode",
 	2563: "k_EMsgGCRedeemCodeResponse",
 	2564: "k_EMsgGCToGCItemConsumptionRollback",
+	2565: "k_EMsgClientToGCWrapAndDeliverGift",
+	2566: "k_EMsgClientToGCWrapAndDeliverGiftResponse",
 }
 var EGCItemMsg_value = map[string]int32{
 	"k_EMsgGCBase":                                   1000,
@@ -379,11 +373,6 @@ var EGCItemMsg_value = map[string]int32{
 	"k_EMsgGCGiftedItems":                            1027,
 	"k_EMsgGCRemoveItemName":                         1030,
 	"k_EMsgGCRemoveItemPaint":                        1031,
-	"k_EMsgGCGiftWrapItem":                           1032,
-	"k_EMsgGCGiftWrapItemResponse":                   1033,
-	"k_EMsgGCDeliverGift":                            1034,
-	"k_EMsgGCDeliverGiftResponseGiver":               1035,
-	"k_EMsgGCDeliverGiftResponseReceiver":            1036,
 	"k_EMsgGCUnwrapGiftRequest":                      1037,
 	"k_EMsgGCUnwrapGiftResponse":                     1038,
 	"k_EMsgGCSetItemStyle":                           1039,
@@ -514,6 +503,8 @@ var EGCItemMsg_value = map[string]int32{
 	"k_EMsgGCRedeemCode":                             2562,
 	"k_EMsgGCRedeemCodeResponse":                     2563,
 	"k_EMsgGCToGCItemConsumptionRollback":            2564,
+	"k_EMsgClientToGCWrapAndDeliverGift":             2565,
+	"k_EMsgClientToGCWrapAndDeliverGiftResponse":     2566,
 }
 
 func (x EGCItemMsg) Enum() *EGCItemMsg {
@@ -2058,6 +2049,74 @@ func (m *CMsgGCAddGiftItem) GetAccountId() uint32 {
 }
 
 func (m *CMsgGCAddGiftItem) GetItemId() uint64 {
+	if m != nil && m.ItemId != nil {
+		return *m.ItemId
+	}
+	return 0
+}
+
+type CMsgClientToGCWrapAndDeliverGift struct {
+	ItemId           *uint64 `protobuf:"varint,1,opt,name=item_id" json:"item_id,omitempty"`
+	GiveToAccountId  *uint32 `protobuf:"varint,2,opt,name=give_to_account_id" json:"give_to_account_id,omitempty"`
+	GiftMessage      *string `protobuf:"bytes,3,opt,name=gift_message" json:"gift_message,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgClientToGCWrapAndDeliverGift) Reset()         { *m = CMsgClientToGCWrapAndDeliverGift{} }
+func (m *CMsgClientToGCWrapAndDeliverGift) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCWrapAndDeliverGift) ProtoMessage()    {}
+
+func (m *CMsgClientToGCWrapAndDeliverGift) GetItemId() uint64 {
+	if m != nil && m.ItemId != nil {
+		return *m.ItemId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCWrapAndDeliverGift) GetGiveToAccountId() uint32 {
+	if m != nil && m.GiveToAccountId != nil {
+		return *m.GiveToAccountId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCWrapAndDeliverGift) GetGiftMessage() string {
+	if m != nil && m.GiftMessage != nil {
+		return *m.GiftMessage
+	}
+	return ""
+}
+
+type CMsgClientToGCWrapAndDeliverGiftResponse struct {
+	Response         *EGCMsgResponse `protobuf:"varint,1,opt,name=response,enum=dota.EGCMsgResponse,def=0" json:"response,omitempty"`
+	XXX_unrecognized []byte          `json:"-"`
+}
+
+func (m *CMsgClientToGCWrapAndDeliverGiftResponse) Reset() {
+	*m = CMsgClientToGCWrapAndDeliverGiftResponse{}
+}
+func (m *CMsgClientToGCWrapAndDeliverGiftResponse) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCWrapAndDeliverGiftResponse) ProtoMessage()    {}
+
+const Default_CMsgClientToGCWrapAndDeliverGiftResponse_Response EGCMsgResponse = EGCMsgResponse_k_EGCMsgResponseOK
+
+func (m *CMsgClientToGCWrapAndDeliverGiftResponse) GetResponse() EGCMsgResponse {
+	if m != nil && m.Response != nil {
+		return *m.Response
+	}
+	return Default_CMsgClientToGCWrapAndDeliverGiftResponse_Response
+}
+
+type CMsgClientToGCUnwrapGift struct {
+	ItemId           *uint64 `protobuf:"varint,1,opt,name=item_id" json:"item_id,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgClientToGCUnwrapGift) Reset()         { *m = CMsgClientToGCUnwrapGift{} }
+func (m *CMsgClientToGCUnwrapGift) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCUnwrapGift) ProtoMessage()    {}
+
+func (m *CMsgClientToGCUnwrapGift) GetItemId() uint64 {
 	if m != nil && m.ItemId != nil {
 		return *m.ItemId
 	}

@@ -4,7 +4,7 @@
 
 package dota
 
-import proto "code.google.com/p/goprotobuf/proto"
+import proto "github.com/golang/protobuf/proto"
 import math "math"
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -693,6 +693,7 @@ type CMsgGameServerInfo struct {
 	ServerPrivateIpAddr         *uint32                        `protobuf:"fixed32,2,opt,name=server_private_ip_addr" json:"server_private_ip_addr,omitempty"`
 	ServerPort                  *uint32                        `protobuf:"varint,3,opt,name=server_port" json:"server_port,omitempty"`
 	ServerTvPort                *uint32                        `protobuf:"varint,4,opt,name=server_tv_port" json:"server_tv_port,omitempty"`
+	ServerSteamdatagramPort     *uint32                        `protobuf:"varint,21,opt,name=server_steamdatagram_port" json:"server_steamdatagram_port,omitempty"`
 	ServerKey                   *string                        `protobuf:"bytes,5,opt,name=server_key" json:"server_key,omitempty"`
 	ServerHibernation           *bool                          `protobuf:"varint,6,opt,name=server_hibernation" json:"server_hibernation,omitempty"`
 	ServerType                  *CMsgGameServerInfo_ServerType `protobuf:"varint,7,opt,name=server_type,enum=dota.CMsgGameServerInfo_ServerType,def=0" json:"server_type,omitempty"`
@@ -742,6 +743,13 @@ func (m *CMsgGameServerInfo) GetServerPort() uint32 {
 func (m *CMsgGameServerInfo) GetServerTvPort() uint32 {
 	if m != nil && m.ServerTvPort != nil {
 		return *m.ServerTvPort
+	}
+	return 0
+}
+
+func (m *CMsgGameServerInfo) GetServerSteamdatagramPort() uint32 {
+	if m != nil && m.ServerSteamdatagramPort != nil {
+		return *m.ServerSteamdatagramPort
 	}
 	return 0
 }
@@ -4438,7 +4446,7 @@ type CMsgGCToServerPredictionResult_Prediction struct {
 	NumCorrect       *uint32                                            `protobuf:"varint,2,opt,name=num_correct" json:"num_correct,omitempty"`
 	NumFails         *uint32                                            `protobuf:"varint,3,opt,name=num_fails" json:"num_fails,omitempty"`
 	Result           *CMsgGCToServerPredictionResult_Prediction_EResult `protobuf:"varint,4,opt,name=result,enum=dota.CMsgGCToServerPredictionResult_Prediction_EResult,def=1" json:"result,omitempty"`
-	GrantedItemDef   *uint32                                            `protobuf:"varint,5,opt,name=granted_item_def" json:"granted_item_def,omitempty"`
+	GrantedItemDefs  []uint32                                           `protobuf:"varint,6,rep,name=granted_item_defs" json:"granted_item_defs,omitempty"`
 	XXX_unrecognized []byte                                             `json:"-"`
 }
 
@@ -4478,9 +4486,33 @@ func (m *CMsgGCToServerPredictionResult_Prediction) GetResult() CMsgGCToServerPr
 	return Default_CMsgGCToServerPredictionResult_Prediction_Result
 }
 
-func (m *CMsgGCToServerPredictionResult_Prediction) GetGrantedItemDef() uint32 {
-	if m != nil && m.GrantedItemDef != nil {
-		return *m.GrantedItemDef
+func (m *CMsgGCToServerPredictionResult_Prediction) GetGrantedItemDefs() []uint32 {
+	if m != nil {
+		return m.GrantedItemDefs
+	}
+	return nil
+}
+
+type CMsgServerToGCLockCharmTrading struct {
+	AccountId        *uint32 `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
+	ItemId           *uint64 `protobuf:"varint,2,opt,name=item_id" json:"item_id,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgServerToGCLockCharmTrading) Reset()         { *m = CMsgServerToGCLockCharmTrading{} }
+func (m *CMsgServerToGCLockCharmTrading) String() string { return proto.CompactTextString(m) }
+func (*CMsgServerToGCLockCharmTrading) ProtoMessage()    {}
+
+func (m *CMsgServerToGCLockCharmTrading) GetAccountId() uint32 {
+	if m != nil && m.AccountId != nil {
+		return *m.AccountId
+	}
+	return 0
+}
+
+func (m *CMsgServerToGCLockCharmTrading) GetItemId() uint64 {
+	if m != nil && m.ItemId != nil {
+		return *m.ItemId
 	}
 	return 0
 }

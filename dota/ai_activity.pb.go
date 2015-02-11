@@ -21,7 +21,6 @@ It is generated from these files:
 	econ_gcmessages.proto
 	gcsdk_gcmessages.proto
 	gcsystemmsgs.proto
-	htmlmessages.proto
 	netmessages.proto
 	network_connection.proto
 	networkbasetypes.proto
@@ -32,7 +31,7 @@ It has these top-level messages:
 */
 package dota
 
-import proto "code.google.com/p/goprotobuf/proto"
+import proto "github.com/golang/protobuf/proto"
 import math "math"
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -644,6 +643,15 @@ const (
 	Activity_ACT_DOTA_KINETIC_FIELD                          Activity = 600
 	Activity_ACT_DOTA_STATIC_STORM                           Activity = 601
 	Activity_ACT_DOTA_MINI_TAUNT                             Activity = 602
+	Activity_ACT_DOTA_ARCTIC_BURN_END                        Activity = 603
+	Activity_ACT_DOTA_LOADOUT_RARE                           Activity = 604
+	Activity_ACT_DOTA_SWIM                                   Activity = 605
+	Activity_ACT_DOTA_FLEE                                   Activity = 606
+	Activity_ACT_DOTA_TROT                                   Activity = 607
+	Activity_ACT_DOTA_SHAKE                                  Activity = 608
+	Activity_ACT_DOTA_SWIM_IDLE                              Activity = 609
+	Activity_ACT_DOTA_WAIT_IDLE                              Activity = 610
+	Activity_ACT_DOTA_GREET                                  Activity = 611
 )
 
 var Activity_name = map[int32]string{
@@ -1249,6 +1257,15 @@ var Activity_name = map[int32]string{
 	600: "ACT_DOTA_KINETIC_FIELD",
 	601: "ACT_DOTA_STATIC_STORM",
 	602: "ACT_DOTA_MINI_TAUNT",
+	603: "ACT_DOTA_ARCTIC_BURN_END",
+	604: "ACT_DOTA_LOADOUT_RARE",
+	605: "ACT_DOTA_SWIM",
+	606: "ACT_DOTA_FLEE",
+	607: "ACT_DOTA_TROT",
+	608: "ACT_DOTA_SHAKE",
+	609: "ACT_DOTA_SWIM_IDLE",
+	610: "ACT_DOTA_WAIT_IDLE",
+	611: "ACT_DOTA_GREET",
 }
 var Activity_value = map[string]int32{
 	"ACT_INVALID":                                     -1,
@@ -1853,6 +1870,15 @@ var Activity_value = map[string]int32{
 	"ACT_DOTA_KINETIC_FIELD":                          600,
 	"ACT_DOTA_STATIC_STORM":                           601,
 	"ACT_DOTA_MINI_TAUNT":                             602,
+	"ACT_DOTA_ARCTIC_BURN_END":                        603,
+	"ACT_DOTA_LOADOUT_RARE":                           604,
+	"ACT_DOTA_SWIM":                                   605,
+	"ACT_DOTA_FLEE":                                   606,
+	"ACT_DOTA_TROT":                                   607,
+	"ACT_DOTA_SHAKE":                                  608,
+	"ACT_DOTA_SWIM_IDLE":                              609,
+	"ACT_DOTA_WAIT_IDLE":                              610,
+	"ACT_DOTA_GREET":                                  611,
 }
 
 func (x Activity) Enum() *Activity {

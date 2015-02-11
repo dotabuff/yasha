@@ -1,5 +1,8 @@
 package dota;
 
+option optimize_for = SPEED;
+option cc_generic_services = false;
+
 enum EGCSystemMsg {
 	k_EGCMsgInvalid = 0;
 	k_EGCMsgMulti = 1;
@@ -85,6 +88,8 @@ enum EGCSystemMsg {
 	k_EGCMsgDPPartnerMicroTxnsResponse = 513;
 	k_EGCMsgGetIPASN = 514;
 	k_EGCMsgGetIPASNResponse = 515;
+	k_EGCMsgGetAppFriendsList = 516;
+	k_EGCMsgGetAppFriendsListResponse = 517;
 }
 
 enum ESOMsg {

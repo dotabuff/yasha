@@ -2,6 +2,8 @@ package dota;
 
 import "network_connection.proto";
 
+option cc_generic_services = false;
+
 enum SIGNONSTATE {
 	SIGNONSTATE_NONE = 0;
 	SIGNONSTATE_CHALLENGE = 1;

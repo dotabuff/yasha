@@ -4,7 +4,7 @@
 
 package dota
 
-import proto "code.google.com/p/goprotobuf/proto"
+import proto "github.com/golang/protobuf/proto"
 import math "math"
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -335,6 +335,117 @@ func (x *EDOTAStatPopupTypes) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+type DotaunitorderT int32
+
+const (
+	DotaunitorderT_DOTA_UNIT_ORDER_NONE                  DotaunitorderT = 0
+	DotaunitorderT_DOTA_UNIT_ORDER_MOVE_TO_POSITION      DotaunitorderT = 1
+	DotaunitorderT_DOTA_UNIT_ORDER_MOVE_TO_TARGET        DotaunitorderT = 2
+	DotaunitorderT_DOTA_UNIT_ORDER_ATTACK_MOVE           DotaunitorderT = 3
+	DotaunitorderT_DOTA_UNIT_ORDER_ATTACK_TARGET         DotaunitorderT = 4
+	DotaunitorderT_DOTA_UNIT_ORDER_CAST_POSITION         DotaunitorderT = 5
+	DotaunitorderT_DOTA_UNIT_ORDER_CAST_TARGET           DotaunitorderT = 6
+	DotaunitorderT_DOTA_UNIT_ORDER_CAST_TARGET_TREE      DotaunitorderT = 7
+	DotaunitorderT_DOTA_UNIT_ORDER_CAST_NO_TARGET        DotaunitorderT = 8
+	DotaunitorderT_DOTA_UNIT_ORDER_CAST_TOGGLE           DotaunitorderT = 9
+	DotaunitorderT_DOTA_UNIT_ORDER_HOLD_POSITION         DotaunitorderT = 10
+	DotaunitorderT_DOTA_UNIT_ORDER_TRAIN_ABILITY         DotaunitorderT = 11
+	DotaunitorderT_DOTA_UNIT_ORDER_DROP_ITEM             DotaunitorderT = 12
+	DotaunitorderT_DOTA_UNIT_ORDER_GIVE_ITEM             DotaunitorderT = 13
+	DotaunitorderT_DOTA_UNIT_ORDER_PICKUP_ITEM           DotaunitorderT = 14
+	DotaunitorderT_DOTA_UNIT_ORDER_PICKUP_RUNE           DotaunitorderT = 15
+	DotaunitorderT_DOTA_UNIT_ORDER_PURCHASE_ITEM         DotaunitorderT = 16
+	DotaunitorderT_DOTA_UNIT_ORDER_SELL_ITEM             DotaunitorderT = 17
+	DotaunitorderT_DOTA_UNIT_ORDER_DISASSEMBLE_ITEM      DotaunitorderT = 18
+	DotaunitorderT_DOTA_UNIT_ORDER_MOVE_ITEM             DotaunitorderT = 19
+	DotaunitorderT_DOTA_UNIT_ORDER_CAST_TOGGLE_AUTO      DotaunitorderT = 20
+	DotaunitorderT_DOTA_UNIT_ORDER_STOP                  DotaunitorderT = 21
+	DotaunitorderT_DOTA_UNIT_ORDER_TAUNT                 DotaunitorderT = 22
+	DotaunitorderT_DOTA_UNIT_ORDER_BUYBACK               DotaunitorderT = 23
+	DotaunitorderT_DOTA_UNIT_ORDER_GLYPH                 DotaunitorderT = 24
+	DotaunitorderT_DOTA_UNIT_ORDER_EJECT_ITEM_FROM_STASH DotaunitorderT = 25
+	DotaunitorderT_DOTA_UNIT_ORDER_CAST_RUNE             DotaunitorderT = 26
+	DotaunitorderT_DOTA_UNIT_ORDER_PING_ABILITY          DotaunitorderT = 27
+)
+
+var DotaunitorderT_name = map[int32]string{
+	0:  "DOTA_UNIT_ORDER_NONE",
+	1:  "DOTA_UNIT_ORDER_MOVE_TO_POSITION",
+	2:  "DOTA_UNIT_ORDER_MOVE_TO_TARGET",
+	3:  "DOTA_UNIT_ORDER_ATTACK_MOVE",
+	4:  "DOTA_UNIT_ORDER_ATTACK_TARGET",
+	5:  "DOTA_UNIT_ORDER_CAST_POSITION",
+	6:  "DOTA_UNIT_ORDER_CAST_TARGET",
+	7:  "DOTA_UNIT_ORDER_CAST_TARGET_TREE",
+	8:  "DOTA_UNIT_ORDER_CAST_NO_TARGET",
+	9:  "DOTA_UNIT_ORDER_CAST_TOGGLE",
+	10: "DOTA_UNIT_ORDER_HOLD_POSITION",
+	11: "DOTA_UNIT_ORDER_TRAIN_ABILITY",
+	12: "DOTA_UNIT_ORDER_DROP_ITEM",
+	13: "DOTA_UNIT_ORDER_GIVE_ITEM",
+	14: "DOTA_UNIT_ORDER_PICKUP_ITEM",
+	15: "DOTA_UNIT_ORDER_PICKUP_RUNE",
+	16: "DOTA_UNIT_ORDER_PURCHASE_ITEM",
+	17: "DOTA_UNIT_ORDER_SELL_ITEM",
+	18: "DOTA_UNIT_ORDER_DISASSEMBLE_ITEM",
+	19: "DOTA_UNIT_ORDER_MOVE_ITEM",
+	20: "DOTA_UNIT_ORDER_CAST_TOGGLE_AUTO",
+	21: "DOTA_UNIT_ORDER_STOP",
+	22: "DOTA_UNIT_ORDER_TAUNT",
+	23: "DOTA_UNIT_ORDER_BUYBACK",
+	24: "DOTA_UNIT_ORDER_GLYPH",
+	25: "DOTA_UNIT_ORDER_EJECT_ITEM_FROM_STASH",
+	26: "DOTA_UNIT_ORDER_CAST_RUNE",
+	27: "DOTA_UNIT_ORDER_PING_ABILITY",
+}
+var DotaunitorderT_value = map[string]int32{
+	"DOTA_UNIT_ORDER_NONE":                  0,
+	"DOTA_UNIT_ORDER_MOVE_TO_POSITION":      1,
+	"DOTA_UNIT_ORDER_MOVE_TO_TARGET":        2,
+	"DOTA_UNIT_ORDER_ATTACK_MOVE":           3,
+	"DOTA_UNIT_ORDER_ATTACK_TARGET":         4,
+	"DOTA_UNIT_ORDER_CAST_POSITION":         5,
+	"DOTA_UNIT_ORDER_CAST_TARGET":           6,
+	"DOTA_UNIT_ORDER_CAST_TARGET_TREE":      7,
+	"DOTA_UNIT_ORDER_CAST_NO_TARGET":        8,
+	"DOTA_UNIT_ORDER_CAST_TOGGLE":           9,
+	"DOTA_UNIT_ORDER_HOLD_POSITION":         10,
+	"DOTA_UNIT_ORDER_TRAIN_ABILITY":         11,
+	"DOTA_UNIT_ORDER_DROP_ITEM":             12,
+	"DOTA_UNIT_ORDER_GIVE_ITEM":             13,
+	"DOTA_UNIT_ORDER_PICKUP_ITEM":           14,
+	"DOTA_UNIT_ORDER_PICKUP_RUNE":           15,
+	"DOTA_UNIT_ORDER_PURCHASE_ITEM":         16,
+	"DOTA_UNIT_ORDER_SELL_ITEM":             17,
+	"DOTA_UNIT_ORDER_DISASSEMBLE_ITEM":      18,
+	"DOTA_UNIT_ORDER_MOVE_ITEM":             19,
+	"DOTA_UNIT_ORDER_CAST_TOGGLE_AUTO":      20,
+	"DOTA_UNIT_ORDER_STOP":                  21,
+	"DOTA_UNIT_ORDER_TAUNT":                 22,
+	"DOTA_UNIT_ORDER_BUYBACK":               23,
+	"DOTA_UNIT_ORDER_GLYPH":                 24,
+	"DOTA_UNIT_ORDER_EJECT_ITEM_FROM_STASH": 25,
+	"DOTA_UNIT_ORDER_CAST_RUNE":             26,
+	"DOTA_UNIT_ORDER_PING_ABILITY":          27,
+}
+
+func (x DotaunitorderT) Enum() *DotaunitorderT {
+	p := new(DotaunitorderT)
+	*p = x
+	return p
+}
+func (x DotaunitorderT) String() string {
+	return proto.EnumName(DotaunitorderT_name, int32(x))
+}
+func (x *DotaunitorderT) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(DotaunitorderT_value, data, "DotaunitorderT")
+	if err != nil {
+		return err
+	}
+	*x = DotaunitorderT(value)
+	return nil
+}
+
 type CDOTAMsg_LocationPing struct {
 	X                *int32 `protobuf:"varint,1,opt,name=x" json:"x,omitempty"`
 	Y                *int32 `protobuf:"varint,2,opt,name=y" json:"y,omitempty"`
@@ -564,4 +675,5 @@ func (m *CDOTAMsg_CoachHUDPing) GetTgtpath() string {
 func init() {
 	proto.RegisterEnum("dota.EDOTAChatWheelMessage", EDOTAChatWheelMessage_name, EDOTAChatWheelMessage_value)
 	proto.RegisterEnum("dota.EDOTAStatPopupTypes", EDOTAStatPopupTypes_name, EDOTAStatPopupTypes_value)
+	proto.RegisterEnum("dota.DotaunitorderT", DotaunitorderT_name, DotaunitorderT_value)
 }

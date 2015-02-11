@@ -4,7 +4,7 @@
 
 package dota
 
-import proto "code.google.com/p/goprotobuf/proto"
+import proto "github.com/golang/protobuf/proto"
 import math "math"
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -98,6 +98,8 @@ const (
 	EGCSystemMsg_k_EGCMsgDPPartnerMicroTxnsResponse        EGCSystemMsg = 513
 	EGCSystemMsg_k_EGCMsgGetIPASN                          EGCSystemMsg = 514
 	EGCSystemMsg_k_EGCMsgGetIPASNResponse                  EGCSystemMsg = 515
+	EGCSystemMsg_k_EGCMsgGetAppFriendsList                 EGCSystemMsg = 516
+	EGCSystemMsg_k_EGCMsgGetAppFriendsListResponse         EGCSystemMsg = 517
 )
 
 var EGCSystemMsg_name = map[int32]string{
@@ -185,6 +187,8 @@ var EGCSystemMsg_name = map[int32]string{
 	513: "k_EGCMsgDPPartnerMicroTxnsResponse",
 	514: "k_EGCMsgGetIPASN",
 	515: "k_EGCMsgGetIPASNResponse",
+	516: "k_EGCMsgGetAppFriendsList",
+	517: "k_EGCMsgGetAppFriendsListResponse",
 }
 var EGCSystemMsg_value = map[string]int32{
 	"k_EGCMsgInvalid":                           0,
@@ -271,6 +275,8 @@ var EGCSystemMsg_value = map[string]int32{
 	"k_EGCMsgDPPartnerMicroTxnsResponse":        513,
 	"k_EGCMsgGetIPASN":                          514,
 	"k_EGCMsgGetIPASNResponse":                  515,
+	"k_EGCMsgGetAppFriendsList":                 516,
+	"k_EGCMsgGetAppFriendsListResponse":         517,
 }
 
 func (x EGCSystemMsg) Enum() *EGCSystemMsg {

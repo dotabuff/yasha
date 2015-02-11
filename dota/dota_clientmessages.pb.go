@@ -4,7 +4,7 @@
 
 package dota
 
-import proto "code.google.com/p/goprotobuf/proto"
+import proto "github.com/golang/protobuf/proto"
 import math "math"
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -54,6 +54,7 @@ const (
 	EDotaClientMessages_DOTA_CM_GlyphAlert                             EDotaClientMessages = 38
 	EDotaClientMessages_DOTA_CM_TeamShowcaseClientData                 EDotaClientMessages = 39
 	EDotaClientMessages_DOTA_CM_PlayTeamShowcase                       EDotaClientMessages = 40
+	EDotaClientMessages_DOTA_CM_EventCNY2015Cmd                        EDotaClientMessages = 41
 )
 
 var EDotaClientMessages_name = map[int32]string{
@@ -97,6 +98,7 @@ var EDotaClientMessages_name = map[int32]string{
 	38: "DOTA_CM_GlyphAlert",
 	39: "DOTA_CM_TeamShowcaseClientData",
 	40: "DOTA_CM_PlayTeamShowcase",
+	41: "DOTA_CM_EventCNY2015Cmd",
 }
 var EDotaClientMessages_value = map[string]int32{
 	"DOTA_CM_MapLine":                                1,
@@ -139,6 +141,7 @@ var EDotaClientMessages_value = map[string]int32{
 	"DOTA_CM_GlyphAlert":                             38,
 	"DOTA_CM_TeamShowcaseClientData":                 39,
 	"DOTA_CM_PlayTeamShowcase":                       40,
+	"DOTA_CM_EventCNY2015Cmd":                        41,
 }
 
 func (x EDotaClientMessages) Enum() *EDotaClientMessages {
@@ -207,8 +210,9 @@ func (m *CDOTAClientMsg_EnemyItemAlert) GetItemEntindex() uint32 {
 }
 
 type CDOTAClientMsg_ModifierAlert struct {
-	BuffInternalIndex *int32 `protobuf:"varint,1,opt,name=buff_internal_index" json:"buff_internal_index,omitempty"`
-	XXX_unrecognized  []byte `json:"-"`
+	BuffInternalIndex *int32  `protobuf:"varint,1,opt,name=buff_internal_index" json:"buff_internal_index,omitempty"`
+	TargetEntindex    *uint32 `protobuf:"varint,2,opt,name=target_entindex" json:"target_entindex,omitempty"`
+	XXX_unrecognized  []byte  `json:"-"`
 }
 
 func (m *CDOTAClientMsg_ModifierAlert) Reset()         { *m = CDOTAClientMsg_ModifierAlert{} }
@@ -218,6 +222,13 @@ func (*CDOTAClientMsg_ModifierAlert) ProtoMessage()    {}
 func (m *CDOTAClientMsg_ModifierAlert) GetBuffInternalIndex() int32 {
 	if m != nil && m.BuffInternalIndex != nil {
 		return *m.BuffInternalIndex
+	}
+	return 0
+}
+
+func (m *CDOTAClientMsg_ModifierAlert) GetTargetEntindex() uint32 {
+	if m != nil && m.TargetEntindex != nil {
+		return *m.TargetEntindex
 	}
 	return 0
 }
@@ -879,6 +890,22 @@ type CDOTAClientMsg_PlayTeamShowcase struct {
 func (m *CDOTAClientMsg_PlayTeamShowcase) Reset()         { *m = CDOTAClientMsg_PlayTeamShowcase{} }
 func (m *CDOTAClientMsg_PlayTeamShowcase) String() string { return proto.CompactTextString(m) }
 func (*CDOTAClientMsg_PlayTeamShowcase) ProtoMessage()    {}
+
+type CDOTAClientMsg_EventCNY2015Cmd struct {
+	Data             []byte `protobuf:"bytes,1,opt,name=data" json:"data,omitempty"`
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *CDOTAClientMsg_EventCNY2015Cmd) Reset()         { *m = CDOTAClientMsg_EventCNY2015Cmd{} }
+func (m *CDOTAClientMsg_EventCNY2015Cmd) String() string { return proto.CompactTextString(m) }
+func (*CDOTAClientMsg_EventCNY2015Cmd) ProtoMessage()    {}
+
+func (m *CDOTAClientMsg_EventCNY2015Cmd) GetData() []byte {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
 
 func init() {
 	proto.RegisterEnum("dota.EDotaClientMessages", EDotaClientMessages_name, EDotaClientMessages_value)

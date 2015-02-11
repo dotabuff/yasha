@@ -2,6 +2,9 @@ package dota;
 
 import "google/protobuf/descriptor.proto";
 
+option optimize_for = SPEED;
+option cc_generic_services = false;
+
 extend .google.protobuf.FieldOptions {
 	optional bool key_field = 60000 [default = false];
 }
@@ -389,6 +392,15 @@ message CMsgGCCheckFriendship {
 message CMsgGCCheckFriendship_Response {
 	optional bool success = 1;
 	optional bool found_friendship = 2;
+}
+
+message CMsgGCGetAppFriendsList {
+	optional fixed64 steamid = 1;
+}
+
+message CMsgGCGetAppFriendsList_Response {
+	optional bool success = 1;
+	repeated fixed64 steamids = 2;
 }
 
 message CMsgGCMsgMasterSetDirectory {

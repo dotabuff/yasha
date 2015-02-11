@@ -4,7 +4,7 @@
 
 package dota
 
-import proto "code.google.com/p/goprotobuf/proto"
+import proto "github.com/golang/protobuf/proto"
 import math "math"
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -14,80 +14,82 @@ var _ = math.Inf
 type EDotaUserMessages int32
 
 const (
-	EDotaUserMessages_DOTA_UM_AddUnitToSelection       EDotaUserMessages = 64
-	EDotaUserMessages_DOTA_UM_AIDebugLine              EDotaUserMessages = 65
-	EDotaUserMessages_DOTA_UM_ChatEvent                EDotaUserMessages = 66
-	EDotaUserMessages_DOTA_UM_CombatHeroPositions      EDotaUserMessages = 67
-	EDotaUserMessages_DOTA_UM_CombatLogData            EDotaUserMessages = 68
-	EDotaUserMessages_DOTA_UM_CombatLogShowDeath       EDotaUserMessages = 70
-	EDotaUserMessages_DOTA_UM_CreateLinearProjectile   EDotaUserMessages = 71
-	EDotaUserMessages_DOTA_UM_DestroyLinearProjectile  EDotaUserMessages = 72
-	EDotaUserMessages_DOTA_UM_DodgeTrackingProjectiles EDotaUserMessages = 73
-	EDotaUserMessages_DOTA_UM_GlobalLightColor         EDotaUserMessages = 74
-	EDotaUserMessages_DOTA_UM_GlobalLightDirection     EDotaUserMessages = 75
-	EDotaUserMessages_DOTA_UM_InvalidCommand           EDotaUserMessages = 76
-	EDotaUserMessages_DOTA_UM_LocationPing             EDotaUserMessages = 77
-	EDotaUserMessages_DOTA_UM_MapLine                  EDotaUserMessages = 78
-	EDotaUserMessages_DOTA_UM_MiniKillCamInfo          EDotaUserMessages = 79
-	EDotaUserMessages_DOTA_UM_MinimapDebugPoint        EDotaUserMessages = 80
-	EDotaUserMessages_DOTA_UM_MinimapEvent             EDotaUserMessages = 81
-	EDotaUserMessages_DOTA_UM_NevermoreRequiem         EDotaUserMessages = 82
-	EDotaUserMessages_DOTA_UM_OverheadEvent            EDotaUserMessages = 83
-	EDotaUserMessages_DOTA_UM_SetNextAutobuyItem       EDotaUserMessages = 84
-	EDotaUserMessages_DOTA_UM_SharedCooldown           EDotaUserMessages = 85
-	EDotaUserMessages_DOTA_UM_SpectatorPlayerClick     EDotaUserMessages = 86
-	EDotaUserMessages_DOTA_UM_TutorialTipInfo          EDotaUserMessages = 87
-	EDotaUserMessages_DOTA_UM_UnitEvent                EDotaUserMessages = 88
-	EDotaUserMessages_DOTA_UM_ParticleManager          EDotaUserMessages = 89
-	EDotaUserMessages_DOTA_UM_BotChat                  EDotaUserMessages = 90
-	EDotaUserMessages_DOTA_UM_HudError                 EDotaUserMessages = 91
-	EDotaUserMessages_DOTA_UM_ItemPurchased            EDotaUserMessages = 92
-	EDotaUserMessages_DOTA_UM_Ping                     EDotaUserMessages = 93
-	EDotaUserMessages_DOTA_UM_ItemFound                EDotaUserMessages = 94
-	EDotaUserMessages_DOTA_UM_CharacterSpeakConcept    EDotaUserMessages = 95
-	EDotaUserMessages_DOTA_UM_SwapVerify               EDotaUserMessages = 96
-	EDotaUserMessages_DOTA_UM_WorldLine                EDotaUserMessages = 97
-	EDotaUserMessages_DOTA_UM_TournamentDrop           EDotaUserMessages = 98
-	EDotaUserMessages_DOTA_UM_ItemAlert                EDotaUserMessages = 99
-	EDotaUserMessages_DOTA_UM_HalloweenDrops           EDotaUserMessages = 100
-	EDotaUserMessages_DOTA_UM_ChatWheel                EDotaUserMessages = 101
-	EDotaUserMessages_DOTA_UM_ReceivedXmasGift         EDotaUserMessages = 102
-	EDotaUserMessages_DOTA_UM_UpdateSharedContent      EDotaUserMessages = 103
-	EDotaUserMessages_DOTA_UM_TutorialRequestExp       EDotaUserMessages = 104
-	EDotaUserMessages_DOTA_UM_TutorialPingMinimap      EDotaUserMessages = 105
-	EDotaUserMessages_DOTA_UM_GamerulesStateChanged    EDotaUserMessages = 106
-	EDotaUserMessages_DOTA_UM_ShowSurvey               EDotaUserMessages = 107
-	EDotaUserMessages_DOTA_UM_TutorialFade             EDotaUserMessages = 108
-	EDotaUserMessages_DOTA_UM_AddQuestLogEntry         EDotaUserMessages = 109
-	EDotaUserMessages_DOTA_UM_SendStatPopup            EDotaUserMessages = 110
-	EDotaUserMessages_DOTA_UM_TutorialFinish           EDotaUserMessages = 111
-	EDotaUserMessages_DOTA_UM_SendRoshanPopup          EDotaUserMessages = 112
-	EDotaUserMessages_DOTA_UM_SendGenericToolTip       EDotaUserMessages = 113
-	EDotaUserMessages_DOTA_UM_SendFinalGold            EDotaUserMessages = 114
-	EDotaUserMessages_DOTA_UM_CustomMsg                EDotaUserMessages = 115
-	EDotaUserMessages_DOTA_UM_CoachHUDPing             EDotaUserMessages = 116
-	EDotaUserMessages_DOTA_UM_ClientLoadGridNav        EDotaUserMessages = 117
-	EDotaUserMessages_DOTA_UM_AbilityPing              EDotaUserMessages = 118
-	EDotaUserMessages_DOTA_UM_ShowGenericPopup         EDotaUserMessages = 119
-	EDotaUserMessages_DOTA_UM_VoteStart                EDotaUserMessages = 120
-	EDotaUserMessages_DOTA_UM_VoteUpdate               EDotaUserMessages = 121
-	EDotaUserMessages_DOTA_UM_VoteEnd                  EDotaUserMessages = 122
-	EDotaUserMessages_DOTA_UM_BoosterState             EDotaUserMessages = 123
-	EDotaUserMessages_DOTA_UM_WillPurchaseAlert        EDotaUserMessages = 124
-	EDotaUserMessages_DOTA_UM_TutorialMinimapPosition  EDotaUserMessages = 125
-	EDotaUserMessages_DOTA_UM_PlayerMMR                EDotaUserMessages = 126
-	EDotaUserMessages_DOTA_UM_AbilitySteal             EDotaUserMessages = 127
-	EDotaUserMessages_DOTA_UM_CourierKilledAlert       EDotaUserMessages = 128
-	EDotaUserMessages_DOTA_UM_EnemyItemAlert           EDotaUserMessages = 129
-	EDotaUserMessages_DOTA_UM_StatsMatchDetails        EDotaUserMessages = 130
-	EDotaUserMessages_DOTA_UM_MiniTaunt                EDotaUserMessages = 131
-	EDotaUserMessages_DOTA_UM_BuyBackStateAlert        EDotaUserMessages = 132
-	EDotaUserMessages_DOTA_UM_QuickBuyAlert            EDotaUserMessages = 133
-	EDotaUserMessages_DOTA_UM_StatsHeroDetails         EDotaUserMessages = 134
-	EDotaUserMessages_DOTA_UM_PredictionResult         EDotaUserMessages = 135
-	EDotaUserMessages_DOTA_UM_ModifierAlert            EDotaUserMessages = 136
-	EDotaUserMessages_DOTA_UM_HPManaAlert              EDotaUserMessages = 137
-	EDotaUserMessages_DOTA_UM_GlyphAlert               EDotaUserMessages = 138
+	EDotaUserMessages_DOTA_UM_AddUnitToSelection        EDotaUserMessages = 64
+	EDotaUserMessages_DOTA_UM_AIDebugLine               EDotaUserMessages = 65
+	EDotaUserMessages_DOTA_UM_ChatEvent                 EDotaUserMessages = 66
+	EDotaUserMessages_DOTA_UM_CombatHeroPositions       EDotaUserMessages = 67
+	EDotaUserMessages_DOTA_UM_CombatLogData             EDotaUserMessages = 68
+	EDotaUserMessages_DOTA_UM_CombatLogShowDeath        EDotaUserMessages = 70
+	EDotaUserMessages_DOTA_UM_CreateLinearProjectile    EDotaUserMessages = 71
+	EDotaUserMessages_DOTA_UM_DestroyLinearProjectile   EDotaUserMessages = 72
+	EDotaUserMessages_DOTA_UM_DodgeTrackingProjectiles  EDotaUserMessages = 73
+	EDotaUserMessages_DOTA_UM_GlobalLightColor          EDotaUserMessages = 74
+	EDotaUserMessages_DOTA_UM_GlobalLightDirection      EDotaUserMessages = 75
+	EDotaUserMessages_DOTA_UM_InvalidCommand            EDotaUserMessages = 76
+	EDotaUserMessages_DOTA_UM_LocationPing              EDotaUserMessages = 77
+	EDotaUserMessages_DOTA_UM_MapLine                   EDotaUserMessages = 78
+	EDotaUserMessages_DOTA_UM_MiniKillCamInfo           EDotaUserMessages = 79
+	EDotaUserMessages_DOTA_UM_MinimapDebugPoint         EDotaUserMessages = 80
+	EDotaUserMessages_DOTA_UM_MinimapEvent              EDotaUserMessages = 81
+	EDotaUserMessages_DOTA_UM_NevermoreRequiem          EDotaUserMessages = 82
+	EDotaUserMessages_DOTA_UM_OverheadEvent             EDotaUserMessages = 83
+	EDotaUserMessages_DOTA_UM_SetNextAutobuyItem        EDotaUserMessages = 84
+	EDotaUserMessages_DOTA_UM_SharedCooldown            EDotaUserMessages = 85
+	EDotaUserMessages_DOTA_UM_SpectatorPlayerClick      EDotaUserMessages = 86
+	EDotaUserMessages_DOTA_UM_TutorialTipInfo           EDotaUserMessages = 87
+	EDotaUserMessages_DOTA_UM_UnitEvent                 EDotaUserMessages = 88
+	EDotaUserMessages_DOTA_UM_ParticleManager           EDotaUserMessages = 89
+	EDotaUserMessages_DOTA_UM_BotChat                   EDotaUserMessages = 90
+	EDotaUserMessages_DOTA_UM_HudError                  EDotaUserMessages = 91
+	EDotaUserMessages_DOTA_UM_ItemPurchased             EDotaUserMessages = 92
+	EDotaUserMessages_DOTA_UM_Ping                      EDotaUserMessages = 93
+	EDotaUserMessages_DOTA_UM_ItemFound                 EDotaUserMessages = 94
+	EDotaUserMessages_DOTA_UM_CharacterSpeakConcept     EDotaUserMessages = 95
+	EDotaUserMessages_DOTA_UM_SwapVerify                EDotaUserMessages = 96
+	EDotaUserMessages_DOTA_UM_WorldLine                 EDotaUserMessages = 97
+	EDotaUserMessages_DOTA_UM_TournamentDrop            EDotaUserMessages = 98
+	EDotaUserMessages_DOTA_UM_ItemAlert                 EDotaUserMessages = 99
+	EDotaUserMessages_DOTA_UM_HalloweenDrops            EDotaUserMessages = 100
+	EDotaUserMessages_DOTA_UM_ChatWheel                 EDotaUserMessages = 101
+	EDotaUserMessages_DOTA_UM_ReceivedXmasGift          EDotaUserMessages = 102
+	EDotaUserMessages_DOTA_UM_UpdateSharedContent       EDotaUserMessages = 103
+	EDotaUserMessages_DOTA_UM_TutorialRequestExp        EDotaUserMessages = 104
+	EDotaUserMessages_DOTA_UM_TutorialPingMinimap       EDotaUserMessages = 105
+	EDotaUserMessages_DOTA_UM_GamerulesStateChanged     EDotaUserMessages = 106
+	EDotaUserMessages_DOTA_UM_ShowSurvey                EDotaUserMessages = 107
+	EDotaUserMessages_DOTA_UM_TutorialFade              EDotaUserMessages = 108
+	EDotaUserMessages_DOTA_UM_AddQuestLogEntry          EDotaUserMessages = 109
+	EDotaUserMessages_DOTA_UM_SendStatPopup             EDotaUserMessages = 110
+	EDotaUserMessages_DOTA_UM_TutorialFinish            EDotaUserMessages = 111
+	EDotaUserMessages_DOTA_UM_SendRoshanPopup           EDotaUserMessages = 112
+	EDotaUserMessages_DOTA_UM_SendGenericToolTip        EDotaUserMessages = 113
+	EDotaUserMessages_DOTA_UM_SendFinalGold             EDotaUserMessages = 114
+	EDotaUserMessages_DOTA_UM_CustomMsg                 EDotaUserMessages = 115
+	EDotaUserMessages_DOTA_UM_CoachHUDPing              EDotaUserMessages = 116
+	EDotaUserMessages_DOTA_UM_ClientLoadGridNav         EDotaUserMessages = 117
+	EDotaUserMessages_DOTA_UM_AbilityPing               EDotaUserMessages = 118
+	EDotaUserMessages_DOTA_UM_ShowGenericPopup          EDotaUserMessages = 119
+	EDotaUserMessages_DOTA_UM_VoteStart                 EDotaUserMessages = 120
+	EDotaUserMessages_DOTA_UM_VoteUpdate                EDotaUserMessages = 121
+	EDotaUserMessages_DOTA_UM_VoteEnd                   EDotaUserMessages = 122
+	EDotaUserMessages_DOTA_UM_BoosterState              EDotaUserMessages = 123
+	EDotaUserMessages_DOTA_UM_WillPurchaseAlert         EDotaUserMessages = 124
+	EDotaUserMessages_DOTA_UM_TutorialMinimapPosition   EDotaUserMessages = 125
+	EDotaUserMessages_DOTA_UM_PlayerMMR                 EDotaUserMessages = 126
+	EDotaUserMessages_DOTA_UM_AbilitySteal              EDotaUserMessages = 127
+	EDotaUserMessages_DOTA_UM_CourierKilledAlert        EDotaUserMessages = 128
+	EDotaUserMessages_DOTA_UM_EnemyItemAlert            EDotaUserMessages = 129
+	EDotaUserMessages_DOTA_UM_StatsMatchDetails         EDotaUserMessages = 130
+	EDotaUserMessages_DOTA_UM_MiniTaunt                 EDotaUserMessages = 131
+	EDotaUserMessages_DOTA_UM_BuyBackStateAlert         EDotaUserMessages = 132
+	EDotaUserMessages_DOTA_UM_QuickBuyAlert             EDotaUserMessages = 133
+	EDotaUserMessages_DOTA_UM_StatsHeroDetails          EDotaUserMessages = 134
+	EDotaUserMessages_DOTA_UM_PredictionResult          EDotaUserMessages = 135
+	EDotaUserMessages_DOTA_UM_ModifierAlert             EDotaUserMessages = 136
+	EDotaUserMessages_DOTA_UM_HPManaAlert               EDotaUserMessages = 137
+	EDotaUserMessages_DOTA_UM_GlyphAlert                EDotaUserMessages = 138
+	EDotaUserMessages_DOTA_UM_BeastChat                 EDotaUserMessages = 139
+	EDotaUserMessages_DOTA_UM_SpectatorPlayerUnitOrders EDotaUserMessages = 140
 )
 
 var EDotaUserMessages_name = map[int32]string{
@@ -165,82 +167,86 @@ var EDotaUserMessages_name = map[int32]string{
 	136: "DOTA_UM_ModifierAlert",
 	137: "DOTA_UM_HPManaAlert",
 	138: "DOTA_UM_GlyphAlert",
+	139: "DOTA_UM_BeastChat",
+	140: "DOTA_UM_SpectatorPlayerUnitOrders",
 }
 var EDotaUserMessages_value = map[string]int32{
-	"DOTA_UM_AddUnitToSelection":       64,
-	"DOTA_UM_AIDebugLine":              65,
-	"DOTA_UM_ChatEvent":                66,
-	"DOTA_UM_CombatHeroPositions":      67,
-	"DOTA_UM_CombatLogData":            68,
-	"DOTA_UM_CombatLogShowDeath":       70,
-	"DOTA_UM_CreateLinearProjectile":   71,
-	"DOTA_UM_DestroyLinearProjectile":  72,
-	"DOTA_UM_DodgeTrackingProjectiles": 73,
-	"DOTA_UM_GlobalLightColor":         74,
-	"DOTA_UM_GlobalLightDirection":     75,
-	"DOTA_UM_InvalidCommand":           76,
-	"DOTA_UM_LocationPing":             77,
-	"DOTA_UM_MapLine":                  78,
-	"DOTA_UM_MiniKillCamInfo":          79,
-	"DOTA_UM_MinimapDebugPoint":        80,
-	"DOTA_UM_MinimapEvent":             81,
-	"DOTA_UM_NevermoreRequiem":         82,
-	"DOTA_UM_OverheadEvent":            83,
-	"DOTA_UM_SetNextAutobuyItem":       84,
-	"DOTA_UM_SharedCooldown":           85,
-	"DOTA_UM_SpectatorPlayerClick":     86,
-	"DOTA_UM_TutorialTipInfo":          87,
-	"DOTA_UM_UnitEvent":                88,
-	"DOTA_UM_ParticleManager":          89,
-	"DOTA_UM_BotChat":                  90,
-	"DOTA_UM_HudError":                 91,
-	"DOTA_UM_ItemPurchased":            92,
-	"DOTA_UM_Ping":                     93,
-	"DOTA_UM_ItemFound":                94,
-	"DOTA_UM_CharacterSpeakConcept":    95,
-	"DOTA_UM_SwapVerify":               96,
-	"DOTA_UM_WorldLine":                97,
-	"DOTA_UM_TournamentDrop":           98,
-	"DOTA_UM_ItemAlert":                99,
-	"DOTA_UM_HalloweenDrops":           100,
-	"DOTA_UM_ChatWheel":                101,
-	"DOTA_UM_ReceivedXmasGift":         102,
-	"DOTA_UM_UpdateSharedContent":      103,
-	"DOTA_UM_TutorialRequestExp":       104,
-	"DOTA_UM_TutorialPingMinimap":      105,
-	"DOTA_UM_GamerulesStateChanged":    106,
-	"DOTA_UM_ShowSurvey":               107,
-	"DOTA_UM_TutorialFade":             108,
-	"DOTA_UM_AddQuestLogEntry":         109,
-	"DOTA_UM_SendStatPopup":            110,
-	"DOTA_UM_TutorialFinish":           111,
-	"DOTA_UM_SendRoshanPopup":          112,
-	"DOTA_UM_SendGenericToolTip":       113,
-	"DOTA_UM_SendFinalGold":            114,
-	"DOTA_UM_CustomMsg":                115,
-	"DOTA_UM_CoachHUDPing":             116,
-	"DOTA_UM_ClientLoadGridNav":        117,
-	"DOTA_UM_AbilityPing":              118,
-	"DOTA_UM_ShowGenericPopup":         119,
-	"DOTA_UM_VoteStart":                120,
-	"DOTA_UM_VoteUpdate":               121,
-	"DOTA_UM_VoteEnd":                  122,
-	"DOTA_UM_BoosterState":             123,
-	"DOTA_UM_WillPurchaseAlert":        124,
-	"DOTA_UM_TutorialMinimapPosition":  125,
-	"DOTA_UM_PlayerMMR":                126,
-	"DOTA_UM_AbilitySteal":             127,
-	"DOTA_UM_CourierKilledAlert":       128,
-	"DOTA_UM_EnemyItemAlert":           129,
-	"DOTA_UM_StatsMatchDetails":        130,
-	"DOTA_UM_MiniTaunt":                131,
-	"DOTA_UM_BuyBackStateAlert":        132,
-	"DOTA_UM_QuickBuyAlert":            133,
-	"DOTA_UM_StatsHeroDetails":         134,
-	"DOTA_UM_PredictionResult":         135,
-	"DOTA_UM_ModifierAlert":            136,
-	"DOTA_UM_HPManaAlert":              137,
-	"DOTA_UM_GlyphAlert":               138,
+	"DOTA_UM_AddUnitToSelection":        64,
+	"DOTA_UM_AIDebugLine":               65,
+	"DOTA_UM_ChatEvent":                 66,
+	"DOTA_UM_CombatHeroPositions":       67,
+	"DOTA_UM_CombatLogData":             68,
+	"DOTA_UM_CombatLogShowDeath":        70,
+	"DOTA_UM_CreateLinearProjectile":    71,
+	"DOTA_UM_DestroyLinearProjectile":   72,
+	"DOTA_UM_DodgeTrackingProjectiles":  73,
+	"DOTA_UM_GlobalLightColor":          74,
+	"DOTA_UM_GlobalLightDirection":      75,
+	"DOTA_UM_InvalidCommand":            76,
+	"DOTA_UM_LocationPing":              77,
+	"DOTA_UM_MapLine":                   78,
+	"DOTA_UM_MiniKillCamInfo":           79,
+	"DOTA_UM_MinimapDebugPoint":         80,
+	"DOTA_UM_MinimapEvent":              81,
+	"DOTA_UM_NevermoreRequiem":          82,
+	"DOTA_UM_OverheadEvent":             83,
+	"DOTA_UM_SetNextAutobuyItem":        84,
+	"DOTA_UM_SharedCooldown":            85,
+	"DOTA_UM_SpectatorPlayerClick":      86,
+	"DOTA_UM_TutorialTipInfo":           87,
+	"DOTA_UM_UnitEvent":                 88,
+	"DOTA_UM_ParticleManager":           89,
+	"DOTA_UM_BotChat":                   90,
+	"DOTA_UM_HudError":                  91,
+	"DOTA_UM_ItemPurchased":             92,
+	"DOTA_UM_Ping":                      93,
+	"DOTA_UM_ItemFound":                 94,
+	"DOTA_UM_CharacterSpeakConcept":     95,
+	"DOTA_UM_SwapVerify":                96,
+	"DOTA_UM_WorldLine":                 97,
+	"DOTA_UM_TournamentDrop":            98,
+	"DOTA_UM_ItemAlert":                 99,
+	"DOTA_UM_HalloweenDrops":            100,
+	"DOTA_UM_ChatWheel":                 101,
+	"DOTA_UM_ReceivedXmasGift":          102,
+	"DOTA_UM_UpdateSharedContent":       103,
+	"DOTA_UM_TutorialRequestExp":        104,
+	"DOTA_UM_TutorialPingMinimap":       105,
+	"DOTA_UM_GamerulesStateChanged":     106,
+	"DOTA_UM_ShowSurvey":                107,
+	"DOTA_UM_TutorialFade":              108,
+	"DOTA_UM_AddQuestLogEntry":          109,
+	"DOTA_UM_SendStatPopup":             110,
+	"DOTA_UM_TutorialFinish":            111,
+	"DOTA_UM_SendRoshanPopup":           112,
+	"DOTA_UM_SendGenericToolTip":        113,
+	"DOTA_UM_SendFinalGold":             114,
+	"DOTA_UM_CustomMsg":                 115,
+	"DOTA_UM_CoachHUDPing":              116,
+	"DOTA_UM_ClientLoadGridNav":         117,
+	"DOTA_UM_AbilityPing":               118,
+	"DOTA_UM_ShowGenericPopup":          119,
+	"DOTA_UM_VoteStart":                 120,
+	"DOTA_UM_VoteUpdate":                121,
+	"DOTA_UM_VoteEnd":                   122,
+	"DOTA_UM_BoosterState":              123,
+	"DOTA_UM_WillPurchaseAlert":         124,
+	"DOTA_UM_TutorialMinimapPosition":   125,
+	"DOTA_UM_PlayerMMR":                 126,
+	"DOTA_UM_AbilitySteal":              127,
+	"DOTA_UM_CourierKilledAlert":        128,
+	"DOTA_UM_EnemyItemAlert":            129,
+	"DOTA_UM_StatsMatchDetails":         130,
+	"DOTA_UM_MiniTaunt":                 131,
+	"DOTA_UM_BuyBackStateAlert":         132,
+	"DOTA_UM_QuickBuyAlert":             133,
+	"DOTA_UM_StatsHeroDetails":          134,
+	"DOTA_UM_PredictionResult":          135,
+	"DOTA_UM_ModifierAlert":             136,
+	"DOTA_UM_HPManaAlert":               137,
+	"DOTA_UM_GlyphAlert":                138,
+	"DOTA_UM_BeastChat":                 139,
+	"DOTA_UM_SpectatorPlayerUnitOrders": 140,
 }
 
 func (x EDotaUserMessages) Enum() *EDotaUserMessages {
@@ -348,6 +354,8 @@ const (
 	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_VICTORY_PREDICTION_SINGLE_USER_CONFIRM    DOTA_CHAT_MESSAGE = 90
 	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_EFFIGY_KILL                               DOTA_CHAT_MESSAGE = 91
 	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_VOICE_TEXT_BANNED_OVERFLOW                DOTA_CHAT_MESSAGE = 92
+	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_YEAR_BEAST_KILLED                         DOTA_CHAT_MESSAGE = 93
+	DOTA_CHAT_MESSAGE_CHAT_MESSAGE_PAUSE_COUNTDOWN                           DOTA_CHAT_MESSAGE = 94
 )
 
 var DOTA_CHAT_MESSAGE_name = map[int32]string{
@@ -436,6 +444,8 @@ var DOTA_CHAT_MESSAGE_name = map[int32]string{
 	90: "CHAT_MESSAGE_VICTORY_PREDICTION_SINGLE_USER_CONFIRM",
 	91: "CHAT_MESSAGE_EFFIGY_KILL",
 	92: "CHAT_MESSAGE_VOICE_TEXT_BANNED_OVERFLOW",
+	93: "CHAT_MESSAGE_YEAR_BEAST_KILLED",
+	94: "CHAT_MESSAGE_PAUSE_COUNTDOWN",
 }
 var DOTA_CHAT_MESSAGE_value = map[string]int32{
 	"CHAT_MESSAGE_INVALID":                                   -1,
@@ -523,6 +533,8 @@ var DOTA_CHAT_MESSAGE_value = map[string]int32{
 	"CHAT_MESSAGE_VICTORY_PREDICTION_SINGLE_USER_CONFIRM":    90,
 	"CHAT_MESSAGE_EFFIGY_KILL":                               91,
 	"CHAT_MESSAGE_VOICE_TEXT_BANNED_OVERFLOW":                92,
+	"CHAT_MESSAGE_YEAR_BEAST_KILLED":                         93,
+	"CHAT_MESSAGE_PAUSE_COUNTDOWN":                           94,
 }
 
 func (x DOTA_CHAT_MESSAGE) Enum() *DOTA_CHAT_MESSAGE {
@@ -868,7 +880,8 @@ const (
 	DOTA_POSITION_CATEGORY_DOTA_POSITION_ROSHAN_PIT          DOTA_POSITION_CATEGORY = 11
 	DOTA_POSITION_CATEGORY_DOTA_POSITION_RADIANT_BASE        DOTA_POSITION_CATEGORY = 12
 	DOTA_POSITION_CATEGORY_DOTA_POSITION_DIRE_BASE           DOTA_POSITION_CATEGORY = 13
-	DOTA_POSITION_CATEGORY_DOTA_POSITION_OTHER               DOTA_POSITION_CATEGORY = 14
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_FOUNTAIN            DOTA_POSITION_CATEGORY = 14
+	DOTA_POSITION_CATEGORY_DOTA_POSITION_OTHER               DOTA_POSITION_CATEGORY = 15
 )
 
 var DOTA_POSITION_CATEGORY_name = map[int32]string{
@@ -886,7 +899,8 @@ var DOTA_POSITION_CATEGORY_name = map[int32]string{
 	11: "DOTA_POSITION_ROSHAN_PIT",
 	12: "DOTA_POSITION_RADIANT_BASE",
 	13: "DOTA_POSITION_DIRE_BASE",
-	14: "DOTA_POSITION_OTHER",
+	14: "DOTA_POSITION_FOUNTAIN",
+	15: "DOTA_POSITION_OTHER",
 }
 var DOTA_POSITION_CATEGORY_value = map[string]int32{
 	"DOTA_POSITION_NONE":                0,
@@ -903,7 +917,8 @@ var DOTA_POSITION_CATEGORY_value = map[string]int32{
 	"DOTA_POSITION_ROSHAN_PIT":          11,
 	"DOTA_POSITION_RADIANT_BASE":        12,
 	"DOTA_POSITION_DIRE_BASE":           13,
-	"DOTA_POSITION_OTHER":               14,
+	"DOTA_POSITION_FOUNTAIN":            14,
+	"DOTA_POSITION_OTHER":               15,
 }
 
 func (x DOTA_POSITION_CATEGORY) Enum() *DOTA_POSITION_CATEGORY {
@@ -920,6 +935,51 @@ func (x *DOTA_POSITION_CATEGORY) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*x = DOTA_POSITION_CATEGORY(value)
+	return nil
+}
+
+type DOTA_ABILITY_TARGET_TYPE int32
+
+const (
+	DOTA_ABILITY_TARGET_TYPE_DOTA_ABILITY_TARGET_NONE        DOTA_ABILITY_TARGET_TYPE = 0
+	DOTA_ABILITY_TARGET_TYPE_DOTA_ABILITY_TARGET_SELF        DOTA_ABILITY_TARGET_TYPE = 1
+	DOTA_ABILITY_TARGET_TYPE_DOTA_ABILITY_TARGET_ALLY_HERO   DOTA_ABILITY_TARGET_TYPE = 2
+	DOTA_ABILITY_TARGET_TYPE_DOTA_ABILITY_TARGET_ALLY_CREEP  DOTA_ABILITY_TARGET_TYPE = 3
+	DOTA_ABILITY_TARGET_TYPE_DOTA_ABILITY_TARGET_ENEMY_HERO  DOTA_ABILITY_TARGET_TYPE = 4
+	DOTA_ABILITY_TARGET_TYPE_DOTA_ABILITY_TARGET_ENEMY_CREEP DOTA_ABILITY_TARGET_TYPE = 5
+)
+
+var DOTA_ABILITY_TARGET_TYPE_name = map[int32]string{
+	0: "DOTA_ABILITY_TARGET_NONE",
+	1: "DOTA_ABILITY_TARGET_SELF",
+	2: "DOTA_ABILITY_TARGET_ALLY_HERO",
+	3: "DOTA_ABILITY_TARGET_ALLY_CREEP",
+	4: "DOTA_ABILITY_TARGET_ENEMY_HERO",
+	5: "DOTA_ABILITY_TARGET_ENEMY_CREEP",
+}
+var DOTA_ABILITY_TARGET_TYPE_value = map[string]int32{
+	"DOTA_ABILITY_TARGET_NONE":        0,
+	"DOTA_ABILITY_TARGET_SELF":        1,
+	"DOTA_ABILITY_TARGET_ALLY_HERO":   2,
+	"DOTA_ABILITY_TARGET_ALLY_CREEP":  3,
+	"DOTA_ABILITY_TARGET_ENEMY_HERO":  4,
+	"DOTA_ABILITY_TARGET_ENEMY_CREEP": 5,
+}
+
+func (x DOTA_ABILITY_TARGET_TYPE) Enum() *DOTA_ABILITY_TARGET_TYPE {
+	p := new(DOTA_ABILITY_TARGET_TYPE)
+	*p = x
+	return p
+}
+func (x DOTA_ABILITY_TARGET_TYPE) String() string {
+	return proto.EnumName(DOTA_ABILITY_TARGET_TYPE_name, int32(x))
+}
+func (x *DOTA_ABILITY_TARGET_TYPE) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(DOTA_ABILITY_TARGET_TYPE_value, data, "DOTA_ABILITY_TARGET_TYPE")
+	if err != nil {
+		return err
+	}
+	*x = DOTA_ABILITY_TARGET_TYPE(value)
 	return nil
 }
 
@@ -1515,6 +1575,7 @@ type CDOTAUserMsg_ModifierAlert struct {
 	ClassName        *string `protobuf:"bytes,2,opt,name=class_name" json:"class_name,omitempty"`
 	StackCount       *uint32 `protobuf:"varint,3,opt,name=stack_count" json:"stack_count,omitempty"`
 	IsDebuff         *bool   `protobuf:"varint,4,opt,name=is_debuff" json:"is_debuff,omitempty"`
+	TargetEntindex   *uint32 `protobuf:"varint,5,opt,name=target_entindex" json:"target_entindex,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -1548,6 +1609,13 @@ func (m *CDOTAUserMsg_ModifierAlert) GetIsDebuff() bool {
 		return *m.IsDebuff
 	}
 	return false
+}
+
+func (m *CDOTAUserMsg_ModifierAlert) GetTargetEntindex() uint32 {
+	if m != nil && m.TargetEntindex != nil {
+		return *m.TargetEntindex
+	}
+	return 0
 }
 
 type CDOTAUserMsg_HPManaAlert struct {
@@ -1974,6 +2042,72 @@ func (m *CDOTAUserMsg_SpectatorPlayerClick) GetTargetIndex() int32 {
 	return 0
 }
 
+type CDOTAUserMsg_SpectatorPlayerUnitOrders struct {
+	Entindex         *int32      `protobuf:"varint,1,opt,name=entindex" json:"entindex,omitempty"`
+	OrderType        *int32      `protobuf:"varint,2,opt,name=order_type" json:"order_type,omitempty"`
+	Units            []int32     `protobuf:"varint,3,rep,name=units" json:"units,omitempty"`
+	TargetIndex      *int32      `protobuf:"varint,4,opt,name=target_index" json:"target_index,omitempty"`
+	AbilityIndex     *int32      `protobuf:"varint,5,opt,name=ability_index" json:"ability_index,omitempty"`
+	Position         *CMsgVector `protobuf:"bytes,6,opt,name=position" json:"position,omitempty"`
+	Queue            *bool       `protobuf:"varint,7,opt,name=queue" json:"queue,omitempty"`
+	XXX_unrecognized []byte      `json:"-"`
+}
+
+func (m *CDOTAUserMsg_SpectatorPlayerUnitOrders) Reset() {
+	*m = CDOTAUserMsg_SpectatorPlayerUnitOrders{}
+}
+func (m *CDOTAUserMsg_SpectatorPlayerUnitOrders) String() string { return proto.CompactTextString(m) }
+func (*CDOTAUserMsg_SpectatorPlayerUnitOrders) ProtoMessage()    {}
+
+func (m *CDOTAUserMsg_SpectatorPlayerUnitOrders) GetEntindex() int32 {
+	if m != nil && m.Entindex != nil {
+		return *m.Entindex
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_SpectatorPlayerUnitOrders) GetOrderType() int32 {
+	if m != nil && m.OrderType != nil {
+		return *m.OrderType
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_SpectatorPlayerUnitOrders) GetUnits() []int32 {
+	if m != nil {
+		return m.Units
+	}
+	return nil
+}
+
+func (m *CDOTAUserMsg_SpectatorPlayerUnitOrders) GetTargetIndex() int32 {
+	if m != nil && m.TargetIndex != nil {
+		return *m.TargetIndex
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_SpectatorPlayerUnitOrders) GetAbilityIndex() int32 {
+	if m != nil && m.AbilityIndex != nil {
+		return *m.AbilityIndex
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_SpectatorPlayerUnitOrders) GetPosition() *CMsgVector {
+	if m != nil {
+		return m.Position
+	}
+	return nil
+}
+
+func (m *CDOTAUserMsg_SpectatorPlayerUnitOrders) GetQueue() bool {
+	if m != nil && m.Queue != nil {
+		return *m.Queue
+	}
+	return false
+}
+
 type CDOTAUserMsg_NevermoreRequiem struct {
 	EntityHandle     *int32      `protobuf:"varint,1,opt,name=entity_handle" json:"entity_handle,omitempty"`
 	Lines            *int32      `protobuf:"varint,2,opt,name=lines" json:"lines,omitempty"`
@@ -2171,7 +2305,7 @@ type CDOTAUserMsg_PredictionResult_Prediction struct {
 	NumCorrect       *uint32                                           `protobuf:"varint,2,opt,name=num_correct" json:"num_correct,omitempty"`
 	NumFails         *uint32                                           `protobuf:"varint,3,opt,name=num_fails" json:"num_fails,omitempty"`
 	Result           *CDOTAUserMsg_PredictionResult_Prediction_EResult `protobuf:"varint,4,opt,name=result,enum=dota.CDOTAUserMsg_PredictionResult_Prediction_EResult,def=1" json:"result,omitempty"`
-	GrantedItemDef   *uint32                                           `protobuf:"varint,5,opt,name=granted_item_def" json:"granted_item_def,omitempty"`
+	GrantedItemDefs  []uint32                                          `protobuf:"varint,6,rep,name=granted_item_defs" json:"granted_item_defs,omitempty"`
 	XXX_unrecognized []byte                                            `json:"-"`
 }
 
@@ -2211,11 +2345,11 @@ func (m *CDOTAUserMsg_PredictionResult_Prediction) GetResult() CDOTAUserMsg_Pred
 	return Default_CDOTAUserMsg_PredictionResult_Prediction_Result
 }
 
-func (m *CDOTAUserMsg_PredictionResult_Prediction) GetGrantedItemDef() uint32 {
-	if m != nil && m.GrantedItemDef != nil {
-		return *m.GrantedItemDef
+func (m *CDOTAUserMsg_PredictionResult_Prediction) GetGrantedItemDefs() []uint32 {
+	if m != nil {
+		return m.GrantedItemDefs
 	}
-	return 0
+	return nil
 }
 
 type CDOTAResponseQuerySerialized struct {
@@ -4115,6 +4249,13 @@ type CDOTAUserMsg_StatsHeroMinuteDetails struct {
 	TotalXp            *uint32                             `protobuf:"varint,6,opt,name=total_xp" json:"total_xp,omitempty"`
 	NetWorth           *uint32                             `protobuf:"varint,7,opt,name=net_worth" json:"net_worth,omitempty"`
 	HarvestedCreepGold *uint32                             `protobuf:"varint,8,opt,name=harvested_creep_gold" json:"harvested_creep_gold,omitempty"`
+	ClaimedFarm        *uint32                             `protobuf:"varint,9,opt,name=claimed_farm" json:"claimed_farm,omitempty"`
+	WardsPlaced        *uint32                             `protobuf:"varint,10,opt,name=wards_placed" json:"wards_placed,omitempty"`
+	RunesCollected     *uint32                             `protobuf:"varint,11,opt,name=runes_collected" json:"runes_collected,omitempty"`
+	TpsUsed            *uint32                             `protobuf:"varint,12,opt,name=tps_used" json:"tps_used,omitempty"`
+	ManaSpent          []uint32                            `protobuf:"varint,13,rep,name=mana_spent" json:"mana_spent,omitempty"`
+	DamageAbsorbed     []uint32                            `protobuf:"varint,14,rep,name=damage_absorbed" json:"damage_absorbed,omitempty"`
+	DamageDone         []uint32                            `protobuf:"varint,15,rep,name=damage_done" json:"damage_done,omitempty"`
 	XXX_unrecognized   []byte                              `json:"-"`
 }
 
@@ -4176,6 +4317,55 @@ func (m *CDOTAUserMsg_StatsHeroMinuteDetails) GetHarvestedCreepGold() uint32 {
 		return *m.HarvestedCreepGold
 	}
 	return 0
+}
+
+func (m *CDOTAUserMsg_StatsHeroMinuteDetails) GetClaimedFarm() uint32 {
+	if m != nil && m.ClaimedFarm != nil {
+		return *m.ClaimedFarm
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsHeroMinuteDetails) GetWardsPlaced() uint32 {
+	if m != nil && m.WardsPlaced != nil {
+		return *m.WardsPlaced
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsHeroMinuteDetails) GetRunesCollected() uint32 {
+	if m != nil && m.RunesCollected != nil {
+		return *m.RunesCollected
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsHeroMinuteDetails) GetTpsUsed() uint32 {
+	if m != nil && m.TpsUsed != nil {
+		return *m.TpsUsed
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsHeroMinuteDetails) GetManaSpent() []uint32 {
+	if m != nil {
+		return m.ManaSpent
+	}
+	return nil
+}
+
+func (m *CDOTAUserMsg_StatsHeroMinuteDetails) GetDamageAbsorbed() []uint32 {
+	if m != nil {
+		return m.DamageAbsorbed
+	}
+	return nil
+}
+
+func (m *CDOTAUserMsg_StatsHeroMinuteDetails) GetDamageDone() []uint32 {
+	if m != nil {
+		return m.DamageDone
+	}
+	return nil
 }
 
 type CDOTAUserMsg_StatsTeamMinuteDetails struct {
@@ -4305,6 +4495,10 @@ func (m *CDOTAUserMsg_StatsTeamMinuteDetails_LocationPerformance) GetValue() uin
 type CDOTAUserMsg_StatsPlayerKillShare struct {
 	PlayerId         *int32   `protobuf:"varint,1,opt,name=player_id" json:"player_id,omitempty"`
 	KillSharePercent *float32 `protobuf:"fixed32,2,opt,name=kill_share_percent" json:"kill_share_percent,omitempty"`
+	PlayerLocX       *float32 `protobuf:"fixed32,3,opt,name=player_loc_x" json:"player_loc_x,omitempty"`
+	PlayerLocY       *float32 `protobuf:"fixed32,4,opt,name=player_loc_y" json:"player_loc_y,omitempty"`
+	HealthPercent    *float32 `protobuf:"fixed32,5,opt,name=health_percent" json:"health_percent,omitempty"`
+	ManaPercent      *float32 `protobuf:"fixed32,6,opt,name=mana_percent" json:"mana_percent,omitempty"`
 	XXX_unrecognized []byte   `json:"-"`
 }
 
@@ -4322,6 +4516,34 @@ func (m *CDOTAUserMsg_StatsPlayerKillShare) GetPlayerId() int32 {
 func (m *CDOTAUserMsg_StatsPlayerKillShare) GetKillSharePercent() float32 {
 	if m != nil && m.KillSharePercent != nil {
 		return *m.KillSharePercent
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsPlayerKillShare) GetPlayerLocX() float32 {
+	if m != nil && m.PlayerLocX != nil {
+		return *m.PlayerLocX
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsPlayerKillShare) GetPlayerLocY() float32 {
+	if m != nil && m.PlayerLocY != nil {
+		return *m.PlayerLocY
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsPlayerKillShare) GetHealthPercent() float32 {
+	if m != nil && m.HealthPercent != nil {
+		return *m.HealthPercent
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsPlayerKillShare) GetManaPercent() float32 {
+	if m != nil && m.ManaPercent != nil {
+		return *m.ManaPercent
 	}
 	return 0
 }
@@ -4383,12 +4605,13 @@ func (m *CDOTAUserMsg_StatsKillDetails) GetKillerId() uint32 {
 }
 
 type CDOTAUserMsg_StatsMatchDetails struct {
-	HeroLookup       []*CDOTAUserMsg_StatsHeroLookup        `protobuf:"bytes,1,rep,name=hero_lookup" json:"hero_lookup,omitempty"`
-	RadiantStats     []*CDOTAUserMsg_StatsTeamMinuteDetails `protobuf:"bytes,2,rep,name=radiant_stats" json:"radiant_stats,omitempty"`
-	DireStats        []*CDOTAUserMsg_StatsTeamMinuteDetails `protobuf:"bytes,3,rep,name=dire_stats" json:"dire_stats,omitempty"`
-	RadiantKills     []*CDOTAUserMsg_StatsKillDetails       `protobuf:"bytes,4,rep,name=radiant_kills" json:"radiant_kills,omitempty"`
-	DireKills        []*CDOTAUserMsg_StatsKillDetails       `protobuf:"bytes,5,rep,name=dire_kills" json:"dire_kills,omitempty"`
-	XXX_unrecognized []byte                                 `json:"-"`
+	HeroLookup       []*CDOTAUserMsg_StatsHeroLookup                                  `protobuf:"bytes,1,rep,name=hero_lookup" json:"hero_lookup,omitempty"`
+	RadiantStats     []*CDOTAUserMsg_StatsTeamMinuteDetails                           `protobuf:"bytes,2,rep,name=radiant_stats" json:"radiant_stats,omitempty"`
+	DireStats        []*CDOTAUserMsg_StatsTeamMinuteDetails                           `protobuf:"bytes,3,rep,name=dire_stats" json:"dire_stats,omitempty"`
+	RadiantKills     []*CDOTAUserMsg_StatsKillDetails                                 `protobuf:"bytes,4,rep,name=radiant_kills" json:"radiant_kills,omitempty"`
+	DireKills        []*CDOTAUserMsg_StatsKillDetails                                 `protobuf:"bytes,5,rep,name=dire_kills" json:"dire_kills,omitempty"`
+	FightDetails     []*CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightDetails `protobuf:"bytes,6,rep,name=fight_details" json:"fight_details,omitempty"`
+	XXX_unrecognized []byte                                                           `json:"-"`
 }
 
 func (m *CDOTAUserMsg_StatsMatchDetails) Reset()         { *m = CDOTAUserMsg_StatsMatchDetails{} }
@@ -4426,6 +4649,101 @@ func (m *CDOTAUserMsg_StatsMatchDetails) GetRadiantKills() []*CDOTAUserMsg_Stats
 func (m *CDOTAUserMsg_StatsMatchDetails) GetDireKills() []*CDOTAUserMsg_StatsKillDetails {
 	if m != nil {
 		return m.DireKills
+	}
+	return nil
+}
+
+func (m *CDOTAUserMsg_StatsMatchDetails) GetFightDetails() []*CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightDetails {
+	if m != nil {
+		return m.FightDetails
+	}
+	return nil
+}
+
+type CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightTeamDetails struct {
+	Participants     []uint32 `protobuf:"varint,1,rep,name=participants" json:"participants,omitempty"`
+	Deaths           []uint32 `protobuf:"varint,2,rep,name=deaths" json:"deaths,omitempty"`
+	GoldDelta        *uint32  `protobuf:"varint,3,opt,name=gold_delta" json:"gold_delta,omitempty"`
+	XpDelta          *uint32  `protobuf:"varint,4,opt,name=xp_delta" json:"xp_delta,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
+}
+
+func (m *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightTeamDetails) Reset() {
+	*m = CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightTeamDetails{}
+}
+func (m *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightTeamDetails) String() string {
+	return proto.CompactTextString(m)
+}
+func (*CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightTeamDetails) ProtoMessage() {}
+
+func (m *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightTeamDetails) GetParticipants() []uint32 {
+	if m != nil {
+		return m.Participants
+	}
+	return nil
+}
+
+func (m *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightTeamDetails) GetDeaths() []uint32 {
+	if m != nil {
+		return m.Deaths
+	}
+	return nil
+}
+
+func (m *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightTeamDetails) GetGoldDelta() uint32 {
+	if m != nil && m.GoldDelta != nil {
+		return *m.GoldDelta
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightTeamDetails) GetXpDelta() uint32 {
+	if m != nil && m.XpDelta != nil {
+		return *m.XpDelta
+	}
+	return 0
+}
+
+type CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightDetails struct {
+	StartTime           *float32                                                           `protobuf:"fixed32,1,opt,name=start_time" json:"start_time,omitempty"`
+	EndTime             *float32                                                           `protobuf:"fixed32,2,opt,name=end_time" json:"end_time,omitempty"`
+	RadiantFightDetails *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightTeamDetails `protobuf:"bytes,3,opt,name=radiant_fight_details" json:"radiant_fight_details,omitempty"`
+	DireFightDetails    *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightTeamDetails `protobuf:"bytes,4,opt,name=dire_fight_details" json:"dire_fight_details,omitempty"`
+	XXX_unrecognized    []byte                                                             `json:"-"`
+}
+
+func (m *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightDetails) Reset() {
+	*m = CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightDetails{}
+}
+func (m *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightDetails) String() string {
+	return proto.CompactTextString(m)
+}
+func (*CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightDetails) ProtoMessage() {}
+
+func (m *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightDetails) GetStartTime() float32 {
+	if m != nil && m.StartTime != nil {
+		return *m.StartTime
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightDetails) GetEndTime() float32 {
+	if m != nil && m.EndTime != nil {
+		return *m.EndTime
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightDetails) GetRadiantFightDetails() *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightTeamDetails {
+	if m != nil {
+		return m.RadiantFightDetails
+	}
+	return nil
+}
+
+func (m *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightDetails) GetDireFightDetails() *CDOTAUserMsg_StatsMatchDetails_CDOTAUserMsg_StatsFightTeamDetails {
+	if m != nil {
+		return m.DireFightDetails
 	}
 	return nil
 }
@@ -4528,6 +4846,46 @@ func (m *CMsgCombatAnalyzerStats) GetPlayerStats() []*CMsgCombatAnalyzerPlayerSt
 	return nil
 }
 
+type CDOTAUserMsg_BeastChat struct {
+	Team             *uint32 `protobuf:"varint,1,opt,name=team" json:"team,omitempty"`
+	Format           *string `protobuf:"bytes,2,opt,name=format" json:"format,omitempty"`
+	Message          *string `protobuf:"bytes,3,opt,name=message" json:"message,omitempty"`
+	Target           *string `protobuf:"bytes,4,opt,name=target" json:"target,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CDOTAUserMsg_BeastChat) Reset()         { *m = CDOTAUserMsg_BeastChat{} }
+func (m *CDOTAUserMsg_BeastChat) String() string { return proto.CompactTextString(m) }
+func (*CDOTAUserMsg_BeastChat) ProtoMessage()    {}
+
+func (m *CDOTAUserMsg_BeastChat) GetTeam() uint32 {
+	if m != nil && m.Team != nil {
+		return *m.Team
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_BeastChat) GetFormat() string {
+	if m != nil && m.Format != nil {
+		return *m.Format
+	}
+	return ""
+}
+
+func (m *CDOTAUserMsg_BeastChat) GetMessage() string {
+	if m != nil && m.Message != nil {
+		return *m.Message
+	}
+	return ""
+}
+
+func (m *CDOTAUserMsg_BeastChat) GetTarget() string {
+	if m != nil && m.Target != nil {
+		return *m.Target
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterEnum("dota.EDotaUserMessages", EDotaUserMessages_name, EDotaUserMessages_value)
 	proto.RegisterEnum("dota.DOTA_CHAT_MESSAGE", DOTA_CHAT_MESSAGE_name, DOTA_CHAT_MESSAGE_value)
@@ -4538,6 +4896,7 @@ func init() {
 	proto.RegisterEnum("dota.DOTA_PARTICLE_MESSAGE", DOTA_PARTICLE_MESSAGE_name, DOTA_PARTICLE_MESSAGE_value)
 	proto.RegisterEnum("dota.DOTA_OVERHEAD_ALERT", DOTA_OVERHEAD_ALERT_name, DOTA_OVERHEAD_ALERT_value)
 	proto.RegisterEnum("dota.DOTA_POSITION_CATEGORY", DOTA_POSITION_CATEGORY_name, DOTA_POSITION_CATEGORY_value)
+	proto.RegisterEnum("dota.DOTA_ABILITY_TARGET_TYPE", DOTA_ABILITY_TARGET_TYPE_name, DOTA_ABILITY_TARGET_TYPE_value)
 	proto.RegisterEnum("dota.EHeroStatType", EHeroStatType_name, EHeroStatType_value)
 	proto.RegisterEnum("dota.CDOTAUserMsg_PredictionResult_Prediction_EResult", CDOTAUserMsg_PredictionResult_Prediction_EResult_name, CDOTAUserMsg_PredictionResult_Prediction_EResult_value)
 	proto.RegisterEnum("dota.CDOTAResponseQuerySerialized_Fact_ValueType", CDOTAResponseQuerySerialized_Fact_ValueType_name, CDOTAResponseQuerySerialized_Fact_ValueType_value)
