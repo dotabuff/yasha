@@ -2030,6 +2030,7 @@ type CMsgStartFindingMatch struct {
 	TeamId           *uint32            `protobuf:"varint,8,opt,name=team_id" json:"team_id,omitempty"`
 	GameLanguageEnum *MatchLanguages    `protobuf:"varint,10,opt,name=game_language_enum,enum=dota.MatchLanguages,def=0" json:"game_language_enum,omitempty"`
 	GameLanguageName *string            `protobuf:"bytes,11,opt,name=game_language_name" json:"game_language_name,omitempty"`
+	IngameEvent      *EIngameEvent      `protobuf:"varint,12,opt,name=ingame_event,enum=dota.EIngameEvent,def=0" json:"ingame_event,omitempty"`
 	XXX_unrecognized []byte             `json:"-"`
 }
 
@@ -2043,6 +2044,7 @@ const Default_CMsgStartFindingMatch_BotDifficulty DOTABotDifficulty = DOTABotDif
 const Default_CMsgStartFindingMatch_MatchType MatchType = MatchType_MATCH_TYPE_CASUAL
 const Default_CMsgStartFindingMatch_Matchlanguages uint32 = 4294967295
 const Default_CMsgStartFindingMatch_GameLanguageEnum MatchLanguages = MatchLanguages_MATCH_LANGUAGE_INVALID
+const Default_CMsgStartFindingMatch_IngameEvent EIngameEvent = EIngameEvent_k_EIngameEvent_OraclePA
 
 func (m *CMsgStartFindingMatch) GetKey() string {
 	if m != nil && m.Key != nil {
@@ -2119,6 +2121,13 @@ func (m *CMsgStartFindingMatch) GetGameLanguageName() string {
 		return *m.GameLanguageName
 	}
 	return ""
+}
+
+func (m *CMsgStartFindingMatch) GetIngameEvent() EIngameEvent {
+	if m != nil && m.IngameEvent != nil {
+		return *m.IngameEvent
+	}
+	return Default_CMsgStartFindingMatch_IngameEvent
 }
 
 type CMsgStopFindingMatch struct {
