@@ -3,17 +3,17 @@ package string_tables
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"regexp"
 	"strconv"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/dotabuff/yasha/dota"
 	"github.com/dotabuff/yasha/parser"
 	"github.com/dotabuff/yasha/send_tables"
 	"github.com/dotabuff/yasha/utils"
+	"github.com/golang/protobuf/proto"
 )
 
 type CacheItem struct {
@@ -67,7 +67,7 @@ func writeStringTables(directory string, tick int, t string) {
 	if err != nil {
 		panic(err)
 	}
-	path := spew.Sprintf("%s/tick_%010d.txt", directory, tick)
+	path := fmt.Sprintf("%s/tick_%010d.txt", directory, tick)
 	err = ioutil.WriteFile(path, []byte(t), 0644)
 	if err != nil {
 		panic(err)
@@ -212,12 +212,15 @@ func (helper *StateHelper) updateInstanceBaselineItem(item *StringTableItem) {
 		helper.Baseline[classId] = baseline
 	}
 
-	br := utils.NewBitReader(item.Data)
-	indices := br.ReadPropertiesIndex()
-	baseValues := br.ReadPropertiesValues(mapping, multiples, indices)
-	for key, value := range baseValues {
-		baseline[key] = value
+	if len(item.Data) > 0 {
+		br := utils.NewBitReader(item.Data)
+		indices := br.ReadPropertiesIndex()
+		baseValues := br.ReadPropertiesValues(mapping, multiples, indices)
+		for key, value := range baseValues {
+			baseline[key] = value
+		}
 	}
+
 	helper.Baseline[classId] = baseline
 }
 
