@@ -168,8 +168,8 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 			*dota.CSVCMsg_UpdateStringTable:
 			// those have been handled above, please keep in sync.
 		case *dota.CDemoStop,
-			*dota.CDemoSyncTick,
 			*dota.CDOTAUserMsg_BoosterState,
+			*dota.CDOTAUserMsg_CourierKilledAlert, // NOTE: might be useful later
 			*dota.CDOTAUserMsg_CreateLinearProjectile,
 			*dota.CDOTAUserMsg_DestroyLinearProjectile,
 			*dota.CDOTAUserMsg_DodgeTrackingProjectiles,
@@ -178,7 +178,6 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 			*dota.CDOTAUserMsg_HalloweenDrops,
 			*dota.CDOTAUserMsg_HudError,
 			*dota.CDOTAUserMsg_LocationPing,
-			*dota.CDOTAUserMsg_CourierKilledAlert, // NOTE: might be useful later
 			*dota.CDOTAUserMsg_MapLine,
 			*dota.CDOTAUserMsg_MinimapEvent,
 			*dota.CDOTAUserMsg_NevermoreRequiem,
@@ -188,9 +187,11 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 			*dota.CDOTAUserMsg_SharedCooldown,
 			*dota.CDOTAUserMsg_UnitEvent,
 			*dota.CDOTAUserMsg_WorldLine,
+			*dota.CDemoSyncTick,
 			*dota.CNETMsg_SignonState,
 			*dota.CNETMsg_Tick,
 			*dota.CSVCMsg_ClassInfo,
+			*dota.CSVCMsg_Print,
 			*dota.CSVCMsg_SetView,
 			*dota.CSVCMsg_TempEntities,
 			*dota.CUserMsg_SendAudio,
