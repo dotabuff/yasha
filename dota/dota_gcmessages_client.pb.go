@@ -818,6 +818,7 @@ const (
 	CMsgDOTAPopup_KICKED_FROM_QUEUE_EVENT_STARTING                      CMsgDOTAPopup_PopupID = 57
 	CMsgDOTAPopup_KICKED_FROM_QUEUE_EVENT_ENDING                        CMsgDOTAPopup_PopupID = 58
 	CMsgDOTAPopup_EVENT_NO_LOW_PRIORITY                                 CMsgDOTAPopup_PopupID = 59
+	CMsgDOTAPopup_MM_LOW_PRI_ONLY_CASUAL_AR                             CMsgDOTAPopup_PopupID = 60
 )
 
 var CMsgDOTAPopup_PopupID_name = map[int32]string{
@@ -881,6 +882,7 @@ var CMsgDOTAPopup_PopupID_name = map[int32]string{
 	57: "KICKED_FROM_QUEUE_EVENT_STARTING",
 	58: "KICKED_FROM_QUEUE_EVENT_ENDING",
 	59: "EVENT_NO_LOW_PRIORITY",
+	60: "MM_LOW_PRI_ONLY_CASUAL_AR",
 }
 var CMsgDOTAPopup_PopupID_value = map[string]int32{
 	"KICKED_FROM_LOBBY":                                     0,
@@ -943,6 +945,7 @@ var CMsgDOTAPopup_PopupID_value = map[string]int32{
 	"KICKED_FROM_QUEUE_EVENT_STARTING":                      57,
 	"KICKED_FROM_QUEUE_EVENT_ENDING":                        58,
 	"EVENT_NO_LOW_PRIORITY":                                 59,
+	"MM_LOW_PRI_ONLY_CASUAL_AR":                             60,
 }
 
 func (x CMsgDOTAPopup_PopupID) Enum() *CMsgDOTAPopup_PopupID {
@@ -2030,7 +2033,6 @@ type CMsgStartFindingMatch struct {
 	TeamId           *uint32            `protobuf:"varint,8,opt,name=team_id" json:"team_id,omitempty"`
 	GameLanguageEnum *MatchLanguages    `protobuf:"varint,10,opt,name=game_language_enum,enum=dota.MatchLanguages,def=0" json:"game_language_enum,omitempty"`
 	GameLanguageName *string            `protobuf:"bytes,11,opt,name=game_language_name" json:"game_language_name,omitempty"`
-	IngameEvent      *EIngameEvent      `protobuf:"varint,12,opt,name=ingame_event,enum=dota.EIngameEvent,def=0" json:"ingame_event,omitempty"`
 	XXX_unrecognized []byte             `json:"-"`
 }
 
@@ -2044,7 +2046,6 @@ const Default_CMsgStartFindingMatch_BotDifficulty DOTABotDifficulty = DOTABotDif
 const Default_CMsgStartFindingMatch_MatchType MatchType = MatchType_MATCH_TYPE_CASUAL
 const Default_CMsgStartFindingMatch_Matchlanguages uint32 = 4294967295
 const Default_CMsgStartFindingMatch_GameLanguageEnum MatchLanguages = MatchLanguages_MATCH_LANGUAGE_INVALID
-const Default_CMsgStartFindingMatch_IngameEvent EIngameEvent = EIngameEvent_k_EIngameEvent_OraclePA
 
 func (m *CMsgStartFindingMatch) GetKey() string {
 	if m != nil && m.Key != nil {
@@ -2121,13 +2122,6 @@ func (m *CMsgStartFindingMatch) GetGameLanguageName() string {
 		return *m.GameLanguageName
 	}
 	return ""
-}
-
-func (m *CMsgStartFindingMatch) GetIngameEvent() EIngameEvent {
-	if m != nil && m.IngameEvent != nil {
-		return *m.IngameEvent
-	}
-	return Default_CMsgStartFindingMatch_IngameEvent
 }
 
 type CMsgStopFindingMatch struct {

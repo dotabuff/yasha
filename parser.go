@@ -38,13 +38,15 @@ type Parser struct {
 
 	OnActiveModifierDelta func(map[int]*string_tables.StringTableItem, string_tables.ModifierBuffs)
 
-	OnChatEvent            func(tick int, obj *dota.CDOTAUserMsg_ChatEvent)
-	OnOverheadEvent        func(tick int, obj *dota.CDOTAUserMsg_OverheadEvent)
-	OnSayText2             func(tick int, obj *dota.CUserMsg_SayText2)
-	OnSounds               func(tick int, obj *dota.CSVCMsg_Sounds)
-	OnSpectatorPlayerClick func(tick int, obj *dota.CDOTAUserMsg_SpectatorPlayerClick)
-	OnChatWheel            func(tick int, obj *dota.CDOTAUserMsg_ChatWheel)
-	OnEnemyItemAlert       func(tick int, obj *dota.CDOTAUserMsg_EnemyItemAlert)
+	OnChatEvent                 func(tick int, obj *dota.CDOTAUserMsg_ChatEvent)
+	OnOverheadEvent             func(tick int, obj *dota.CDOTAUserMsg_OverheadEvent)
+	OnSayText2                  func(tick int, obj *dota.CUserMsg_SayText2)
+	OnSounds                    func(tick int, obj *dota.CSVCMsg_Sounds)
+	OnSpectatorPlayerClick      func(tick int, obj *dota.CDOTAUserMsg_SpectatorPlayerClick)
+	OnChatWheel                 func(tick int, obj *dota.CDOTAUserMsg_ChatWheel)
+	OnEnemyItemAlert            func(tick int, obj *dota.CDOTAUserMsg_EnemyItemAlert)
+	OnSpectatorPlayerUnitOrders func(tick int, obj *dota.CDOTAUserMsg_SpectatorPlayerUnitOrders)
+	OnPredictionResult          func(tick int, obj *dota.CDOTAUserMsg_PredictionResult)
 
 	OnFileInfo  func(obj *dota.CDemoFileInfo)
 	OnSetConVar func(obj *dota.CNETMsg_SetConVar)
@@ -263,6 +265,17 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 			*/
 		case *dota.CDemoSaveGame:
 			// this is not VDF... some new fun stuff instead.
+		case *dota.CDOTAUserMsg_SpectatorPlayerUnitOrders:
+			// (entindex:3 order_type:8 units:403 ability_index:464 queue:false )
+			if p.OnSpectatorPlayerUnitOrders != nil {
+				p.OnSpectatorPlayerUnitOrders(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_PredictionResult:
+			// (account_id:47276380 match_id:1232716559 correct:true predictions:<item_def:11133 num_correct:1 num_fails:0 > )
+			// item_def is the id from the items_game.txt in vpk
+			if p.OnPredictionResult != nil {
+				p.OnPredictionResult(item.Tick, obj)
+			}
 		default:
 			spew.Dump(obj)
 		}

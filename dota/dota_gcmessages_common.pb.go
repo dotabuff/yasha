@@ -518,10 +518,12 @@ const (
 	EDOTAGCMsg_k_EMsgGCToClientNewBloomTimingUpdated                      EDOTAGCMsg = 7575
 	EDOTAGCMsg_k_EMsgGCToGCCustomGamePlayed                               EDOTAGCMsg = 7576
 	EDOTAGCMsg_k_EMsgGCToGCGrantEventPointsToUser                         EDOTAGCMsg = 7577
+	EDOTAGCMsg_k_EMsgGCToGCSetEventMMPanicFlushTime                       EDOTAGCMsg = 7578
 	EDOTAGCMsg_k_EMsgGCDev_GrantWarKill                                   EDOTAGCMsg = 8001
 	EDOTAGCMsg_k_EMsgClientToGCCreateTeamShowcase                         EDOTAGCMsg = 8002
 	EDOTAGCMsg_k_EMsgGCToClientTeamShowcaseCreateResult                   EDOTAGCMsg = 8003
 	EDOTAGCMsg_k_EMsgServerToGCLockCharmTrading                           EDOTAGCMsg = 8004
+	EDOTAGCMsg_k_EMsgDOTACNY2015EventPointUsage                           EDOTAGCMsg = 8005
 )
 
 var EDOTAGCMsg_name = map[int32]string{
@@ -1029,10 +1031,12 @@ var EDOTAGCMsg_name = map[int32]string{
 	7575: "k_EMsgGCToClientNewBloomTimingUpdated",
 	7576: "k_EMsgGCToGCCustomGamePlayed",
 	7577: "k_EMsgGCToGCGrantEventPointsToUser",
+	7578: "k_EMsgGCToGCSetEventMMPanicFlushTime",
 	8001: "k_EMsgGCDev_GrantWarKill",
 	8002: "k_EMsgClientToGCCreateTeamShowcase",
 	8003: "k_EMsgGCToClientTeamShowcaseCreateResult",
 	8004: "k_EMsgServerToGCLockCharmTrading",
+	8005: "k_EMsgDOTACNY2015EventPointUsage",
 }
 var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgGCDOTABase":                                           7000,
@@ -1539,10 +1543,12 @@ var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgGCToClientNewBloomTimingUpdated":                      7575,
 	"k_EMsgGCToGCCustomGamePlayed":                               7576,
 	"k_EMsgGCToGCGrantEventPointsToUser":                         7577,
+	"k_EMsgGCToGCSetEventMMPanicFlushTime":                       7578,
 	"k_EMsgGCDev_GrantWarKill":                                   8001,
 	"k_EMsgClientToGCCreateTeamShowcase":                         8002,
 	"k_EMsgGCToClientTeamShowcaseCreateResult":                   8003,
 	"k_EMsgServerToGCLockCharmTrading":                           8004,
+	"k_EMsgDOTACNY2015EventPointUsage":                           8005,
 }
 
 func (x EDOTAGCMsg) Enum() *EDOTAGCMsg {
@@ -2196,6 +2202,7 @@ const (
 	MatchType_MATCH_TYPE_COMPETITIVE       MatchType = 4
 	MatchType_MATCH_TYPE_WEEKEND_TOURNEY   MatchType = 5
 	MatchType_MATCH_TYPE_CASUAL_1V1        MatchType = 6
+	MatchType_MATCH_TYPE_EVENT             MatchType = 7
 )
 
 var MatchType_name = map[int32]string{
@@ -2206,6 +2213,7 @@ var MatchType_name = map[int32]string{
 	4: "MATCH_TYPE_COMPETITIVE",
 	5: "MATCH_TYPE_WEEKEND_TOURNEY",
 	6: "MATCH_TYPE_CASUAL_1V1",
+	7: "MATCH_TYPE_EVENT",
 }
 var MatchType_value = map[string]int32{
 	"MATCH_TYPE_CASUAL":            0,
@@ -2215,6 +2223,7 @@ var MatchType_value = map[string]int32{
 	"MATCH_TYPE_COMPETITIVE":       4,
 	"MATCH_TYPE_WEEKEND_TOURNEY":   5,
 	"MATCH_TYPE_CASUAL_1V1":        6,
+	"MATCH_TYPE_EVENT":             7,
 }
 
 func (x MatchType) Enum() *MatchType {
@@ -6645,6 +6654,7 @@ type CMsgGCToClientNewBloomTimingUpdated struct {
 	IsActive           *bool   `protobuf:"varint,1,opt,name=is_active" json:"is_active,omitempty"`
 	NextTransitionTime *uint32 `protobuf:"varint,2,opt,name=next_transition_time" json:"next_transition_time,omitempty"`
 	BonusAmount        *uint32 `protobuf:"varint,3,opt,name=bonus_amount" json:"bonus_amount,omitempty"`
+	StandbyDuration    *uint32 `protobuf:"varint,4,opt,name=standby_duration" json:"standby_duration,omitempty"`
 	XXX_unrecognized   []byte  `json:"-"`
 }
 
@@ -6669,6 +6679,13 @@ func (m *CMsgGCToClientNewBloomTimingUpdated) GetNextTransitionTime() uint32 {
 func (m *CMsgGCToClientNewBloomTimingUpdated) GetBonusAmount() uint32 {
 	if m != nil && m.BonusAmount != nil {
 		return *m.BonusAmount
+	}
+	return 0
+}
+
+func (m *CMsgGCToClientNewBloomTimingUpdated) GetStandbyDuration() uint32 {
+	if m != nil && m.StandbyDuration != nil {
+		return *m.StandbyDuration
 	}
 	return 0
 }

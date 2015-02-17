@@ -366,6 +366,7 @@ const (
 	DotaunitorderT_DOTA_UNIT_ORDER_EJECT_ITEM_FROM_STASH DotaunitorderT = 25
 	DotaunitorderT_DOTA_UNIT_ORDER_CAST_RUNE             DotaunitorderT = 26
 	DotaunitorderT_DOTA_UNIT_ORDER_PING_ABILITY          DotaunitorderT = 27
+	DotaunitorderT_DOTA_UNIT_ORDER_MOVE_TO_DIRECTION     DotaunitorderT = 28
 )
 
 var DotaunitorderT_name = map[int32]string{
@@ -397,6 +398,7 @@ var DotaunitorderT_name = map[int32]string{
 	25: "DOTA_UNIT_ORDER_EJECT_ITEM_FROM_STASH",
 	26: "DOTA_UNIT_ORDER_CAST_RUNE",
 	27: "DOTA_UNIT_ORDER_PING_ABILITY",
+	28: "DOTA_UNIT_ORDER_MOVE_TO_DIRECTION",
 }
 var DotaunitorderT_value = map[string]int32{
 	"DOTA_UNIT_ORDER_NONE":                  0,
@@ -427,6 +429,7 @@ var DotaunitorderT_value = map[string]int32{
 	"DOTA_UNIT_ORDER_EJECT_ITEM_FROM_STASH": 25,
 	"DOTA_UNIT_ORDER_CAST_RUNE":             26,
 	"DOTA_UNIT_ORDER_PING_ABILITY":          27,
+	"DOTA_UNIT_ORDER_MOVE_TO_DIRECTION":     28,
 }
 
 func (x DotaunitorderT) Enum() *DotaunitorderT {

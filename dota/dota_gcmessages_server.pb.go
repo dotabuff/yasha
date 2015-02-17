@@ -4517,6 +4517,64 @@ func (m *CMsgServerToGCLockCharmTrading) GetItemId() uint64 {
 	return 0
 }
 
+type CMsgDOTACNY2015EventPointUsage struct {
+	WinningTeamUsage *CMsgDOTACNY2015EventPointUsage_PointUsage `protobuf:"bytes,1,opt,name=winning_team_usage" json:"winning_team_usage,omitempty"`
+	LosingTeamUsage  *CMsgDOTACNY2015EventPointUsage_PointUsage `protobuf:"bytes,2,opt,name=losing_team_usage" json:"losing_team_usage,omitempty"`
+	XXX_unrecognized []byte                                     `json:"-"`
+}
+
+func (m *CMsgDOTACNY2015EventPointUsage) Reset()         { *m = CMsgDOTACNY2015EventPointUsage{} }
+func (m *CMsgDOTACNY2015EventPointUsage) String() string { return proto.CompactTextString(m) }
+func (*CMsgDOTACNY2015EventPointUsage) ProtoMessage()    {}
+
+func (m *CMsgDOTACNY2015EventPointUsage) GetWinningTeamUsage() *CMsgDOTACNY2015EventPointUsage_PointUsage {
+	if m != nil {
+		return m.WinningTeamUsage
+	}
+	return nil
+}
+
+func (m *CMsgDOTACNY2015EventPointUsage) GetLosingTeamUsage() *CMsgDOTACNY2015EventPointUsage_PointUsage {
+	if m != nil {
+		return m.LosingTeamUsage
+	}
+	return nil
+}
+
+type CMsgDOTACNY2015EventPointUsage_PointUsage struct {
+	Path               []uint32 `protobuf:"varint,1,rep,name=path" json:"path,omitempty"`
+	PathLevel          []uint32 `protobuf:"varint,2,rep,name=path_level" json:"path_level,omitempty"`
+	AbilityPointsSpent []uint32 `protobuf:"varint,3,rep,name=ability_points_spent" json:"ability_points_spent,omitempty"`
+	XXX_unrecognized   []byte   `json:"-"`
+}
+
+func (m *CMsgDOTACNY2015EventPointUsage_PointUsage) Reset() {
+	*m = CMsgDOTACNY2015EventPointUsage_PointUsage{}
+}
+func (m *CMsgDOTACNY2015EventPointUsage_PointUsage) String() string { return proto.CompactTextString(m) }
+func (*CMsgDOTACNY2015EventPointUsage_PointUsage) ProtoMessage()    {}
+
+func (m *CMsgDOTACNY2015EventPointUsage_PointUsage) GetPath() []uint32 {
+	if m != nil {
+		return m.Path
+	}
+	return nil
+}
+
+func (m *CMsgDOTACNY2015EventPointUsage_PointUsage) GetPathLevel() []uint32 {
+	if m != nil {
+		return m.PathLevel
+	}
+	return nil
+}
+
+func (m *CMsgDOTACNY2015EventPointUsage_PointUsage) GetAbilityPointsSpent() []uint32 {
+	if m != nil {
+		return m.AbilityPointsSpent
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterEnum("dota.EPoorNetworkConditionsType", EPoorNetworkConditionsType_name, EPoorNetworkConditionsType_value)
 	proto.RegisterEnum("dota.EAbilityAbuseType", EAbilityAbuseType_name, EAbilityAbuseType_value)

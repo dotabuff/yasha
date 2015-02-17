@@ -25,6 +25,8 @@ It is generated from these files:
 	network_connection.proto
 	networkbasetypes.proto
 	steammessages.proto
+	steammessages_cloud.steamworkssdk.proto
+	steammessages_unified_base.steamworkssdk.proto
 	usermessages.proto
 
 It has these top-level messages:
