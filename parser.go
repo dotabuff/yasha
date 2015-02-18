@@ -38,15 +38,48 @@ type Parser struct {
 
 	OnActiveModifierDelta func(map[int]*string_tables.StringTableItem, string_tables.ModifierBuffs)
 
+	OnAbilitySteal              func(tick int, obj *dota.CDOTAUserMsg_AbilitySteal)
+	OnBoosterState              func(tick int, obj *dota.CDOTAUserMsg_BoosterState)
+	OnBotChat                   func(tick int, obj *dota.CDOTAUserMsg_BotChat)
 	OnChatEvent                 func(tick int, obj *dota.CDOTAUserMsg_ChatEvent)
+	OnChatWheel                 func(tick int, obj *dota.CDOTAUserMsg_ChatWheel)
+	OnClassInfo                 func(tick int, obj *dota.CSVCMsg_ClassInfo)
+	OnCourierKilledAlert        func(tick int, obj *dota.CDOTAUserMsg_CourierKilledAlert)
+	OnCreateLinearProjectile    func(tick int, obj *dota.CDOTAUserMsg_CreateLinearProjectile)
+	OnDemoStop                  func(tick int, obj *dota.CDemoStop)
+	OnDemoSyncTick              func(tick int, obj *dota.CDemoSyncTick)
+	OnDestroyLinearProjectile   func(tick int, obj *dota.CDOTAUserMsg_DestroyLinearProjectile)
+	OnDodgeTrackingProjectiles  func(tick int, obj *dota.CDOTAUserMsg_DodgeTrackingProjectiles)
+	OnEnemyItemAlert            func(tick int, obj *dota.CDOTAUserMsg_EnemyItemAlert)
+	OnGlobalLightColor          func(tick int, obj *dota.CDOTAUserMsg_GlobalLightColor)
+	OnGlobalLightDirection      func(tick int, obj *dota.CDOTAUserMsg_GlobalLightDirection)
+	OnHPManaAlert               func(tick int, obj *dota.CDOTAUserMsg_HPManaAlert)
+	OnHalloweenDrops            func(tick int, obj *dota.CDOTAUserMsg_HalloweenDrops)
+	OnHudError                  func(tick int, obj *dota.CDOTAUserMsg_HudError)
+	OnLocationPing              func(tick int, obj *dota.CDOTAUserMsg_LocationPing)
+	OnMapLine                   func(tick int, obj *dota.CDOTAUserMsg_MapLine)
+	OnMinimapEvent              func(tick int, obj *dota.CDOTAUserMsg_MinimapEvent)
+	OnNevermoreRequiem          func(tick int, obj *dota.CDOTAUserMsg_NevermoreRequiem)
 	OnOverheadEvent             func(tick int, obj *dota.CDOTAUserMsg_OverheadEvent)
+	OnParticleManager           func(tick int, obj *dota.CDOTAUserMsg_ParticleManager)
+	OnPredictionResult          func(tick int, obj *dota.CDOTAUserMsg_PredictionResult)
+	OnPrint                     func(tick int, obj *dota.CSVCMsg_Print)
 	OnSayText2                  func(tick int, obj *dota.CUserMsg_SayText2)
+	OnSendAudio                 func(tick int, obj *dota.CUserMsg_SendAudio)
+	OnSendRoshanPopup           func(tick int, obj *dota.CDOTAUserMsg_SendRoshanPopup)
+	OnSendStatPopup             func(tick int, obj *dota.CDOTAUserMsg_SendStatPopup)
+	OnSetView                   func(tick int, obj *dota.CSVCMsg_SetView)
+	OnSharedCooldown            func(tick int, obj *dota.CDOTAUserMsg_SharedCooldown)
+	OnSignonState               func(tick int, obj *dota.CNETMsg_SignonState)
 	OnSounds                    func(tick int, obj *dota.CSVCMsg_Sounds)
 	OnSpectatorPlayerClick      func(tick int, obj *dota.CDOTAUserMsg_SpectatorPlayerClick)
-	OnChatWheel                 func(tick int, obj *dota.CDOTAUserMsg_ChatWheel)
-	OnEnemyItemAlert            func(tick int, obj *dota.CDOTAUserMsg_EnemyItemAlert)
 	OnSpectatorPlayerUnitOrders func(tick int, obj *dota.CDOTAUserMsg_SpectatorPlayerUnitOrders)
-	OnPredictionResult          func(tick int, obj *dota.CDOTAUserMsg_PredictionResult)
+	OnTempEntities              func(tick int, obj *dota.CSVCMsg_TempEntities)
+	OnTextMsg                   func(tick int, obj *dota.CUserMsg_TextMsg)
+	OnTick                      func(tick int, obj *dota.CNETMsg_Tick)
+	OnUnitEvent                 func(tick int, obj *dota.CDOTAUserMsg_UnitEvent)
+	OnVoiceMask                 func(tick int, obj *dota.CUserMsg_VoiceMask)
+	OnWorldLine                 func(tick int, obj *dota.CDOTAUserMsg_WorldLine)
 
 	OnFileInfo  func(obj *dota.CDemoFileInfo)
 	OnSetConVar func(obj *dota.CNETMsg_SetConVar)
@@ -167,37 +200,126 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 			*dota.CSVCMsg_ServerInfo,
 			*dota.CSVCMsg_UpdateStringTable:
 			// those have been handled above, please keep in sync.
-		case *dota.CDemoStop,
-			*dota.CDOTAUserMsg_BoosterState,
-			*dota.CDOTAUserMsg_CourierKilledAlert, // NOTE: might be useful later
-			*dota.CDOTAUserMsg_CreateLinearProjectile,
-			*dota.CDOTAUserMsg_DestroyLinearProjectile,
-			*dota.CDOTAUserMsg_DodgeTrackingProjectiles,
-			*dota.CDOTAUserMsg_GlobalLightColor,
-			*dota.CDOTAUserMsg_GlobalLightDirection,
-			*dota.CDOTAUserMsg_HalloweenDrops,
-			*dota.CDOTAUserMsg_HudError,
-			*dota.CDOTAUserMsg_LocationPing,
-			*dota.CDOTAUserMsg_MapLine,
-			*dota.CDOTAUserMsg_MinimapEvent,
-			*dota.CDOTAUserMsg_NevermoreRequiem,
-			*dota.CDOTAUserMsg_ParticleManager,
-			*dota.CDOTAUserMsg_SendRoshanPopup,
-			*dota.CDOTAUserMsg_SendStatPopup,
-			*dota.CDOTAUserMsg_SharedCooldown,
-			*dota.CDOTAUserMsg_UnitEvent,
-			*dota.CDOTAUserMsg_WorldLine,
-			*dota.CDemoSyncTick,
-			*dota.CNETMsg_SignonState,
-			*dota.CNETMsg_Tick,
-			*dota.CSVCMsg_ClassInfo,
-			*dota.CSVCMsg_Print,
-			*dota.CSVCMsg_SetView,
-			*dota.CSVCMsg_TempEntities,
-			*dota.CUserMsg_SendAudio,
-			*dota.CUserMsg_TextMsg,
-			*dota.CUserMsg_VoiceMask:
-			// see NOTES for why we ignore them.
+		case *dota.CDemoStop:
+			if p.OnDemoStop != nil {
+				p.OnDemoStop(item.Tick, obj)
+			}
+		case *dota.CDemoSyncTick:
+			if p.OnDemoSyncTick != nil {
+				p.OnDemoSyncTick(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_BoosterState:
+			if p.OnBoosterState != nil {
+				p.OnBoosterState(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_CourierKilledAlert:
+			if p.OnCourierKilledAlert != nil {
+				p.OnCourierKilledAlert(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_CreateLinearProjectile:
+			if p.OnCreateLinearProjectile != nil {
+				p.OnCreateLinearProjectile(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_DestroyLinearProjectile:
+			if p.OnDestroyLinearProjectile != nil {
+				p.OnDestroyLinearProjectile(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_DodgeTrackingProjectiles:
+			if p.OnDodgeTrackingProjectiles != nil {
+				p.OnDodgeTrackingProjectiles(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_GlobalLightColor:
+			if p.OnGlobalLightColor != nil {
+				p.OnGlobalLightColor(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_GlobalLightDirection:
+			if p.OnGlobalLightDirection != nil {
+				p.OnGlobalLightDirection(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_HalloweenDrops:
+			if p.OnHalloweenDrops != nil {
+				p.OnHalloweenDrops(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_HudError:
+			if p.OnHudError != nil {
+				p.OnHudError(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_LocationPing:
+			if p.OnLocationPing != nil {
+				p.OnLocationPing(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_MapLine:
+			if p.OnMapLine != nil {
+				p.OnMapLine(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_MinimapEvent:
+			if p.OnMinimapEvent != nil {
+				p.OnMinimapEvent(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_NevermoreRequiem:
+			if p.OnNevermoreRequiem != nil {
+				p.OnNevermoreRequiem(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_ParticleManager:
+			if p.OnParticleManager != nil {
+				p.OnParticleManager(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_SendRoshanPopup:
+			if p.OnSendRoshanPopup != nil {
+				p.OnSendRoshanPopup(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_SendStatPopup:
+			if p.OnSendStatPopup != nil {
+				p.OnSendStatPopup(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_SharedCooldown:
+			if p.OnSharedCooldown != nil {
+				p.OnSharedCooldown(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_UnitEvent:
+			if p.OnUnitEvent != nil {
+				p.OnUnitEvent(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_WorldLine:
+			if p.OnWorldLine != nil {
+				p.OnWorldLine(item.Tick, obj)
+			}
+		case *dota.CNETMsg_SignonState:
+			if p.OnSignonState != nil {
+				p.OnSignonState(item.Tick, obj)
+			}
+		case *dota.CNETMsg_Tick:
+			if p.OnTick != nil {
+				p.OnTick(item.Tick, obj)
+			}
+		case *dota.CSVCMsg_ClassInfo:
+			if p.OnClassInfo != nil {
+				p.OnClassInfo(item.Tick, obj)
+			}
+		case *dota.CSVCMsg_Print:
+			if p.OnPrint != nil {
+				p.OnPrint(item.Tick, obj)
+			}
+		case *dota.CSVCMsg_SetView:
+			if p.OnSetView != nil {
+				p.OnSetView(item.Tick, obj)
+			}
+		case *dota.CSVCMsg_TempEntities:
+			if p.OnTempEntities != nil {
+				p.OnTempEntities(item.Tick, obj)
+			}
+		case *dota.CUserMsg_SendAudio:
+			if p.OnSendAudio != nil {
+				p.OnSendAudio(item.Tick, obj)
+			}
+		case *dota.CUserMsg_TextMsg:
+			if p.OnTextMsg != nil {
+				p.OnTextMsg(item.Tick, obj)
+			}
+		case *dota.CUserMsg_VoiceMask:
+			if p.OnVoiceMask != nil {
+				p.OnVoiceMask(item.Tick, obj)
+			}
 		case *dota.CSVCMsg_PacketEntities:
 			// to skip to a specific time, we have to handle more.
 			if item.From == dota.EDemoCommands_DEM_Packet {
@@ -250,20 +372,10 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 				p.OnEnemyItemAlert(item.Tick, obj)
 			}
 		case *dota.CDOTAUserMsg_AbilitySteal:
-			/*
-				(player_id:0 ability_id:412 ability_level:4 )
-				(player_id:0 ability_id:305 ability_level:4 )
-				(player_id:0 ability_id:117 ability_level:4 )
-				(player_id:0 ability_id:131 ability_level:4 )
-				(player_id:0 ability_id:413 ability_level:2 )
-				(player_id:0 ability_id:413 ability_level:2 )
-				(player_id:0 ability_id:275 ability_level:4 )
-				(player_id:0 ability_id:411 ability_level:4 )
-				(player_id:0 ability_id:131 ability_level:4 )
-				(player_id:0 ability_id:305 ability_level:4 )
-				(player_id:0 ability_id:412 ability_level:4 )
-				(player_id:0 ability_id:132 ability_level:4 )
-			*/
+			// (player_id:0 ability_id:412 ability_level:4 )
+			if p.OnAbilitySteal != nil {
+				p.OnAbilitySteal(item.Tick, obj)
+			}
 		case *dota.CDemoSaveGame:
 			// this is not VDF... some new fun stuff instead.
 		case *dota.CDOTAUserMsg_SpectatorPlayerUnitOrders:
@@ -276,6 +388,16 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 			// item_def is the id from the items_game.txt in vpk
 			if p.OnPredictionResult != nil {
 				p.OnPredictionResult(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_HPManaAlert:
+			// (player_id:10 target_entindex:54)
+			if p.OnHPManaAlert != nil {
+				p.OnHPManaAlert(item.Tick, obj)
+			}
+		case *dota.CDOTAUserMsg_BotChat:
+			// (player_id:4294967295 format:"DOTA_Chat_Spec" message:"dota_chatwheel_message_GoodJob" target:"" )
+			if p.OnBotChat != nil {
+				p.OnBotChat(item.Tick, obj)
 			}
 		default:
 			spew.Dump(obj)
