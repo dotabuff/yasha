@@ -819,6 +819,7 @@ const (
 	CMsgDOTAPopup_KICKED_FROM_QUEUE_EVENT_ENDING                        CMsgDOTAPopup_PopupID = 58
 	CMsgDOTAPopup_EVENT_NO_LOW_PRIORITY                                 CMsgDOTAPopup_PopupID = 59
 	CMsgDOTAPopup_MM_LOW_PRI_ONLY_CASUAL_AR                             CMsgDOTAPopup_PopupID = 60
+	CMsgDOTAPopup_CNY2015_ONCE_PER_ROUND                                CMsgDOTAPopup_PopupID = 61
 )
 
 var CMsgDOTAPopup_PopupID_name = map[int32]string{
@@ -883,6 +884,7 @@ var CMsgDOTAPopup_PopupID_name = map[int32]string{
 	58: "KICKED_FROM_QUEUE_EVENT_ENDING",
 	59: "EVENT_NO_LOW_PRIORITY",
 	60: "MM_LOW_PRI_ONLY_CASUAL_AR",
+	61: "CNY2015_ONCE_PER_ROUND",
 }
 var CMsgDOTAPopup_PopupID_value = map[string]int32{
 	"KICKED_FROM_LOBBY":                                     0,
@@ -946,6 +948,7 @@ var CMsgDOTAPopup_PopupID_value = map[string]int32{
 	"KICKED_FROM_QUEUE_EVENT_ENDING":                        58,
 	"EVENT_NO_LOW_PRIORITY":                                 59,
 	"MM_LOW_PRI_ONLY_CASUAL_AR":                             60,
+	"CNY2015_ONCE_PER_ROUND":                                61,
 }
 
 func (x CMsgDOTAPopup_PopupID) Enum() *CMsgDOTAPopup_PopupID {

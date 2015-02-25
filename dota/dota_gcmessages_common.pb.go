@@ -6655,6 +6655,7 @@ type CMsgGCToClientNewBloomTimingUpdated struct {
 	NextTransitionTime *uint32 `protobuf:"varint,2,opt,name=next_transition_time" json:"next_transition_time,omitempty"`
 	BonusAmount        *uint32 `protobuf:"varint,3,opt,name=bonus_amount" json:"bonus_amount,omitempty"`
 	StandbyDuration    *uint32 `protobuf:"varint,4,opt,name=standby_duration" json:"standby_duration,omitempty"`
+	TransitionTime     *uint32 `protobuf:"varint,5,opt,name=transition_time" json:"transition_time,omitempty"`
 	XXX_unrecognized   []byte  `json:"-"`
 }
 
@@ -6686,6 +6687,13 @@ func (m *CMsgGCToClientNewBloomTimingUpdated) GetBonusAmount() uint32 {
 func (m *CMsgGCToClientNewBloomTimingUpdated) GetStandbyDuration() uint32 {
 	if m != nil && m.StandbyDuration != nil {
 		return *m.StandbyDuration
+	}
+	return 0
+}
+
+func (m *CMsgGCToClientNewBloomTimingUpdated) GetTransitionTime() uint32 {
+	if m != nil && m.TransitionTime != nil {
+		return *m.TransitionTime
 	}
 	return 0
 }
