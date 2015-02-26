@@ -519,6 +519,8 @@ const (
 	EDOTAGCMsg_k_EMsgGCToGCCustomGamePlayed                               EDOTAGCMsg = 7576
 	EDOTAGCMsg_k_EMsgGCToGCGrantEventPointsToUser                         EDOTAGCMsg = 7577
 	EDOTAGCMsg_k_EMsgGCToGCSetEventMMPanicFlushTime                       EDOTAGCMsg = 7578
+	EDOTAGCMsg_k_EMsgGameserverCrashReport                                EDOTAGCMsg = 7579
+	EDOTAGCMsg_k_EMsgGameserverCrashReportResponse                        EDOTAGCMsg = 7580
 	EDOTAGCMsg_k_EMsgGCDev_GrantWarKill                                   EDOTAGCMsg = 8001
 	EDOTAGCMsg_k_EMsgClientToGCCreateTeamShowcase                         EDOTAGCMsg = 8002
 	EDOTAGCMsg_k_EMsgGCToClientTeamShowcaseCreateResult                   EDOTAGCMsg = 8003
@@ -1032,6 +1034,8 @@ var EDOTAGCMsg_name = map[int32]string{
 	7576: "k_EMsgGCToGCCustomGamePlayed",
 	7577: "k_EMsgGCToGCGrantEventPointsToUser",
 	7578: "k_EMsgGCToGCSetEventMMPanicFlushTime",
+	7579: "k_EMsgGameserverCrashReport",
+	7580: "k_EMsgGameserverCrashReportResponse",
 	8001: "k_EMsgGCDev_GrantWarKill",
 	8002: "k_EMsgClientToGCCreateTeamShowcase",
 	8003: "k_EMsgGCToClientTeamShowcaseCreateResult",
@@ -1544,6 +1548,8 @@ var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgGCToGCCustomGamePlayed":                               7576,
 	"k_EMsgGCToGCGrantEventPointsToUser":                         7577,
 	"k_EMsgGCToGCSetEventMMPanicFlushTime":                       7578,
+	"k_EMsgGameserverCrashReport":                                7579,
+	"k_EMsgGameserverCrashReportResponse":                        7580,
 	"k_EMsgGCDev_GrantWarKill":                                   8001,
 	"k_EMsgClientToGCCreateTeamShowcase":                         8002,
 	"k_EMsgGCToClientTeamShowcaseCreateResult":                   8003,

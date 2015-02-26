@@ -571,6 +571,88 @@ func (m *CMsgPoorNetworkConditions_Player) GetPeakLossPct() uint32 {
 	return 0
 }
 
+type CMsgGameserverCrash struct {
+	MatchId            *uint64         `protobuf:"varint,1,opt,name=match_id" json:"match_id,omitempty"`
+	LobbyId            *uint64         `protobuf:"fixed64,2,opt,name=lobby_id" json:"lobby_id,omitempty"`
+	GameState          *DOTA_GameState `protobuf:"varint,3,opt,name=game_state,enum=dota.DOTA_GameState,def=0" json:"game_state,omitempty"`
+	SentinelSaveTime   *uint32         `protobuf:"fixed32,4,opt,name=sentinel_save_time" json:"sentinel_save_time,omitempty"`
+	ServerSteamId      *uint64         `protobuf:"fixed64,5,opt,name=server_steam_id" json:"server_steam_id,omitempty"`
+	ServerPublicIpAddr *uint32         `protobuf:"fixed32,6,opt,name=server_public_ip_addr" json:"server_public_ip_addr,omitempty"`
+	ServerPort         *uint32         `protobuf:"varint,7,opt,name=server_port" json:"server_port,omitempty"`
+	ServerCluster      *uint32         `protobuf:"varint,8,opt,name=server_cluster" json:"server_cluster,omitempty"`
+	Pid                *uint32         `protobuf:"varint,9,opt,name=pid" json:"pid,omitempty"`
+	XXX_unrecognized   []byte          `json:"-"`
+}
+
+func (m *CMsgGameserverCrash) Reset()         { *m = CMsgGameserverCrash{} }
+func (m *CMsgGameserverCrash) String() string { return proto.CompactTextString(m) }
+func (*CMsgGameserverCrash) ProtoMessage()    {}
+
+const Default_CMsgGameserverCrash_GameState DOTA_GameState = DOTA_GameState_DOTA_GAMERULES_STATE_INIT
+
+func (m *CMsgGameserverCrash) GetMatchId() uint64 {
+	if m != nil && m.MatchId != nil {
+		return *m.MatchId
+	}
+	return 0
+}
+
+func (m *CMsgGameserverCrash) GetLobbyId() uint64 {
+	if m != nil && m.LobbyId != nil {
+		return *m.LobbyId
+	}
+	return 0
+}
+
+func (m *CMsgGameserverCrash) GetGameState() DOTA_GameState {
+	if m != nil && m.GameState != nil {
+		return *m.GameState
+	}
+	return Default_CMsgGameserverCrash_GameState
+}
+
+func (m *CMsgGameserverCrash) GetSentinelSaveTime() uint32 {
+	if m != nil && m.SentinelSaveTime != nil {
+		return *m.SentinelSaveTime
+	}
+	return 0
+}
+
+func (m *CMsgGameserverCrash) GetServerSteamId() uint64 {
+	if m != nil && m.ServerSteamId != nil {
+		return *m.ServerSteamId
+	}
+	return 0
+}
+
+func (m *CMsgGameserverCrash) GetServerPublicIpAddr() uint32 {
+	if m != nil && m.ServerPublicIpAddr != nil {
+		return *m.ServerPublicIpAddr
+	}
+	return 0
+}
+
+func (m *CMsgGameserverCrash) GetServerPort() uint32 {
+	if m != nil && m.ServerPort != nil {
+		return *m.ServerPort
+	}
+	return 0
+}
+
+func (m *CMsgGameserverCrash) GetServerCluster() uint32 {
+	if m != nil && m.ServerCluster != nil {
+		return *m.ServerCluster
+	}
+	return 0
+}
+
+func (m *CMsgGameserverCrash) GetPid() uint32 {
+	if m != nil && m.Pid != nil {
+		return *m.Pid
+	}
+	return 0
+}
+
 type CMsgConnectedPlayers struct {
 	ConnectedPlayers      []*CMsgConnectedPlayers_Player   `protobuf:"bytes,1,rep,name=connected_players" json:"connected_players,omitempty"`
 	DisconnectedPlayers   []*CMsgConnectedPlayers_Player   `protobuf:"bytes,7,rep,name=disconnected_players" json:"disconnected_players,omitempty"`
