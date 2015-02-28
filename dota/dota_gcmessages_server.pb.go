@@ -1536,7 +1536,7 @@ func (m *CMsgGameMatchSignOut_CTeam) GetPlayers() []*CMsgGameMatchSignOut_CTeam_
 }
 
 type CMsgGameMatchSignOut_CTeam_CPlayer struct {
-	AccountId                *uint64                          `protobuf:"fixed64,1,opt,name=account_id" json:"account_id,omitempty"`
+	SteamId                  *uint64                          `protobuf:"fixed64,1,opt,name=steam_id" json:"steam_id,omitempty"`
 	HeroId                   *uint32                          `protobuf:"varint,3,opt,name=hero_id" json:"hero_id,omitempty"`
 	Items                    []uint32                         `protobuf:"varint,4,rep,name=items" json:"items,omitempty"`
 	Gold                     *uint32                          `protobuf:"varint,5,opt,name=gold" json:"gold,omitempty"`
@@ -1574,9 +1574,9 @@ func (m *CMsgGameMatchSignOut_CTeam_CPlayer) Reset()         { *m = CMsgGameMatc
 func (m *CMsgGameMatchSignOut_CTeam_CPlayer) String() string { return proto.CompactTextString(m) }
 func (*CMsgGameMatchSignOut_CTeam_CPlayer) ProtoMessage()    {}
 
-func (m *CMsgGameMatchSignOut_CTeam_CPlayer) GetAccountId() uint64 {
-	if m != nil && m.AccountId != nil {
-		return *m.AccountId
+func (m *CMsgGameMatchSignOut_CTeam_CPlayer) GetSteamId() uint64 {
+	if m != nil && m.SteamId != nil {
+		return *m.SteamId
 	}
 	return 0
 }
