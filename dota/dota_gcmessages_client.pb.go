@@ -2213,6 +2213,7 @@ type CSourceTVGame struct {
 	GameMode            *DOTA_GameMode          `protobuf:"varint,21,opt,name=game_mode,enum=dota.DOTA_GameMode,def=0" json:"game_mode,omitempty"`
 	LobbyType           *uint32                 `protobuf:"varint,22,opt,name=lobby_type" json:"lobby_type,omitempty"`
 	CustomGameId        *uint64                 `protobuf:"varint,24,opt,name=custom_game_id" json:"custom_game_id,omitempty"`
+	AverageRank         *uint32                 `protobuf:"varint,25,opt,name=average_rank" json:"average_rank,omitempty"`
 	XXX_unrecognized    []byte                  `json:"-"`
 }
 
@@ -2351,6 +2352,13 @@ func (m *CSourceTVGame) GetLobbyType() uint32 {
 func (m *CSourceTVGame) GetCustomGameId() uint64 {
 	if m != nil && m.CustomGameId != nil {
 		return *m.CustomGameId
+	}
+	return 0
+}
+
+func (m *CSourceTVGame) GetAverageRank() uint32 {
+	if m != nil && m.AverageRank != nil {
+		return *m.AverageRank
 	}
 	return 0
 }

@@ -24,6 +24,7 @@ It is generated from these files:
 	netmessages.proto
 	network_connection.proto
 	networkbasetypes.proto
+	steamdatagram_messages.proto
 	steammessages.proto
 	steammessages_cloud.steamworkssdk.proto
 	steammessages_unified_base.steamworkssdk.proto

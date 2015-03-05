@@ -2,6 +2,11 @@ SteamKit := $(wildcard ~/github/SteamRE/SteamKit/Resources/Protobufs)
 
 default : proto
 
+proto:
+	git -C game-tracking pull
+	rm -rf dota
+	make dota
+
 game-tracking:
 	git init game-tracking
 	cd game-tracking && \
