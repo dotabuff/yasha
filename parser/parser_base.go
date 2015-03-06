@@ -3,13 +3,12 @@ package parser
 import (
 	"io/ioutil"
 
-	"github.com/golang/protobuf/proto"
 	"code.google.com/p/snappy-go/snappy"
 	"github.com/dotabuff/yasha/dota"
+	"github.com/golang/protobuf/proto"
 )
 
 func SnappyUncompress(compressed []byte) []byte {
-	rm -rf dota
 	dst := make([]byte, 0, len(compressed))
 	out, err := snappy.Decode(dst, compressed)
 	if err != nil {
