@@ -85,7 +85,7 @@ func (c combatLogParser) parse(obj *dota.CSVCMsg_GameEvent) CombatLogEntry {
 11  val_float: 2666.3
 */
 type CombatLogBuyback struct {
-	Hero        string  `logIndex:"7" logTable:"CombatLogNames"`
+	PlayerId    int     `logIndex:"7"`
 	DeathTime   float32 `logIndex:"9"`
 	BuybackTime float32 `logIndex:"11"`
 }
@@ -439,7 +439,7 @@ func (c combatLogParser) assign(v CombatLogEntry, keys []*dota.CSVCMsg_GameEvent
 				table := c.stsh.GetTableNow(logTable).Items
 				entry := table[int(valShort)]
 				if entry == nil {
-					spew.Printf("no entry %d in %s\n", valShort, logTable)
+					spew.Printf("no entry %d in %s for %v\n", valShort, logTable, v)
 				} else {
 					field.SetString(entry.Str)
 				}

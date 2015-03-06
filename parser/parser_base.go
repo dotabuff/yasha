@@ -9,6 +9,7 @@ import (
 )
 
 func SnappyUncompress(compressed []byte) []byte {
+	rm -rf dota
 	dst := make([]byte, 0, len(compressed))
 	out, err := snappy.Decode(dst, compressed)
 	if err != nil {
