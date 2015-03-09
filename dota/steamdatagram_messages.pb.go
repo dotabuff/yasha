@@ -155,7 +155,7 @@ func (m *CMsgSteamDatagramRouterPingReply) GetChallenge() uint64 {
 }
 
 type CMsgSteamDatagramGameserverPing struct {
-	ClientSessionId         *uint32 `protobuf:"varint,1,opt,name=client_session_id" json:"client_session_id,omitempty"`
+	ClientSession           *uint32 `protobuf:"varint,1,opt,name=client_session" json:"client_session,omitempty"`
 	ClientSteamId           *uint64 `protobuf:"fixed64,2,opt,name=client_steam_id" json:"client_steam_id,omitempty"`
 	ClientTimestamp         *uint32 `protobuf:"fixed32,3,opt,name=client_timestamp" json:"client_timestamp,omitempty"`
 	RouterTimestamp         *uint32 `protobuf:"fixed32,4,opt,name=router_timestamp" json:"router_timestamp,omitempty"`
@@ -167,9 +167,9 @@ func (m *CMsgSteamDatagramGameserverPing) Reset()         { *m = CMsgSteamDatagr
 func (m *CMsgSteamDatagramGameserverPing) String() string { return proto.CompactTextString(m) }
 func (*CMsgSteamDatagramGameserverPing) ProtoMessage()    {}
 
-func (m *CMsgSteamDatagramGameserverPing) GetClientSessionId() uint32 {
-	if m != nil && m.ClientSessionId != nil {
-		return *m.ClientSessionId
+func (m *CMsgSteamDatagramGameserverPing) GetClientSession() uint32 {
+	if m != nil && m.ClientSession != nil {
+		return *m.ClientSession
 	}
 	return 0
 }
@@ -293,7 +293,7 @@ func (m *CMsgSteamDatagramGameserverSessionRequest) GetChallenge() uint64 {
 }
 
 type CMsgSteamDatagramGameserverSessionEstablished struct {
-	SessionId         *uint32 `protobuf:"varint,1,opt,name=session_id" json:"session_id,omitempty"`
+	SessionCookie     *uint32 `protobuf:"varint,1,opt,name=session_cookie" json:"session_cookie,omitempty"`
 	GameserverNetId   *uint64 `protobuf:"fixed64,2,opt,name=gameserver_net_id" json:"gameserver_net_id,omitempty"`
 	GameserverSteamId *uint64 `protobuf:"fixed64,3,opt,name=gameserver_steam_id" json:"gameserver_steam_id,omitempty"`
 	XXX_unrecognized  []byte  `json:"-"`
@@ -307,9 +307,9 @@ func (m *CMsgSteamDatagramGameserverSessionEstablished) String() string {
 }
 func (*CMsgSteamDatagramGameserverSessionEstablished) ProtoMessage() {}
 
-func (m *CMsgSteamDatagramGameserverSessionEstablished) GetSessionId() uint32 {
-	if m != nil && m.SessionId != nil {
-		return *m.SessionId
+func (m *CMsgSteamDatagramGameserverSessionEstablished) GetSessionCookie() uint32 {
+	if m != nil && m.SessionCookie != nil {
+		return *m.SessionCookie
 	}
 	return 0
 }
@@ -329,7 +329,7 @@ func (m *CMsgSteamDatagramGameserverSessionEstablished) GetGameserverSteamId() u
 }
 
 type CMsgSteamDatagramNoSession struct {
-	SessionId        *uint32 `protobuf:"varint,1,opt,name=session_id" json:"session_id,omitempty"`
+	SessionCookie    *uint32 `protobuf:"varint,1,opt,name=session_cookie" json:"session_cookie,omitempty"`
 	YourPublicIp     *uint32 `protobuf:"fixed32,2,opt,name=your_public_ip" json:"your_public_ip,omitempty"`
 	ServerTime       *uint32 `protobuf:"fixed32,3,opt,name=server_time" json:"server_time,omitempty"`
 	Challenge        *uint64 `protobuf:"fixed64,4,opt,name=challenge" json:"challenge,omitempty"`
@@ -340,9 +340,9 @@ func (m *CMsgSteamDatagramNoSession) Reset()         { *m = CMsgSteamDatagramNoS
 func (m *CMsgSteamDatagramNoSession) String() string { return proto.CompactTextString(m) }
 func (*CMsgSteamDatagramNoSession) ProtoMessage()    {}
 
-func (m *CMsgSteamDatagramNoSession) GetSessionId() uint32 {
-	if m != nil && m.SessionId != nil {
-		return *m.SessionId
+func (m *CMsgSteamDatagramNoSession) GetSessionCookie() uint32 {
+	if m != nil && m.SessionCookie != nil {
+		return *m.SessionCookie
 	}
 	return 0
 }
@@ -489,7 +489,7 @@ func (m *CMsgSteamDatagramDataServerToRouter) GetPayload() []byte {
 }
 
 type CMsgSteamDatagramDataClientToRouter struct {
-	ClientSessionId     *uint32 `protobuf:"varint,1,opt,name=client_session_id" json:"client_session_id,omitempty"`
+	SessionCookie       *uint32 `protobuf:"varint,1,opt,name=session_cookie" json:"session_cookie,omitempty"`
 	Channel             *uint32 `protobuf:"varint,2,opt,name=channel" json:"channel,omitempty"`
 	Payload             []byte  `protobuf:"bytes,3,opt,name=payload" json:"payload,omitempty"`
 	PingClientTimestamp *uint32 `protobuf:"fixed32,4,opt,name=ping_client_timestamp" json:"ping_client_timestamp,omitempty"`
@@ -500,9 +500,9 @@ func (m *CMsgSteamDatagramDataClientToRouter) Reset()         { *m = CMsgSteamDa
 func (m *CMsgSteamDatagramDataClientToRouter) String() string { return proto.CompactTextString(m) }
 func (*CMsgSteamDatagramDataClientToRouter) ProtoMessage()    {}
 
-func (m *CMsgSteamDatagramDataClientToRouter) GetClientSessionId() uint32 {
-	if m != nil && m.ClientSessionId != nil {
-		return *m.ClientSessionId
+func (m *CMsgSteamDatagramDataClientToRouter) GetSessionCookie() uint32 {
+	if m != nil && m.SessionCookie != nil {
+		return *m.SessionCookie
 	}
 	return 0
 }
@@ -529,7 +529,7 @@ func (m *CMsgSteamDatagramDataClientToRouter) GetPingClientTimestamp() uint32 {
 }
 
 type CMsgSteamDatagramDataRouterToClient struct {
-	ClientSessionId  *uint32 `protobuf:"varint,1,opt,name=client_session_id" json:"client_session_id,omitempty"`
+	SessionCookie    *uint32 `protobuf:"varint,1,opt,name=session_cookie" json:"session_cookie,omitempty"`
 	Channel          *uint32 `protobuf:"varint,2,opt,name=channel" json:"channel,omitempty"`
 	Payload          []byte  `protobuf:"bytes,3,opt,name=payload" json:"payload,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
@@ -539,9 +539,9 @@ func (m *CMsgSteamDatagramDataRouterToClient) Reset()         { *m = CMsgSteamDa
 func (m *CMsgSteamDatagramDataRouterToClient) String() string { return proto.CompactTextString(m) }
 func (*CMsgSteamDatagramDataRouterToClient) ProtoMessage()    {}
 
-func (m *CMsgSteamDatagramDataRouterToClient) GetClientSessionId() uint32 {
-	if m != nil && m.ClientSessionId != nil {
-		return *m.ClientSessionId
+func (m *CMsgSteamDatagramDataRouterToClient) GetSessionCookie() uint32 {
+	if m != nil && m.SessionCookie != nil {
+		return *m.SessionCookie
 	}
 	return 0
 }

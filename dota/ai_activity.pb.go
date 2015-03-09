@@ -655,6 +655,17 @@ const (
 	Activity_ACT_DOTA_SWIM_IDLE                              Activity = 609
 	Activity_ACT_DOTA_WAIT_IDLE                              Activity = 610
 	Activity_ACT_DOTA_GREET                                  Activity = 611
+	Activity_ACT_DOTA_TELEPORT_COOP_START                    Activity = 612
+	Activity_ACT_DOTA_TELEPORT_COOP_WAIT                     Activity = 613
+	Activity_ACT_DOTA_TELEPORT_COOP_END                      Activity = 614
+	Activity_ACT_DOTA_TELEPORT_COOP_EXIT                     Activity = 615
+	Activity_ACT_DOTA_SHOPKEEPER_PET_INTERACT                Activity = 616
+	Activity_ACT_DOTA_ITEM_PICKUP                            Activity = 617
+	Activity_ACT_DOTA_ITEM_DROP                              Activity = 618
+	Activity_ACT_DOTA_CAPTURE_PET                            Activity = 619
+	Activity_ACT_DOTA_PET_WARD_OBSERVER                      Activity = 620
+	Activity_ACT_DOTA_PET_WARD_SENTRY                        Activity = 621
+	Activity_ACT_DOTA_PET_LEVEL                              Activity = 622
 )
 
 var Activity_name = map[int32]string{
@@ -1269,6 +1280,17 @@ var Activity_name = map[int32]string{
 	609: "ACT_DOTA_SWIM_IDLE",
 	610: "ACT_DOTA_WAIT_IDLE",
 	611: "ACT_DOTA_GREET",
+	612: "ACT_DOTA_TELEPORT_COOP_START",
+	613: "ACT_DOTA_TELEPORT_COOP_WAIT",
+	614: "ACT_DOTA_TELEPORT_COOP_END",
+	615: "ACT_DOTA_TELEPORT_COOP_EXIT",
+	616: "ACT_DOTA_SHOPKEEPER_PET_INTERACT",
+	617: "ACT_DOTA_ITEM_PICKUP",
+	618: "ACT_DOTA_ITEM_DROP",
+	619: "ACT_DOTA_CAPTURE_PET",
+	620: "ACT_DOTA_PET_WARD_OBSERVER",
+	621: "ACT_DOTA_PET_WARD_SENTRY",
+	622: "ACT_DOTA_PET_LEVEL",
 }
 var Activity_value = map[string]int32{
 	"ACT_INVALID":                                     -1,
@@ -1882,6 +1904,17 @@ var Activity_value = map[string]int32{
 	"ACT_DOTA_SWIM_IDLE":                              609,
 	"ACT_DOTA_WAIT_IDLE":                              610,
 	"ACT_DOTA_GREET":                                  611,
+	"ACT_DOTA_TELEPORT_COOP_START":                    612,
+	"ACT_DOTA_TELEPORT_COOP_WAIT":                     613,
+	"ACT_DOTA_TELEPORT_COOP_END":                      614,
+	"ACT_DOTA_TELEPORT_COOP_EXIT":                     615,
+	"ACT_DOTA_SHOPKEEPER_PET_INTERACT":                616,
+	"ACT_DOTA_ITEM_PICKUP":                            617,
+	"ACT_DOTA_ITEM_DROP":                              618,
+	"ACT_DOTA_CAPTURE_PET":                            619,
+	"ACT_DOTA_PET_WARD_OBSERVER":                      620,
+	"ACT_DOTA_PET_WARD_SENTRY":                        621,
+	"ACT_DOTA_PET_LEVEL":                              622,
 }
 
 func (x Activity) Enum() *Activity {
