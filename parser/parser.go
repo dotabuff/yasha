@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"strings"
+
 	"github.com/davecgh/go-spew/spew"
 	"github.com/dotabuff/yasha/dota"
 	"github.com/dotabuff/yasha/utils"
@@ -15,7 +17,13 @@ type Parser struct {
 }
 
 func ParserFromFile(path string) *Parser {
-	return NewParser(ReadFile(path))
+	if strings.HasSuffix(path, ".dem.bz2") {
+		return NewParser(ReadBz2File(path))
+	} else if strings.HasSuffix(path, ".dem") {
+		return NewParser(ReadFile(path))
+	} else {
+		panic("expected path to .dem or .dem.bz2 instead of " + path)
+	}
 }
 
 func NewParser(data []byte) *Parser {

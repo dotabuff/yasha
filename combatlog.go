@@ -1,8 +1,12 @@
 package yasha
 
 import (
+	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
+
+	"go/format"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/dotabuff/yasha/dota"
@@ -17,6 +21,80 @@ type CombatLogEntry interface {
 type combatLogParser struct {
 	stsh     *string_tables.StateHelper
 	distinct map[dota.DOTA_COMBATLOG_TYPES][]map[interface{}]bool
+}
+
+func printCombatLogKeys(v CombatLogEntry, keys []*dota.CSVCMsg_GameEventKeyT) {
+	out := []byte{}
+
+	typeString := v.Type().String()
+	parts := strings.Split(typeString, "_")
+	parts = parts[2:len(parts)]
+	for i, part := range parts {
+		parts[i] = strings.Title(strings.ToLower(part))
+	}
+	typeName := strings.Join(append([]string{"CombatLog"}, parts...), "")
+
+	out = append(out, spew.Sprintf("type %s struct {\n", typeName)...)
+
+	var key interface{}
+	var t string
+
+	for i, k := range keys {
+		switch k.GetType() {
+		case 2:
+			key = float64(k.GetValFloat())
+			t = "float64"
+		case 4:
+			key = int64(k.GetValShort())
+			t = "int64"
+		case 5:
+			key = int64(k.GetValByte())
+			t = "int64"
+		case 6:
+			key = k.GetValBool()
+			t = "bool"
+		}
+
+		name := fmt.Sprintf("Unknown%d", i)
+
+		switch i {
+		case 0:
+			continue
+		case 5:
+			name = "AttackerIsillusion"
+		case 6:
+			name = "TargetIsIllusion"
+		case 9:
+			name = "Time"
+		case 11:
+			name = "TimeRaw"
+		case 12:
+			name = "AttackerIsHero"
+		case 13:
+			name = "TargetIsHero"
+		case 14, 15:
+			if key.(bool) {
+				pp(v, keys)
+				panic("found one")
+			}
+		}
+
+		out = append(out, fmt.Sprintf("%s %s `logIndex:\"%d\"` // %v\n", name, t, i, key)...)
+	}
+
+	out = append(out, '}', '\n')
+	out = append(out, fmt.Sprintf(`func (c %s) Type() dota.DOTA_COMBATLOG_TYPES {`, typeName)...)
+	out = append(out, fmt.Sprintf(`return dota.DOTA_COMBATLOG_TYPES_%s`, typeString)...)
+	out = append(out, '}', '\n')
+	out = append(out, fmt.Sprintf(`func (c %s) Timestamp() float32 {`, typeName)...)
+	out = append(out, `return c.Time`...)
+	out = append(out, '}', '\n')
+
+	if formatted, err := format.Source(out); err == nil {
+		spew.Println(string(formatted))
+	} else {
+		panic(err)
+	}
 }
 
 /*
@@ -66,6 +144,7 @@ func (c combatLogParser) parse(obj *dota.CSVCMsg_GameEvent) CombatLogEntry {
 		v = &CombatLogModifierRemove{}
 	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_PURCHASE:
 		v = &CombatLogPurchase{}
+		// printCombatLogKeys(v, keys)
 	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_XP:
 		v = &CombatLogXP{}
 	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_BUYBACK:
@@ -79,22 +158,17 @@ func (c combatLogParser) parse(obj *dota.CSVCMsg_GameEvent) CombatLogEntry {
 	return v
 }
 
-/*
- 7  val_short: 9
- 9  val_float: 2625.6892
-11  val_float: 2666.3
-*/
 type CombatLogBuyback struct {
-	PlayerId    int     `logIndex:"7"`
-	DeathTime   float32 `logIndex:"9"`
-	BuybackTime float32 `logIndex:"11"`
+	PlayerId int     `logIndex:"7"`  //  7:  val_short: 9
+	Time     float32 `logIndex:"9"`  //  9:  val_float: 2625.6892
+	TimeRaw  float32 `logIndex:"11"` // 11:  val_float: 2666.3
 }
 
 func (c CombatLogBuyback) Type() dota.DOTA_COMBATLOG_TYPES {
 	return dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_BUYBACK
 }
 func (c CombatLogBuyback) Timestamp() float32 {
-	return c.BuybackTime
+	return c.Time
 }
 
 type CombatLogItem struct {
@@ -136,24 +210,6 @@ func (c CombatLogAbility) Timestamp() float32 {
 	return c.Time
 }
 
-//  2:  4 val_short:12
-//  3:  4 val_short:5
-//  4:  4 val_short:47
-//  5:  6 val_bool:false
-//  6:  6 val_bool:false
-//  7:  4 val_short:3
-//  8:  4 val_short:0
-//  9:  2 val_float:1519.1506
-// 10:  4 val_short:0
-// 11:  2 val_float:1638.1001
-// 12:  6 val_bool:true
-// 13:  6 val_bool:true
-// 14:  6 val_bool:false
-// 15:  6 val_bool:false
-// 16:  4 val_short:4
-// 17:  4 val_short:0
-// 18:  4 val_short:0
-
 type CombatLogAbilityTrigger struct {
 	Target             string  `logIndex:"2" logTable:"CombatLogNames"`  //  2:  4 val_short:12
 	Attacker           string  `logIndex:"3" logTable:"CombatLogNames"`  //  3:  4 val_short:5
@@ -164,7 +220,7 @@ type CombatLogAbilityTrigger struct {
 	Unknown8           int     `logIndex:"8"`                            //  8:  4 val_short:0
 	Time               float32 `logIndex:"9"`                            //  9:  2 val_float:1519.1506
 	TargetSource       string  `logIndex:"10" logTable:"CombatLogNames"` // 10:  4 val_short:0
-	Unknown11          float32 `logIndex:"11"`                           // 11:  2 val_float:1638.1001
+	TimeRaw            float32 `logIndex:"11"`                           // 11:  2 val_float:1638.1001
 	AttackerIsHero     bool    `logIndex:"12"`                           // 12:  6 val_bool:true
 	TargetIsHero       bool    `logIndex:"13"`                           // 13:  6 val_bool:true
 	Unknown14          bool    `logIndex:"14"`                           // 14:  6 val_bool:false
@@ -173,7 +229,6 @@ type CombatLogAbilityTrigger struct {
 	Unknown17          int     `logIndex:"17"`                           // 17:  4 val_short:0
 	Unknown18          int     `logIndex:"18"`                           // 18:  4 val_short:0
 	Unknown19          int     `logIndex:"19"`                           // 18:  4 val_short:0
-
 }
 
 func (c CombatLogAbilityTrigger) Type() dota.DOTA_COMBATLOG_TYPES {
@@ -184,35 +239,20 @@ func (c CombatLogAbilityTrigger) Timestamp() float32 {
 	return c.Time
 }
 
-/*
- 0: val_byte:0
- 1: val_short:3
- 2: val_short:27
- 3: val_short:3
- 4: val_short:0
- 5: val_bool:false
- 6: val_bool:false
- 7: val_short:70
- 8: val_short:429
- 9: val_float:229.45338
- 10: val_short:27
- 11: val_float:238.43335
- 12: val_bool:true
- 13: val_bool:false
-*/
 type CombatLogDamage struct {
-	Source             string  `logIndex:"1" logTable:"CombatLogNames"`
-	Target             string  `logIndex:"2" logTable:"CombatLogNames"`
-	Attacker           string  `logIndex:"3" logTable:"CombatLogNames"`
-	Cause              string  `logIndex:"4" logTable:"CombatLogNames"`
-	AttackerIsIllusion bool    `logIndex:"5"`
-	TargetIsIllusion   bool    `logIndex:"6"`
-	Value              int     `logIndex:"7"`
-	Health             int     `logIndex:"8"`
-	Time               float32 `logIndex:"9"`
-	TargetSource       string  `logIndex:"10" logTable:"CombatLogNames"`
-	AttackerIsHero     bool    `logIndex:"12"`
-	TargetIsHero       bool    `logIndex:"13"`
+	Source             string  `logIndex:"1" logTable:"CombatLogNames"`  // 1: val_short:3
+	Target             string  `logIndex:"2" logTable:"CombatLogNames"`  // 2: val_short:27
+	Attacker           string  `logIndex:"3" logTable:"CombatLogNames"`  // 3: val_short:3
+	Cause              string  `logIndex:"4" logTable:"CombatLogNames"`  // 4: val_short:0
+	AttackerIsIllusion bool    `logIndex:"5"`                            // 5: val_bool:false
+	TargetIsIllusion   bool    `logIndex:"6"`                            // 6: val_bool:false
+	Value              int     `logIndex:"7"`                            // 7: val_short:70
+	Health             int     `logIndex:"8"`                            // 8: val_short:429
+	Time               float32 `logIndex:"9"`                            // 9: val_float:229.45338
+	TargetSource       string  `logIndex:"10" logTable:"CombatLogNames"` // 10: val_short:27
+	TimeRaw            float32 `logIndex:"11"`                           // 11: val_float:238.43335
+	AttackerIsHero     bool    `logIndex:"12"`                           // 12: val_bool:true
+	TargetIsHero       bool    `logIndex:"13"`                           // 13: val_bool:false
 }
 
 func (c CombatLogDamage) Type() dota.DOTA_COMBATLOG_TYPES {
@@ -318,6 +358,7 @@ type CombatLogDeath struct {
 	TargetIsIllusion   bool    `logIndex:"6"`
 	Time               float32 `logIndex:"9"`
 	TargetSource       string  `logIndex:"10" logTable:"CombatLogNames"`
+	TimeRaw            float32 `logIndex:"11"`
 	AttackerIsHero     bool    `logIndex:"12"`
 	TargetIsHero       bool    `logIndex:"13"`
 }
@@ -330,9 +371,10 @@ func (c CombatLogDeath) Timestamp() float32 {
 }
 
 type CombatLogPurchase struct {
-	Time  float32 `logIndex:"9"`
-	Buyer string  `logIndex:"2" logTable:"CombatLogNames"`
-	Item  string  `logIndex:"7" logTable:"CombatLogNames"`
+	Buyer   string  `logIndex:"2" logTable:"CombatLogNames"`
+	Item    string  `logIndex:"7" logTable:"CombatLogNames"`
+	Time    float32 `logIndex:"9"`
+	TimeRaw float32 `logIndex:"11"`
 }
 
 func (c CombatLogPurchase) Type() dota.DOTA_COMBATLOG_TYPES {
@@ -343,9 +385,10 @@ func (c CombatLogPurchase) Timestamp() float32 {
 }
 
 type CombatLogGold struct {
-	Target string  `logIndex:"2" logTable:"CombatLogNames"`
-	Value  int     `logIndex:"7"`
-	Time   float32 `logIndex:"9"`
+	Target  string  `logIndex:"2" logTable:"CombatLogNames"`
+	Value   int     `logIndex:"7"`
+	Time    float32 `logIndex:"9"`
+	TimeRaw float32 `logIndex:"11"`
 }
 
 func (c CombatLogGold) Type() dota.DOTA_COMBATLOG_TYPES {
@@ -356,8 +399,9 @@ func (c CombatLogGold) Timestamp() float32 {
 }
 
 type CombatLogGameState struct {
-	State int     `logIndex:"7"`
-	Time  float32 `logIndex:"9"`
+	State   int     `logIndex:"7"`  //  7: val_short:5 (2,3,4,5,6)
+	Time    float32 `logIndex:"9"`  //  9: val_float:505.76474
+	TimeRaw float32 `logIndex:"11"` // 11: val_float:597.93335
 }
 
 func (c CombatLogGameState) Type() dota.DOTA_COMBATLOG_TYPES {

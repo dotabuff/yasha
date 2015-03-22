@@ -2,10 +2,13 @@ package parser
 
 import (
 	"io/ioutil"
+	"os"
 
-	"code.google.com/p/snappy-go/snappy"
+	"compress/bzip2"
+
 	"github.com/dotabuff/yasha/dota"
 	"github.com/golang/protobuf/proto"
+	"github.com/siddontang/go/snappy"
 )
 
 func SnappyUncompress(compressed []byte) []byte {
@@ -23,6 +26,19 @@ func ProtoUnmarshal(data []byte, obj proto.Message) error {
 
 func ReadFile(path string) []byte {
 	raw, err := ioutil.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+	return raw
+}
+
+func ReadBz2File(path string) []byte {
+	fd, err := os.Open(path)
+	if err != nil {
+		panic(err)
+	}
+	reader := bzip2.NewReader(fd)
+	raw, err := ioutil.ReadAll(reader)
 	if err != nil {
 		panic(err)
 	}

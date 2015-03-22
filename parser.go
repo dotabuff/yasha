@@ -3,6 +3,7 @@ package yasha
 import (
 	"math"
 	"sort"
+	"strings"
 
 	"github.com/davecgh/go-spew/spew"
 
@@ -94,7 +95,13 @@ type Parser struct {
 }
 
 func ParserFromFile(path string) *Parser {
-	return NewParser(parser.ReadFile(path))
+	if strings.HasSuffix(path, ".dem.bz2") {
+		return NewParser(parser.ReadBz2File(path))
+	} else if strings.HasSuffix(path, ".dem") {
+		return NewParser(parser.ReadFile(path))
+	} else {
+		panic("expected path to .dem or .dem.bz2 instead of " + path)
+	}
 }
 
 func NewParser(data []byte) *Parser {
