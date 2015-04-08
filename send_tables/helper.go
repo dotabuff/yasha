@@ -3,11 +3,8 @@ package send_tables
 import (
 	"sort"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/dotabuff/yasha/dota"
 )
-
-func foo() { spew.Dump("hi") }
 
 type DPTType int
 
@@ -117,6 +114,7 @@ func (sth *Helper) buildHierarchy(sendTableName string) {
 	sth.buildHierarchyIterateProps(sendTableName, &result)
 	sth.flatSendTable = append(sth.flatSendTable, result...)
 }
+
 func (sth *Helper) buildHierarchyIterateProps(sendTableName string, result *[]*SendProp) {
 	pTable := sth.sendTables[sendTableName]
 	for _, pProp := range pTable.GetProps() {

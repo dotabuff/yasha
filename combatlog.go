@@ -389,6 +389,7 @@ type CombatLogGold struct {
 	Value   int     `logIndex:"7"`
 	Time    float32 `logIndex:"9"`
 	TimeRaw float32 `logIndex:"11"`
+	Reason  int     `logIndex:"17"`
 }
 
 func (c CombatLogGold) Type() dota.DOTA_COMBATLOG_TYPES {
@@ -412,9 +413,11 @@ func (c CombatLogGameState) Timestamp() float32 {
 }
 
 type CombatLogXP struct {
-	Target string  `logIndex:"2" logTable:"CombatLogNames"`
-	Value  int     `logIndex:"7"`
-	Time   float32 `logIndex:"9"`
+	Target  string  `logIndex:"2" logTable:"CombatLogNames"`
+	Value   int     `logIndex:"7"`
+	Time    float32 `logIndex:"9"`
+	TimeRaw float32 `logIndex:"11"`
+	Reason  int     `logIndex:"18"`
 }
 
 func (c CombatLogXP) Type() dota.DOTA_COMBATLOG_TYPES {
