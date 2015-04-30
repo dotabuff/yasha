@@ -26,6 +26,6 @@ dota: dota/google/protobuf/descriptor.pb.go game-tracking
 	protoc -I$(SteamKit)/ -Idota --go_out=dota dota/*.proto
 	sed -i 's|google/protobuf/descriptor.pb|github.com/dotabuff/yasha/dota/google/protobuf|' dota/*.pb.go
 
-dota/google/protobuf/descriptor.pb.go : descriptor.proto
+dota/google/protobuf/descriptor.pb.go : google/protobuf/descriptor.proto
 	mkdir -p dota/google/protobuf
-	protoc -I. --go_out=dota/google/protobuf $<
+	protoc -I. --go_out=dota $<

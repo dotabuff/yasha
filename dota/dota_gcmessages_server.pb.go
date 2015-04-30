@@ -262,6 +262,8 @@ const (
 	CMsgConnectedPlayers_TOWER_STATE                        CMsgConnectedPlayers_SendReason = 9
 	CMsgConnectedPlayers_GAMESTATE_TIMEOUT                  CMsgConnectedPlayers_SendReason = 10
 	CMsgConnectedPlayers_MASS_DISCONNECT                    CMsgConnectedPlayers_SendReason = 11
+	CMsgConnectedPlayers_BARRACKS_STATE                     CMsgConnectedPlayers_SendReason = 12
+	CMsgConnectedPlayers_KILLS                              CMsgConnectedPlayers_SendReason = 13
 )
 
 var CMsgConnectedPlayers_SendReason_name = map[int32]string{
@@ -276,6 +278,8 @@ var CMsgConnectedPlayers_SendReason_name = map[int32]string{
 	9:  "TOWER_STATE",
 	10: "GAMESTATE_TIMEOUT",
 	11: "MASS_DISCONNECT",
+	12: "BARRACKS_STATE",
+	13: "KILLS",
 }
 var CMsgConnectedPlayers_SendReason_value = map[string]int32{
 	"INVALID":                            0,
@@ -289,6 +293,8 @@ var CMsgConnectedPlayers_SendReason_value = map[string]int32{
 	"TOWER_STATE":                        9,
 	"GAMESTATE_TIMEOUT":                  10,
 	"MASS_DISCONNECT":                    11,
+	"BARRACKS_STATE":                     12,
+	"KILLS":                              13,
 }
 
 func (x CMsgConnectedPlayers_SendReason) Enum() *CMsgConnectedPlayers_SendReason {
@@ -662,6 +668,9 @@ type CMsgConnectedPlayers struct {
 	LegacyMassDisconnect  *bool                            `protobuf:"varint,9,opt,name=legacy_mass_disconnect" json:"legacy_mass_disconnect,omitempty"`
 	PoorNetworkConditions *CMsgPoorNetworkConditions       `protobuf:"bytes,10,opt,name=poor_network_conditions" json:"poor_network_conditions,omitempty"`
 	SendReason            *CMsgConnectedPlayers_SendReason `protobuf:"varint,8,opt,name=send_reason,enum=dota.CMsgConnectedPlayers_SendReason,def=0" json:"send_reason,omitempty"`
+	RadiantKills          *uint32                          `protobuf:"varint,11,opt,name=radiant_kills" json:"radiant_kills,omitempty"`
+	DireKills             *uint32                          `protobuf:"varint,12,opt,name=dire_kills" json:"dire_kills,omitempty"`
+	BarracksState         *uint32                          `protobuf:"varint,13,opt,name=barracks_state" json:"barracks_state,omitempty"`
 	XXX_unrecognized      []byte                           `json:"-"`
 }
 
@@ -726,6 +735,27 @@ func (m *CMsgConnectedPlayers) GetSendReason() CMsgConnectedPlayers_SendReason {
 		return *m.SendReason
 	}
 	return Default_CMsgConnectedPlayers_SendReason
+}
+
+func (m *CMsgConnectedPlayers) GetRadiantKills() uint32 {
+	if m != nil && m.RadiantKills != nil {
+		return *m.RadiantKills
+	}
+	return 0
+}
+
+func (m *CMsgConnectedPlayers) GetDireKills() uint32 {
+	if m != nil && m.DireKills != nil {
+		return *m.DireKills
+	}
+	return 0
+}
+
+func (m *CMsgConnectedPlayers) GetBarracksState() uint32 {
+	if m != nil && m.BarracksState != nil {
+		return *m.BarracksState
+	}
+	return 0
 }
 
 type CMsgConnectedPlayers_Player struct {
@@ -2762,11 +2792,9 @@ func (m *CMsgDOTARequestPlayerResourcesResponse) GetLowPriority() bool {
 }
 
 type CMsgDOTARequestBatchPlayerResources struct {
-	AccountIds               []uint32 `protobuf:"varint,1,rep,packed,name=account_ids" json:"account_ids,omitempty"`
-	LegacyRankUseCompetitive *bool    `protobuf:"varint,2,opt,name=legacy_rank_use_competitive" json:"legacy_rank_use_competitive,omitempty"`
-	LegacyRankUseSolo        []bool   `protobuf:"varint,3,rep,packed,name=legacy_rank_use_solo" json:"legacy_rank_use_solo,omitempty"`
-	RankTypes                []uint32 `protobuf:"varint,4,rep,packed,name=rank_types" json:"rank_types,omitempty"`
-	XXX_unrecognized         []byte   `json:"-"`
+	AccountIds       []uint32 `protobuf:"varint,1,rep,packed,name=account_ids" json:"account_ids,omitempty"`
+	RankTypes        []uint32 `protobuf:"varint,4,rep,packed,name=rank_types" json:"rank_types,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
 }
 
 func (m *CMsgDOTARequestBatchPlayerResources) Reset()         { *m = CMsgDOTARequestBatchPlayerResources{} }
@@ -2776,20 +2804,6 @@ func (*CMsgDOTARequestBatchPlayerResources) ProtoMessage()    {}
 func (m *CMsgDOTARequestBatchPlayerResources) GetAccountIds() []uint32 {
 	if m != nil {
 		return m.AccountIds
-	}
-	return nil
-}
-
-func (m *CMsgDOTARequestBatchPlayerResources) GetLegacyRankUseCompetitive() bool {
-	if m != nil && m.LegacyRankUseCompetitive != nil {
-		return *m.LegacyRankUseCompetitive
-	}
-	return false
-}
-
-func (m *CMsgDOTARequestBatchPlayerResources) GetLegacyRankUseSolo() []bool {
-	if m != nil {
-		return m.LegacyRankUseSolo
 	}
 	return nil
 }
@@ -3438,7 +3452,6 @@ func (m *CMsgDOTAAwardEventPoints) GetEventId() uint32 {
 type CMsgDOTAAwardEventPoints_AwardPoints struct {
 	AccountId        *uint32 `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
 	Points           *int32  `protobuf:"varint,2,opt,name=points" json:"points,omitempty"`
-	PremiumPoints    *int32  `protobuf:"varint,3,opt,name=premium_points" json:"premium_points,omitempty"`
 	TradeBanTime     *uint32 `protobuf:"varint,5,opt,name=trade_ban_time" json:"trade_ban_time,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
@@ -3457,13 +3470,6 @@ func (m *CMsgDOTAAwardEventPoints_AwardPoints) GetAccountId() uint32 {
 func (m *CMsgDOTAAwardEventPoints_AwardPoints) GetPoints() int32 {
 	if m != nil && m.Points != nil {
 		return *m.Points
-	}
-	return 0
-}
-
-func (m *CMsgDOTAAwardEventPoints_AwardPoints) GetPremiumPoints() int32 {
-	if m != nil && m.PremiumPoints != nil {
-		return *m.PremiumPoints
 	}
 	return 0
 }
@@ -3780,7 +3786,7 @@ func (m *CMsgServerGetEventPointsResponse) GetPoints() []*CMsgServerGetEventPoin
 type CMsgServerGetEventPointsResponse_Points struct {
 	AccountId        *uint32 `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
 	PointsTotal      *uint32 `protobuf:"varint,2,opt,name=points_total" json:"points_total,omitempty"`
-	PremiumTotal     *uint32 `protobuf:"varint,3,opt,name=premium_total" json:"premium_total,omitempty"`
+	Owned            *bool   `protobuf:"varint,4,opt,name=owned" json:"owned,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -3804,11 +3810,11 @@ func (m *CMsgServerGetEventPointsResponse_Points) GetPointsTotal() uint32 {
 	return 0
 }
 
-func (m *CMsgServerGetEventPointsResponse_Points) GetPremiumTotal() uint32 {
-	if m != nil && m.PremiumTotal != nil {
-		return *m.PremiumTotal
+func (m *CMsgServerGetEventPointsResponse_Points) GetOwned() bool {
+	if m != nil && m.Owned != nil {
+		return *m.Owned
 	}
-	return 0
+	return false
 }
 
 type CMsgServerGrantSurveyPermission struct {

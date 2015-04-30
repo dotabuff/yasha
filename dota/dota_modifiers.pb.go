@@ -74,6 +74,7 @@ type CDOTAModifierBuffTableEntry struct {
 	DdModifierIndex     *int32                    `protobuf:"varint,27,opt,name=dd_modifier_index" json:"dd_modifier_index,omitempty"`
 	DdAbilityIndex      *int32                    `protobuf:"varint,28,opt,name=dd_ability_index" json:"dd_ability_index,omitempty"`
 	IllusionLabel       *string                   `protobuf:"bytes,29,opt,name=illusion_label" json:"illusion_label,omitempty"`
+	Active              *bool                     `protobuf:"varint,30,opt,name=active" json:"active,omitempty"`
 	XXX_unrecognized    []byte                    `json:"-"`
 }
 
@@ -285,6 +286,13 @@ func (m *CDOTAModifierBuffTableEntry) GetIllusionLabel() string {
 		return *m.IllusionLabel
 	}
 	return ""
+}
+
+func (m *CDOTAModifierBuffTableEntry) GetActive() bool {
+	if m != nil && m.Active != nil {
+		return *m.Active
+	}
+	return false
 }
 
 func init() {

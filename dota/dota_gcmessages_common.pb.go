@@ -344,8 +344,6 @@ const (
 	EDOTAGCMsg_k_EMsgGCPartyLeaderWatchGamePrompt                         EDOTAGCMsg = 7397
 	EDOTAGCMsg_k_EMsgDOTAFrostivusTimeElapsed                             EDOTAGCMsg = 7398
 	EDOTAGCMsg_k_EMsgGCToGCGrantEarnedLicense                             EDOTAGCMsg = 7399
-	EDOTAGCMsg_k_EMsgDOTAExchangeEventPoints                              EDOTAGCMsg = 7400
-	EDOTAGCMsg_k_EMsgDOTAExchangeEventPointsResponse                      EDOTAGCMsg = 7401
 	EDOTAGCMsg_k_EMsgDOTALiveLeagueGameUpdate                             EDOTAGCMsg = 7402
 	EDOTAGCMsg_k_EMsgDOTAChatGetUserList                                  EDOTAGCMsg = 7403
 	EDOTAGCMsg_k_EMsgDOTAChatGetUserListResponse                          EDOTAGCMsg = 7404
@@ -364,8 +362,6 @@ const (
 	EDOTAGCMsg_k_EMsgGCToServerPingResponse                               EDOTAGCMsg = 7417
 	EDOTAGCMsg_k_EMsgGCToServerConsoleCommand                             EDOTAGCMsg = 7418
 	EDOTAGCMsg_k_EMsgGCToGCUpdateLiveLeagueGameInfo                       EDOTAGCMsg = 7420
-	EDOTAGCMsg_k_EMsgGCNewBloomModeState                                  EDOTAGCMsg = 7421
-	EDOTAGCMsg_k_EMsgGCNewBloomModeStateResponse                          EDOTAGCMsg = 7422
 	EDOTAGCMsg_k_EMsgGCMakeOffering                                       EDOTAGCMsg = 7423
 	EDOTAGCMsg_k_EMsgGCRequestOfferings                                   EDOTAGCMsg = 7424
 	EDOTAGCMsg_k_EMsgGCRequestOfferingsResponse                           EDOTAGCMsg = 7425
@@ -522,11 +518,14 @@ const (
 	EDOTAGCMsg_k_EMsgGameserverCrashReport                                EDOTAGCMsg = 7579
 	EDOTAGCMsg_k_EMsgGameserverCrashReportResponse                        EDOTAGCMsg = 7580
 	EDOTAGCMsg_k_EMsgGCToClientSteamDatagramTicket                        EDOTAGCMsg = 7581
+	EDOTAGCMsg_k_EMsgGCToGCGrantEventOwnership                            EDOTAGCMsg = 7582
 	EDOTAGCMsg_k_EMsgGCDev_GrantWarKill                                   EDOTAGCMsg = 8001
 	EDOTAGCMsg_k_EMsgClientToGCCreateTeamShowcase                         EDOTAGCMsg = 8002
 	EDOTAGCMsg_k_EMsgGCToClientTeamShowcaseCreateResult                   EDOTAGCMsg = 8003
 	EDOTAGCMsg_k_EMsgServerToGCLockCharmTrading                           EDOTAGCMsg = 8004
 	EDOTAGCMsg_k_EMsgDOTACNY2015EventPointUsage                           EDOTAGCMsg = 8005
+	EDOTAGCMsg_k_EMsgClientToGCFindTopSourceTVGames                       EDOTAGCMsg = 8009
+	EDOTAGCMsg_k_EMsgGCToClientFindTopSourceTVGamesResponse               EDOTAGCMsg = 8010
 )
 
 var EDOTAGCMsg_name = map[int32]string{
@@ -860,8 +859,6 @@ var EDOTAGCMsg_name = map[int32]string{
 	7397: "k_EMsgGCPartyLeaderWatchGamePrompt",
 	7398: "k_EMsgDOTAFrostivusTimeElapsed",
 	7399: "k_EMsgGCToGCGrantEarnedLicense",
-	7400: "k_EMsgDOTAExchangeEventPoints",
-	7401: "k_EMsgDOTAExchangeEventPointsResponse",
 	7402: "k_EMsgDOTALiveLeagueGameUpdate",
 	7403: "k_EMsgDOTAChatGetUserList",
 	7404: "k_EMsgDOTAChatGetUserListResponse",
@@ -880,8 +877,6 @@ var EDOTAGCMsg_name = map[int32]string{
 	7417: "k_EMsgGCToServerPingResponse",
 	7418: "k_EMsgGCToServerConsoleCommand",
 	7420: "k_EMsgGCToGCUpdateLiveLeagueGameInfo",
-	7421: "k_EMsgGCNewBloomModeState",
-	7422: "k_EMsgGCNewBloomModeStateResponse",
 	7423: "k_EMsgGCMakeOffering",
 	7424: "k_EMsgGCRequestOfferings",
 	7425: "k_EMsgGCRequestOfferingsResponse",
@@ -1038,11 +1033,14 @@ var EDOTAGCMsg_name = map[int32]string{
 	7579: "k_EMsgGameserverCrashReport",
 	7580: "k_EMsgGameserverCrashReportResponse",
 	7581: "k_EMsgGCToClientSteamDatagramTicket",
+	7582: "k_EMsgGCToGCGrantEventOwnership",
 	8001: "k_EMsgGCDev_GrantWarKill",
 	8002: "k_EMsgClientToGCCreateTeamShowcase",
 	8003: "k_EMsgGCToClientTeamShowcaseCreateResult",
 	8004: "k_EMsgServerToGCLockCharmTrading",
 	8005: "k_EMsgDOTACNY2015EventPointUsage",
+	8009: "k_EMsgClientToGCFindTopSourceTVGames",
+	8010: "k_EMsgGCToClientFindTopSourceTVGamesResponse",
 }
 var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgGCDOTABase":                                           7000,
@@ -1375,8 +1373,6 @@ var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgGCPartyLeaderWatchGamePrompt":                         7397,
 	"k_EMsgDOTAFrostivusTimeElapsed":                             7398,
 	"k_EMsgGCToGCGrantEarnedLicense":                             7399,
-	"k_EMsgDOTAExchangeEventPoints":                              7400,
-	"k_EMsgDOTAExchangeEventPointsResponse":                      7401,
 	"k_EMsgDOTALiveLeagueGameUpdate":                             7402,
 	"k_EMsgDOTAChatGetUserList":                                  7403,
 	"k_EMsgDOTAChatGetUserListResponse":                          7404,
@@ -1395,8 +1391,6 @@ var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgGCToServerPingResponse":                               7417,
 	"k_EMsgGCToServerConsoleCommand":                             7418,
 	"k_EMsgGCToGCUpdateLiveLeagueGameInfo":                       7420,
-	"k_EMsgGCNewBloomModeState":                                  7421,
-	"k_EMsgGCNewBloomModeStateResponse":                          7422,
 	"k_EMsgGCMakeOffering":                                       7423,
 	"k_EMsgGCRequestOfferings":                                   7424,
 	"k_EMsgGCRequestOfferingsResponse":                           7425,
@@ -1553,11 +1547,14 @@ var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgGameserverCrashReport":                                7579,
 	"k_EMsgGameserverCrashReportResponse":                        7580,
 	"k_EMsgGCToClientSteamDatagramTicket":                        7581,
+	"k_EMsgGCToGCGrantEventOwnership":                            7582,
 	"k_EMsgGCDev_GrantWarKill":                                   8001,
 	"k_EMsgClientToGCCreateTeamShowcase":                         8002,
 	"k_EMsgGCToClientTeamShowcaseCreateResult":                   8003,
 	"k_EMsgServerToGCLockCharmTrading":                           8004,
 	"k_EMsgDOTACNY2015EventPointUsage":                           8005,
+	"k_EMsgClientToGCFindTopSourceTVGames":                       8009,
+	"k_EMsgGCToClientFindTopSourceTVGamesResponse":               8010,
 }
 
 func (x EDOTAGCMsg) Enum() *EDOTAGCMsg {
@@ -4533,6 +4530,7 @@ type CSODOTALobby struct {
 	MassDisconnect       *bool                         `protobuf:"varint,67,opt,name=mass_disconnect" json:"mass_disconnect,omitempty"`
 	CustomGameId         *uint64                       `protobuf:"varint,68,opt,name=custom_game_id" json:"custom_game_id,omitempty"`
 	ActiveIngameEvents   []EIngameEvent                `protobuf:"varint,69,rep,name=active_ingame_events,enum=dota.EIngameEvent" json:"active_ingame_events,omitempty"`
+	PartnerType          *PartnerAccountType           `protobuf:"varint,73,opt,name=partner_type,enum=dota.PartnerAccountType,def=0" json:"partner_type,omitempty"`
 	XXX_unrecognized     []byte                        `json:"-"`
 }
 
@@ -4554,6 +4552,7 @@ const Default_CSODOTALobby_PenaltyLevelDire uint32 = 0
 const Default_CSODOTALobby_Allchat bool = false
 const Default_CSODOTALobby_DotaTvDelay LobbyDotaTVDelay = LobbyDotaTVDelay_LobbyDotaTV_10
 const Default_CSODOTALobby_MatchOutcome EMatchOutcome = EMatchOutcome_k_EMatchOutcome_Unknown
+const Default_CSODOTALobby_PartnerType PartnerAccountType = PartnerAccountType_PARTNER_NONE
 
 func (m *CSODOTALobby) GetLobbyId() uint64 {
 	if m != nil && m.LobbyId != nil {
@@ -4947,6 +4946,13 @@ func (m *CSODOTALobby) GetActiveIngameEvents() []EIngameEvent {
 	return nil
 }
 
+func (m *CSODOTALobby) GetPartnerType() PartnerAccountType {
+	if m != nil && m.PartnerType != nil {
+		return *m.PartnerType
+	}
+	return Default_CSODOTALobby_PartnerType
+}
+
 type CSODOTALobby_CExtraMsg struct {
 	Id               *uint32 `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
 	Contents         []byte  `protobuf:"bytes,2,opt,name=contents" json:"contents,omitempty"`
@@ -4998,6 +5004,7 @@ func (m *CMsgLobbyEventPoints) GetAccountPoints() []*CMsgLobbyEventPoints_Accoun
 type CMsgLobbyEventPoints_AccountPoints struct {
 	AccountId        *uint32 `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
 	NormalPoints     *uint32 `protobuf:"varint,2,opt,name=normal_points" json:"normal_points,omitempty"`
+	Owned            *bool   `protobuf:"varint,3,opt,name=owned" json:"owned,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -5017,6 +5024,13 @@ func (m *CMsgLobbyEventPoints_AccountPoints) GetNormalPoints() uint32 {
 		return *m.NormalPoints
 	}
 	return 0
+}
+
+func (m *CMsgLobbyEventPoints_AccountPoints) GetOwned() bool {
+	if m != nil && m.Owned != nil {
+		return *m.Owned
+	}
+	return false
 }
 
 type CMsgDOTAGenericResult struct {

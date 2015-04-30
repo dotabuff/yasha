@@ -113,6 +113,8 @@ message CMsgConnectedPlayers {
 		TOWER_STATE = 9;
 		GAMESTATE_TIMEOUT = 10;
 		MASS_DISCONNECT = 11;
+		BARRACKS_STATE = 12;
+		KILLS = 13;
 	}
 
 	repeated CMsgConnectedPlayers.Player connected_players = 1;
@@ -123,6 +125,9 @@ message CMsgConnectedPlayers {
 	optional bool legacy_mass_disconnect = 9;
 	optional CMsgPoorNetworkConditions poor_network_conditions = 10;
 	optional CMsgConnectedPlayers.SendReason send_reason = 8 [default = INVALID];
+	optional uint32 radiant_kills = 11;
+	optional uint32 dire_kills = 12;
+	optional uint32 barracks_state = 13;
 }
 
 message CMsgGameServerInfo {
@@ -436,8 +441,6 @@ message CMsgDOTARequestPlayerResourcesResponse {
 
 message CMsgDOTARequestBatchPlayerResources {
 	repeated uint32 account_ids = 1 [packed = true];
-	optional bool legacy_rank_use_competitive = 2;
-	repeated bool legacy_rank_use_solo = 3 [packed = true];
 	repeated uint32 rank_types = 4 [packed = true];
 }
 
@@ -565,7 +568,6 @@ message CMsgDOTAAwardEventPoints {
 	message AwardPoints {
 		optional uint32 account_id = 1;
 		optional int32 points = 2;
-		optional int32 premium_points = 3;
 		optional uint32 trade_ban_time = 5;
 	}
 
@@ -632,7 +634,7 @@ message CMsgServerGetEventPointsResponse {
 	message Points {
 		optional uint32 account_id = 1;
 		optional uint32 points_total = 2;
-		optional uint32 premium_total = 3;
+		optional bool owned = 4;
 	}
 
 	optional uint32 event_id = 1;

@@ -55,6 +55,7 @@ const (
 	EDotaClientMessages_DOTA_CM_TeamShowcaseClientData                 EDotaClientMessages = 39
 	EDotaClientMessages_DOTA_CM_PlayTeamShowcase                       EDotaClientMessages = 40
 	EDotaClientMessages_DOTA_CM_EventCNY2015Cmd                        EDotaClientMessages = 41
+	EDotaClientMessages_DOTA_CM_ClickedBuff                            EDotaClientMessages = 44
 )
 
 var EDotaClientMessages_name = map[int32]string{
@@ -99,6 +100,7 @@ var EDotaClientMessages_name = map[int32]string{
 	39: "DOTA_CM_TeamShowcaseClientData",
 	40: "DOTA_CM_PlayTeamShowcase",
 	41: "DOTA_CM_EventCNY2015Cmd",
+	44: "DOTA_CM_ClickedBuff",
 }
 var EDotaClientMessages_value = map[string]int32{
 	"DOTA_CM_MapLine":                                1,
@@ -142,6 +144,7 @@ var EDotaClientMessages_value = map[string]int32{
 	"DOTA_CM_TeamShowcaseClientData":                 39,
 	"DOTA_CM_PlayTeamShowcase":                       40,
 	"DOTA_CM_EventCNY2015Cmd":                        41,
+	"DOTA_CM_ClickedBuff":                            44,
 }
 
 func (x EDotaClientMessages) Enum() *EDotaClientMessages {
@@ -227,6 +230,30 @@ func (m *CDOTAClientMsg_ModifierAlert) GetBuffInternalIndex() int32 {
 }
 
 func (m *CDOTAClientMsg_ModifierAlert) GetTargetEntindex() uint32 {
+	if m != nil && m.TargetEntindex != nil {
+		return *m.TargetEntindex
+	}
+	return 0
+}
+
+type CDOTAClientMsg_ClickedBuff struct {
+	BuffInternalIndex *int32  `protobuf:"varint,1,opt,name=buff_internal_index" json:"buff_internal_index,omitempty"`
+	TargetEntindex    *uint32 `protobuf:"varint,2,opt,name=target_entindex" json:"target_entindex,omitempty"`
+	XXX_unrecognized  []byte  `json:"-"`
+}
+
+func (m *CDOTAClientMsg_ClickedBuff) Reset()         { *m = CDOTAClientMsg_ClickedBuff{} }
+func (m *CDOTAClientMsg_ClickedBuff) String() string { return proto.CompactTextString(m) }
+func (*CDOTAClientMsg_ClickedBuff) ProtoMessage()    {}
+
+func (m *CDOTAClientMsg_ClickedBuff) GetBuffInternalIndex() int32 {
+	if m != nil && m.BuffInternalIndex != nil {
+		return *m.BuffInternalIndex
+	}
+	return 0
+}
+
+func (m *CDOTAClientMsg_ClickedBuff) GetTargetEntindex() uint32 {
 	if m != nil && m.TargetEntindex != nil {
 		return *m.TargetEntindex
 	}

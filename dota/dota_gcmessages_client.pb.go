@@ -2214,6 +2214,11 @@ type CSourceTVGame struct {
 	LobbyType           *uint32                 `protobuf:"varint,22,opt,name=lobby_type" json:"lobby_type,omitempty"`
 	CustomGameId        *uint64                 `protobuf:"varint,24,opt,name=custom_game_id" json:"custom_game_id,omitempty"`
 	AverageRank         *uint32                 `protobuf:"varint,25,opt,name=average_rank" json:"average_rank,omitempty"`
+	RadiantKills        *uint32                 `protobuf:"varint,26,opt,name=radiant_kills" json:"radiant_kills,omitempty"`
+	DireKills           *uint32                 `protobuf:"varint,27,opt,name=dire_kills" json:"dire_kills,omitempty"`
+	BarracksState       *uint32                 `protobuf:"varint,28,opt,name=barracks_state" json:"barracks_state,omitempty"`
+	GroupId             *uint64                 `protobuf:"varint,29,opt,name=group_id" json:"group_id,omitempty"`
+	SortScore           *uint32                 `protobuf:"varint,30,opt,name=sort_score" json:"sort_score,omitempty"`
 	XXX_unrecognized    []byte                  `json:"-"`
 }
 
@@ -2363,6 +2368,41 @@ func (m *CSourceTVGame) GetAverageRank() uint32 {
 	return 0
 }
 
+func (m *CSourceTVGame) GetRadiantKills() uint32 {
+	if m != nil && m.RadiantKills != nil {
+		return *m.RadiantKills
+	}
+	return 0
+}
+
+func (m *CSourceTVGame) GetDireKills() uint32 {
+	if m != nil && m.DireKills != nil {
+		return *m.DireKills
+	}
+	return 0
+}
+
+func (m *CSourceTVGame) GetBarracksState() uint32 {
+	if m != nil && m.BarracksState != nil {
+		return *m.BarracksState
+	}
+	return 0
+}
+
+func (m *CSourceTVGame) GetGroupId() uint64 {
+	if m != nil && m.GroupId != nil {
+		return *m.GroupId
+	}
+	return 0
+}
+
+func (m *CSourceTVGame) GetSortScore() uint32 {
+	if m != nil && m.SortScore != nil {
+		return *m.SortScore
+	}
+	return 0
+}
+
 type CSourceTVGame_Player struct {
 	SteamId          *uint64 `protobuf:"fixed64,1,opt,name=steam_id" json:"steam_id,omitempty"`
 	Name             *string `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
@@ -2481,6 +2521,138 @@ func (m *CMsgFindSourceTVGames) GetCustomGameId() uint64 {
 		return *m.CustomGameId
 	}
 	return 0
+}
+
+type CMsgClientToGCFindTopSourceTVGames struct {
+	SearchKey        *string  `protobuf:"bytes,1,opt,name=search_key" json:"search_key,omitempty"`
+	LeagueId         *uint32  `protobuf:"varint,2,opt,name=league_id" json:"league_id,omitempty"`
+	HeroId           *uint32  `protobuf:"varint,3,opt,name=hero_id" json:"hero_id,omitempty"`
+	StartGame        *uint32  `protobuf:"varint,4,opt,name=start_game" json:"start_game,omitempty"`
+	GameListIndex    *uint32  `protobuf:"varint,5,opt,name=game_list_index" json:"game_list_index,omitempty"`
+	LobbyIds         []uint64 `protobuf:"varint,6,rep,name=lobby_ids" json:"lobby_ids,omitempty"`
+	XXX_unrecognized []byte   `json:"-"`
+}
+
+func (m *CMsgClientToGCFindTopSourceTVGames) Reset()         { *m = CMsgClientToGCFindTopSourceTVGames{} }
+func (m *CMsgClientToGCFindTopSourceTVGames) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCFindTopSourceTVGames) ProtoMessage()    {}
+
+func (m *CMsgClientToGCFindTopSourceTVGames) GetSearchKey() string {
+	if m != nil && m.SearchKey != nil {
+		return *m.SearchKey
+	}
+	return ""
+}
+
+func (m *CMsgClientToGCFindTopSourceTVGames) GetLeagueId() uint32 {
+	if m != nil && m.LeagueId != nil {
+		return *m.LeagueId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCFindTopSourceTVGames) GetHeroId() uint32 {
+	if m != nil && m.HeroId != nil {
+		return *m.HeroId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCFindTopSourceTVGames) GetStartGame() uint32 {
+	if m != nil && m.StartGame != nil {
+		return *m.StartGame
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCFindTopSourceTVGames) GetGameListIndex() uint32 {
+	if m != nil && m.GameListIndex != nil {
+		return *m.GameListIndex
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCFindTopSourceTVGames) GetLobbyIds() []uint64 {
+	if m != nil {
+		return m.LobbyIds
+	}
+	return nil
+}
+
+type CMsgGCToClientFindTopSourceTVGamesResponse struct {
+	SearchKey        *string          `protobuf:"bytes,1,opt,name=search_key" json:"search_key,omitempty"`
+	LeagueId         *uint32          `protobuf:"varint,2,opt,name=league_id" json:"league_id,omitempty"`
+	HeroId           *uint32          `protobuf:"varint,3,opt,name=hero_id" json:"hero_id,omitempty"`
+	StartGame        *uint32          `protobuf:"varint,4,opt,name=start_game" json:"start_game,omitempty"`
+	NumGames         *uint32          `protobuf:"varint,5,opt,name=num_games" json:"num_games,omitempty"`
+	GameListIndex    *uint32          `protobuf:"varint,6,opt,name=game_list_index" json:"game_list_index,omitempty"`
+	GameList         []*CSourceTVGame `protobuf:"bytes,7,rep,name=game_list" json:"game_list,omitempty"`
+	SpecificGames    *bool            `protobuf:"varint,8,opt,name=specific_games" json:"specific_games,omitempty"`
+	XXX_unrecognized []byte           `json:"-"`
+}
+
+func (m *CMsgGCToClientFindTopSourceTVGamesResponse) Reset() {
+	*m = CMsgGCToClientFindTopSourceTVGamesResponse{}
+}
+func (m *CMsgGCToClientFindTopSourceTVGamesResponse) String() string {
+	return proto.CompactTextString(m)
+}
+func (*CMsgGCToClientFindTopSourceTVGamesResponse) ProtoMessage() {}
+
+func (m *CMsgGCToClientFindTopSourceTVGamesResponse) GetSearchKey() string {
+	if m != nil && m.SearchKey != nil {
+		return *m.SearchKey
+	}
+	return ""
+}
+
+func (m *CMsgGCToClientFindTopSourceTVGamesResponse) GetLeagueId() uint32 {
+	if m != nil && m.LeagueId != nil {
+		return *m.LeagueId
+	}
+	return 0
+}
+
+func (m *CMsgGCToClientFindTopSourceTVGamesResponse) GetHeroId() uint32 {
+	if m != nil && m.HeroId != nil {
+		return *m.HeroId
+	}
+	return 0
+}
+
+func (m *CMsgGCToClientFindTopSourceTVGamesResponse) GetStartGame() uint32 {
+	if m != nil && m.StartGame != nil {
+		return *m.StartGame
+	}
+	return 0
+}
+
+func (m *CMsgGCToClientFindTopSourceTVGamesResponse) GetNumGames() uint32 {
+	if m != nil && m.NumGames != nil {
+		return *m.NumGames
+	}
+	return 0
+}
+
+func (m *CMsgGCToClientFindTopSourceTVGamesResponse) GetGameListIndex() uint32 {
+	if m != nil && m.GameListIndex != nil {
+		return *m.GameListIndex
+	}
+	return 0
+}
+
+func (m *CMsgGCToClientFindTopSourceTVGamesResponse) GetGameList() []*CSourceTVGame {
+	if m != nil {
+		return m.GameList
+	}
+	return nil
+}
+
+func (m *CMsgGCToClientFindTopSourceTVGamesResponse) GetSpecificGames() bool {
+	if m != nil && m.SpecificGames != nil {
+		return *m.SpecificGames
+	}
+	return false
 }
 
 type CMsgSpectateFriendGame struct {
@@ -11358,11 +11530,10 @@ func (m *CMsgDOTARedeemEventPrize) GetItemDefIndex() uint32 {
 }
 
 type CMsgDOTARedeemEventPrizeResponse struct {
-	Result                 *CMsgDOTARedeemEventPrizeResponse_ResultCode `protobuf:"varint,1,opt,name=result,enum=dota.CMsgDOTARedeemEventPrizeResponse_ResultCode,def=0" json:"result,omitempty"`
-	RemainingPoints        *uint32                                      `protobuf:"varint,2,opt,name=remaining_points" json:"remaining_points,omitempty"`
-	RemainingPremiumPoints *uint32                                      `protobuf:"varint,3,opt,name=remaining_premium_points" json:"remaining_premium_points,omitempty"`
-	EventId                *uint32                                      `protobuf:"varint,4,opt,name=event_id" json:"event_id,omitempty"`
-	XXX_unrecognized       []byte                                       `json:"-"`
+	Result           *CMsgDOTARedeemEventPrizeResponse_ResultCode `protobuf:"varint,1,opt,name=result,enum=dota.CMsgDOTARedeemEventPrizeResponse_ResultCode,def=0" json:"result,omitempty"`
+	RemainingPoints  *uint32                                      `protobuf:"varint,2,opt,name=remaining_points" json:"remaining_points,omitempty"`
+	EventId          *uint32                                      `protobuf:"varint,4,opt,name=event_id" json:"event_id,omitempty"`
+	XXX_unrecognized []byte                                       `json:"-"`
 }
 
 func (m *CMsgDOTARedeemEventPrizeResponse) Reset()         { *m = CMsgDOTARedeemEventPrizeResponse{} }
@@ -11381,13 +11552,6 @@ func (m *CMsgDOTARedeemEventPrizeResponse) GetResult() CMsgDOTARedeemEventPrizeR
 func (m *CMsgDOTARedeemEventPrizeResponse) GetRemainingPoints() uint32 {
 	if m != nil && m.RemainingPoints != nil {
 		return *m.RemainingPoints
-	}
-	return 0
-}
-
-func (m *CMsgDOTARedeemEventPrizeResponse) GetRemainingPremiumPoints() uint32 {
-	if m != nil && m.RemainingPremiumPoints != nil {
-		return *m.RemainingPremiumPoints
 	}
 	return 0
 }
@@ -11424,14 +11588,13 @@ func (m *CMsgDOTAGetEventPoints) GetAccountId() uint32 {
 }
 
 type CMsgDOTAGetEventPointsResponse struct {
-	TotalPoints        *uint32                                  `protobuf:"varint,1,opt,name=total_points" json:"total_points,omitempty"`
-	TotalPremiumPoints *uint32                                  `protobuf:"varint,2,opt,name=total_premium_points" json:"total_premium_points,omitempty"`
-	EventId            *uint32                                  `protobuf:"varint,3,opt,name=event_id" json:"event_id,omitempty"`
-	Points             *uint32                                  `protobuf:"varint,4,opt,name=points" json:"points,omitempty"`
-	PremiumPoints      *uint32                                  `protobuf:"varint,5,opt,name=premium_points" json:"premium_points,omitempty"`
-	CompletedActions   []*CMsgDOTAGetEventPointsResponse_Action `protobuf:"bytes,6,rep,name=completed_actions" json:"completed_actions,omitempty"`
-	AccountId          *uint32                                  `protobuf:"varint,7,opt,name=account_id" json:"account_id,omitempty"`
-	XXX_unrecognized   []byte                                   `json:"-"`
+	TotalPoints      *uint32                                  `protobuf:"varint,1,opt,name=total_points" json:"total_points,omitempty"`
+	EventId          *uint32                                  `protobuf:"varint,3,opt,name=event_id" json:"event_id,omitempty"`
+	Points           *uint32                                  `protobuf:"varint,4,opt,name=points" json:"points,omitempty"`
+	CompletedActions []*CMsgDOTAGetEventPointsResponse_Action `protobuf:"bytes,6,rep,name=completed_actions" json:"completed_actions,omitempty"`
+	AccountId        *uint32                                  `protobuf:"varint,7,opt,name=account_id" json:"account_id,omitempty"`
+	Owned            *bool                                    `protobuf:"varint,8,opt,name=owned" json:"owned,omitempty"`
+	XXX_unrecognized []byte                                   `json:"-"`
 }
 
 func (m *CMsgDOTAGetEventPointsResponse) Reset()         { *m = CMsgDOTAGetEventPointsResponse{} }
@@ -11441,13 +11604,6 @@ func (*CMsgDOTAGetEventPointsResponse) ProtoMessage()    {}
 func (m *CMsgDOTAGetEventPointsResponse) GetTotalPoints() uint32 {
 	if m != nil && m.TotalPoints != nil {
 		return *m.TotalPoints
-	}
-	return 0
-}
-
-func (m *CMsgDOTAGetEventPointsResponse) GetTotalPremiumPoints() uint32 {
-	if m != nil && m.TotalPremiumPoints != nil {
-		return *m.TotalPremiumPoints
 	}
 	return 0
 }
@@ -11466,13 +11622,6 @@ func (m *CMsgDOTAGetEventPointsResponse) GetPoints() uint32 {
 	return 0
 }
 
-func (m *CMsgDOTAGetEventPointsResponse) GetPremiumPoints() uint32 {
-	if m != nil && m.PremiumPoints != nil {
-		return *m.PremiumPoints
-	}
-	return 0
-}
-
 func (m *CMsgDOTAGetEventPointsResponse) GetCompletedActions() []*CMsgDOTAGetEventPointsResponse_Action {
 	if m != nil {
 		return m.CompletedActions
@@ -11485,6 +11634,13 @@ func (m *CMsgDOTAGetEventPointsResponse) GetAccountId() uint32 {
 		return *m.AccountId
 	}
 	return 0
+}
+
+func (m *CMsgDOTAGetEventPointsResponse) GetOwned() bool {
+	if m != nil && m.Owned != nil {
+		return *m.Owned
+	}
+	return false
 }
 
 type CMsgDOTAGetEventPointsResponse_Action struct {
@@ -11511,62 +11667,6 @@ func (m *CMsgDOTAGetEventPointsResponse_Action) GetTimesCompleted() uint32 {
 		return *m.TimesCompleted
 	}
 	return Default_CMsgDOTAGetEventPointsResponse_Action_TimesCompleted
-}
-
-type CMsgDOTAExchangeEventPoints struct {
-	EventId          *uint32 `protobuf:"varint,1,opt,name=event_id" json:"event_id,omitempty"`
-	XXX_unrecognized []byte  `json:"-"`
-}
-
-func (m *CMsgDOTAExchangeEventPoints) Reset()         { *m = CMsgDOTAExchangeEventPoints{} }
-func (m *CMsgDOTAExchangeEventPoints) String() string { return proto.CompactTextString(m) }
-func (*CMsgDOTAExchangeEventPoints) ProtoMessage()    {}
-
-func (m *CMsgDOTAExchangeEventPoints) GetEventId() uint32 {
-	if m != nil && m.EventId != nil {
-		return *m.EventId
-	}
-	return 0
-}
-
-type CMsgDOTAExchangeEventPointsResponse struct {
-	Success            *bool   `protobuf:"varint,1,opt,name=success" json:"success,omitempty"`
-	TotalPoints        *uint32 `protobuf:"varint,2,opt,name=total_points" json:"total_points,omitempty"`
-	TotalPremiumPoints *uint32 `protobuf:"varint,3,opt,name=total_premium_points" json:"total_premium_points,omitempty"`
-	EventId            *uint32 `protobuf:"varint,4,opt,name=event_id" json:"event_id,omitempty"`
-	XXX_unrecognized   []byte  `json:"-"`
-}
-
-func (m *CMsgDOTAExchangeEventPointsResponse) Reset()         { *m = CMsgDOTAExchangeEventPointsResponse{} }
-func (m *CMsgDOTAExchangeEventPointsResponse) String() string { return proto.CompactTextString(m) }
-func (*CMsgDOTAExchangeEventPointsResponse) ProtoMessage()    {}
-
-func (m *CMsgDOTAExchangeEventPointsResponse) GetSuccess() bool {
-	if m != nil && m.Success != nil {
-		return *m.Success
-	}
-	return false
-}
-
-func (m *CMsgDOTAExchangeEventPointsResponse) GetTotalPoints() uint32 {
-	if m != nil && m.TotalPoints != nil {
-		return *m.TotalPoints
-	}
-	return 0
-}
-
-func (m *CMsgDOTAExchangeEventPointsResponse) GetTotalPremiumPoints() uint32 {
-	if m != nil && m.TotalPremiumPoints != nil {
-		return *m.TotalPremiumPoints
-	}
-	return 0
-}
-
-func (m *CMsgDOTAExchangeEventPointsResponse) GetEventId() uint32 {
-	if m != nil && m.EventId != nil {
-		return *m.EventId
-	}
-	return 0
 }
 
 type CMsgDOTALiveLeagueGameUpdate struct {
@@ -11896,46 +11996,6 @@ type CMsgDOTAStartDailyHeroChallenge struct {
 func (m *CMsgDOTAStartDailyHeroChallenge) Reset()         { *m = CMsgDOTAStartDailyHeroChallenge{} }
 func (m *CMsgDOTAStartDailyHeroChallenge) String() string { return proto.CompactTextString(m) }
 func (*CMsgDOTAStartDailyHeroChallenge) ProtoMessage()    {}
-
-type CMsgGCNewBloomModeState struct {
-	XXX_unrecognized []byte `json:"-"`
-}
-
-func (m *CMsgGCNewBloomModeState) Reset()         { *m = CMsgGCNewBloomModeState{} }
-func (m *CMsgGCNewBloomModeState) String() string { return proto.CompactTextString(m) }
-func (*CMsgGCNewBloomModeState) ProtoMessage()    {}
-
-type CMsgGCNewBloomModeStateResponse struct {
-	Active           *bool   `protobuf:"varint,1,opt,name=active" json:"active,omitempty"`
-	SwitchTime       *uint32 `protobuf:"varint,2,opt,name=switch_time" json:"switch_time,omitempty"`
-	Round            *uint32 `protobuf:"varint,3,opt,name=round" json:"round,omitempty"`
-	XXX_unrecognized []byte  `json:"-"`
-}
-
-func (m *CMsgGCNewBloomModeStateResponse) Reset()         { *m = CMsgGCNewBloomModeStateResponse{} }
-func (m *CMsgGCNewBloomModeStateResponse) String() string { return proto.CompactTextString(m) }
-func (*CMsgGCNewBloomModeStateResponse) ProtoMessage()    {}
-
-func (m *CMsgGCNewBloomModeStateResponse) GetActive() bool {
-	if m != nil && m.Active != nil {
-		return *m.Active
-	}
-	return false
-}
-
-func (m *CMsgGCNewBloomModeStateResponse) GetSwitchTime() uint32 {
-	if m != nil && m.SwitchTime != nil {
-		return *m.SwitchTime
-	}
-	return 0
-}
-
-func (m *CMsgGCNewBloomModeStateResponse) GetRound() uint32 {
-	if m != nil && m.Round != nil {
-		return *m.Round
-	}
-	return 0
-}
 
 type CMsgGCNotificationsRequest struct {
 	XXX_unrecognized []byte `json:"-"`

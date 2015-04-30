@@ -666,6 +666,9 @@ const (
 	Activity_ACT_DOTA_PET_WARD_OBSERVER                      Activity = 620
 	Activity_ACT_DOTA_PET_WARD_SENTRY                        Activity = 621
 	Activity_ACT_DOTA_PET_LEVEL                              Activity = 622
+	Activity_ACT_DOTA_CAST_BURROW_END                        Activity = 623
+	Activity_ACT_DOTA_LIFESTEALER_ASSIMILATE                 Activity = 624
+	Activity_ACT_DOTA_LIFESTEALER_EJECT                      Activity = 625
 )
 
 var Activity_name = map[int32]string{
@@ -1291,6 +1294,9 @@ var Activity_name = map[int32]string{
 	620: "ACT_DOTA_PET_WARD_OBSERVER",
 	621: "ACT_DOTA_PET_WARD_SENTRY",
 	622: "ACT_DOTA_PET_LEVEL",
+	623: "ACT_DOTA_CAST_BURROW_END",
+	624: "ACT_DOTA_LIFESTEALER_ASSIMILATE",
+	625: "ACT_DOTA_LIFESTEALER_EJECT",
 }
 var Activity_value = map[string]int32{
 	"ACT_INVALID":                                     -1,
@@ -1915,6 +1921,9 @@ var Activity_value = map[string]int32{
 	"ACT_DOTA_PET_WARD_OBSERVER":                      620,
 	"ACT_DOTA_PET_WARD_SENTRY":                        621,
 	"ACT_DOTA_PET_LEVEL":                              622,
+	"ACT_DOTA_CAST_BURROW_END":                        623,
+	"ACT_DOTA_LIFESTEALER_ASSIMILATE":                 624,
+	"ACT_DOTA_LIFESTEALER_EJECT":                      625,
 }
 
 func (x Activity) Enum() *Activity {
