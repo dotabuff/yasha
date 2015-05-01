@@ -55,6 +55,8 @@ const (
 	EDotaClientMessages_DOTA_CM_TeamShowcaseClientData                 EDotaClientMessages = 39
 	EDotaClientMessages_DOTA_CM_PlayTeamShowcase                       EDotaClientMessages = 40
 	EDotaClientMessages_DOTA_CM_EventCNY2015Cmd                        EDotaClientMessages = 41
+	EDotaClientMessages_DOTA_CM_ChallengeSelect                        EDotaClientMessages = 42
+	EDotaClientMessages_DOTA_CM_ChallengeReroll                        EDotaClientMessages = 43
 	EDotaClientMessages_DOTA_CM_ClickedBuff                            EDotaClientMessages = 44
 )
 
@@ -100,6 +102,8 @@ var EDotaClientMessages_name = map[int32]string{
 	39: "DOTA_CM_TeamShowcaseClientData",
 	40: "DOTA_CM_PlayTeamShowcase",
 	41: "DOTA_CM_EventCNY2015Cmd",
+	42: "DOTA_CM_ChallengeSelect",
+	43: "DOTA_CM_ChallengeReroll",
 	44: "DOTA_CM_ClickedBuff",
 }
 var EDotaClientMessages_value = map[string]int32{
@@ -144,6 +148,8 @@ var EDotaClientMessages_value = map[string]int32{
 	"DOTA_CM_TeamShowcaseClientData":                 39,
 	"DOTA_CM_PlayTeamShowcase":                       40,
 	"DOTA_CM_EventCNY2015Cmd":                        41,
+	"DOTA_CM_ChallengeSelect":                        42,
+	"DOTA_CM_ChallengeReroll":                        43,
 	"DOTA_CM_ClickedBuff":                            44,
 }
 
@@ -932,6 +938,70 @@ func (m *CDOTAClientMsg_EventCNY2015Cmd) GetData() []byte {
 		return m.Data
 	}
 	return nil
+}
+
+type CDOTAClientMsg_ChallengeSelect struct {
+	EventId          *uint32 `protobuf:"varint,1,opt,name=event_id" json:"event_id,omitempty"`
+	SlotId           *uint32 `protobuf:"varint,2,opt,name=slot_id" json:"slot_id,omitempty"`
+	SequenceId       *uint32 `protobuf:"varint,3,opt,name=sequence_id" json:"sequence_id,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CDOTAClientMsg_ChallengeSelect) Reset()         { *m = CDOTAClientMsg_ChallengeSelect{} }
+func (m *CDOTAClientMsg_ChallengeSelect) String() string { return proto.CompactTextString(m) }
+func (*CDOTAClientMsg_ChallengeSelect) ProtoMessage()    {}
+
+func (m *CDOTAClientMsg_ChallengeSelect) GetEventId() uint32 {
+	if m != nil && m.EventId != nil {
+		return *m.EventId
+	}
+	return 0
+}
+
+func (m *CDOTAClientMsg_ChallengeSelect) GetSlotId() uint32 {
+	if m != nil && m.SlotId != nil {
+		return *m.SlotId
+	}
+	return 0
+}
+
+func (m *CDOTAClientMsg_ChallengeSelect) GetSequenceId() uint32 {
+	if m != nil && m.SequenceId != nil {
+		return *m.SequenceId
+	}
+	return 0
+}
+
+type CDOTAClientMsg_ChallengeReroll struct {
+	EventId          *uint32 `protobuf:"varint,1,opt,name=event_id" json:"event_id,omitempty"`
+	SlotId           *uint32 `protobuf:"varint,2,opt,name=slot_id" json:"slot_id,omitempty"`
+	SequenceId       *uint32 `protobuf:"varint,3,opt,name=sequence_id" json:"sequence_id,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CDOTAClientMsg_ChallengeReroll) Reset()         { *m = CDOTAClientMsg_ChallengeReroll{} }
+func (m *CDOTAClientMsg_ChallengeReroll) String() string { return proto.CompactTextString(m) }
+func (*CDOTAClientMsg_ChallengeReroll) ProtoMessage()    {}
+
+func (m *CDOTAClientMsg_ChallengeReroll) GetEventId() uint32 {
+	if m != nil && m.EventId != nil {
+		return *m.EventId
+	}
+	return 0
+}
+
+func (m *CDOTAClientMsg_ChallengeReroll) GetSlotId() uint32 {
+	if m != nil && m.SlotId != nil {
+		return *m.SlotId
+	}
+	return 0
+}
+
+func (m *CDOTAClientMsg_ChallengeReroll) GetSequenceId() uint32 {
+	if m != nil && m.SequenceId != nil {
+		return *m.SequenceId
+	}
+	return 0
 }
 
 func init() {

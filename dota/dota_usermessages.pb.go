@@ -90,6 +90,7 @@ const (
 	EDotaUserMessages_DOTA_UM_GlyphAlert                EDotaUserMessages = 138
 	EDotaUserMessages_DOTA_UM_BeastChat                 EDotaUserMessages = 139
 	EDotaUserMessages_DOTA_UM_SpectatorPlayerUnitOrders EDotaUserMessages = 140
+	EDotaUserMessages_DOTA_UM_CompendiumState           EDotaUserMessages = 141
 )
 
 var EDotaUserMessages_name = map[int32]string{
@@ -169,6 +170,7 @@ var EDotaUserMessages_name = map[int32]string{
 	138: "DOTA_UM_GlyphAlert",
 	139: "DOTA_UM_BeastChat",
 	140: "DOTA_UM_SpectatorPlayerUnitOrders",
+	141: "DOTA_UM_CompendiumState",
 }
 var EDotaUserMessages_value = map[string]int32{
 	"DOTA_UM_AddUnitToSelection":        64,
@@ -247,6 +249,7 @@ var EDotaUserMessages_value = map[string]int32{
 	"DOTA_UM_GlyphAlert":                138,
 	"DOTA_UM_BeastChat":                 139,
 	"DOTA_UM_SpectatorPlayerUnitOrders": 140,
+	"DOTA_UM_CompendiumState":           141,
 }
 
 func (x EDotaUserMessages) Enum() *EDotaUserMessages {
@@ -4884,6 +4887,46 @@ func (m *CDOTAUserMsg_BeastChat) GetTarget() string {
 		return *m.Target
 	}
 	return ""
+}
+
+type CDOTAUserMsg_CompendiumStatePlayer struct {
+	PlayerId         *uint32 `protobuf:"varint,1,opt,name=player_id" json:"player_id,omitempty"`
+	Level            *uint32 `protobuf:"varint,2,opt,name=level" json:"level,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CDOTAUserMsg_CompendiumStatePlayer) Reset()         { *m = CDOTAUserMsg_CompendiumStatePlayer{} }
+func (m *CDOTAUserMsg_CompendiumStatePlayer) String() string { return proto.CompactTextString(m) }
+func (*CDOTAUserMsg_CompendiumStatePlayer) ProtoMessage()    {}
+
+func (m *CDOTAUserMsg_CompendiumStatePlayer) GetPlayerId() uint32 {
+	if m != nil && m.PlayerId != nil {
+		return *m.PlayerId
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_CompendiumStatePlayer) GetLevel() uint32 {
+	if m != nil && m.Level != nil {
+		return *m.Level
+	}
+	return 0
+}
+
+type CDOTAUserMsg_CompendiumState struct {
+	CompendiumPlayers []*CDOTAUserMsg_CompendiumStatePlayer `protobuf:"bytes,1,rep,name=compendium_players" json:"compendium_players,omitempty"`
+	XXX_unrecognized  []byte                                `json:"-"`
+}
+
+func (m *CDOTAUserMsg_CompendiumState) Reset()         { *m = CDOTAUserMsg_CompendiumState{} }
+func (m *CDOTAUserMsg_CompendiumState) String() string { return proto.CompactTextString(m) }
+func (*CDOTAUserMsg_CompendiumState) ProtoMessage()    {}
+
+func (m *CDOTAUserMsg_CompendiumState) GetCompendiumPlayers() []*CDOTAUserMsg_CompendiumStatePlayer {
+	if m != nil {
+		return m.CompendiumPlayers
+	}
+	return nil
 }
 
 func init() {
