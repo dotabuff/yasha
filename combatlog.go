@@ -23,80 +23,6 @@ type combatLogParser struct {
 	distinct map[dota.DOTA_COMBATLOG_TYPES][]map[interface{}]bool
 }
 
-func printCombatLogKeys(v CombatLogEntry, keys []*dota.CSVCMsg_GameEventKeyT) {
-	out := []byte{}
-
-	typeString := v.Type().String()
-	parts := strings.Split(typeString, "_")
-	parts = parts[2:len(parts)]
-	for i, part := range parts {
-		parts[i] = strings.Title(strings.ToLower(part))
-	}
-	typeName := strings.Join(append([]string{"CombatLog"}, parts...), "")
-
-	out = append(out, spew.Sprintf("type %s struct {\n", typeName)...)
-
-	var key interface{}
-	var t string
-
-	for i, k := range keys {
-		switch k.GetType() {
-		case 2:
-			key = float64(k.GetValFloat())
-			t = "float64"
-		case 4:
-			key = int64(k.GetValShort())
-			t = "int64"
-		case 5:
-			key = int64(k.GetValByte())
-			t = "int64"
-		case 6:
-			key = k.GetValBool()
-			t = "bool"
-		}
-
-		name := fmt.Sprintf("Unknown%d", i)
-
-		switch i {
-		case 0:
-			continue
-		case 5:
-			name = "AttackerIsillusion"
-		case 6:
-			name = "TargetIsIllusion"
-		case 9:
-			name = "Time"
-		case 11:
-			name = "TimeRaw"
-		case 12:
-			name = "AttackerIsHero"
-		case 13:
-			name = "TargetIsHero"
-		case 14, 15:
-			if key.(bool) {
-				pp(v, keys)
-				panic("found one")
-			}
-		}
-
-		out = append(out, fmt.Sprintf("%s %s `logIndex:\"%d\"` // %v\n", name, t, i, key)...)
-	}
-
-	out = append(out, '}', '\n')
-	out = append(out, fmt.Sprintf(`func (c %s) Type() dota.DOTA_COMBATLOG_TYPES {`, typeName)...)
-	out = append(out, fmt.Sprintf(`return dota.DOTA_COMBATLOG_TYPES_%s`, typeString)...)
-	out = append(out, '}', '\n')
-	out = append(out, fmt.Sprintf(`func (c %s) Timestamp() float32 {`, typeName)...)
-	out = append(out, `return c.Time`...)
-	out = append(out, '}', '\n')
-
-	if formatted, err := format.Source(out); err == nil {
-		spew.Println(string(formatted))
-	} else {
-		panic(err)
-	}
-}
-
 /*
 The default is mostly:
 
@@ -149,6 +75,14 @@ func (c combatLogParser) parse(obj *dota.CSVCMsg_GameEvent) CombatLogEntry {
 		v = &CombatLogXP{}
 	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_BUYBACK:
 		v = &CombatLogBuyback{}
+	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_PLAYERSTATS:
+		v = &CombatLogPlayerstats{}
+	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_TEAM_BUILDING_KILL:
+		v = &CombatLogTeamBuildingKill{}
+	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_KILLSTREAK:
+		v = &CombatLogKillStreak{}
+	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_MULTIKILL:
+		v = &CombatLogMultikill{}
 	default:
 		pp(t, keys)
 		return nil
@@ -159,9 +93,9 @@ func (c combatLogParser) parse(obj *dota.CSVCMsg_GameEvent) CombatLogEntry {
 }
 
 type CombatLogBuyback struct {
-	PlayerId int     `logIndex:"7"`  //  7:  val_short: 9
-	Time     float32 `logIndex:"9"`  //  9:  val_float: 2625.6892
-	TimeRaw  float32 `logIndex:"11"` // 11:  val_float: 2666.3
+	PlayerId int     `logIndex:"7"`  //  7:  9
+	Time     float32 `logIndex:"9"`  //  9:  2625.6892
+	TimeRaw  float32 `logIndex:"11"` // 11:  2666.3
 }
 
 func (c CombatLogBuyback) Type() dota.DOTA_COMBATLOG_TYPES {
@@ -211,24 +145,24 @@ func (c CombatLogAbility) Timestamp() float32 {
 }
 
 type CombatLogAbilityTrigger struct {
-	Target             string  `logIndex:"2" logTable:"CombatLogNames"`  //  2:  4 val_short:12
-	Attacker           string  `logIndex:"3" logTable:"CombatLogNames"`  //  3:  4 val_short:5
-	Ability            string  `logIndex:"4" logTable:"CombatLogNames"`  //  4:  4 val_short:47
-	AttackerIsIllusion bool    `logIndex:"5"`                            //  5:  6 val_bool:false
-	TargetIsIllusion   bool    `logIndex:"6"`                            //  6:  6 val_bool:false
-	IsDebuff           int     `logIndex:"7"`                            //  7:  4 val_short:3  (seen values: 3)
-	Unknown8           int     `logIndex:"8"`                            //  8:  4 val_short:0
-	Time               float32 `logIndex:"9"`                            //  9:  2 val_float:1519.1506
-	TargetSource       string  `logIndex:"10" logTable:"CombatLogNames"` // 10:  4 val_short:0
-	TimeRaw            float32 `logIndex:"11"`                           // 11:  2 val_float:1638.1001
-	AttackerIsHero     bool    `logIndex:"12"`                           // 12:  6 val_bool:true
-	TargetIsHero       bool    `logIndex:"13"`                           // 13:  6 val_bool:true
-	Unknown14          bool    `logIndex:"14"`                           // 14:  6 val_bool:false
-	Unknown15          bool    `logIndex:"15"`                           // 15:  6 val_bool:false
-	Unknown16          int     `logIndex:"16"`                           // 16:  4 val_short:4
-	Unknown17          int     `logIndex:"17"`                           // 17:  4 val_short:0
-	Unknown18          int     `logIndex:"18"`                           // 18:  4 val_short:0
-	Unknown19          int     `logIndex:"19"`                           // 18:  4 val_short:0
+	Target             string  `logIndex:"2" logTable:"CombatLogNames"`  // 12
+	Attacker           string  `logIndex:"3" logTable:"CombatLogNames"`  // 5
+	Ability            string  `logIndex:"4" logTable:"CombatLogNames"`  // 47
+	AttackerIsIllusion bool    `logIndex:"5"`                            // false
+	TargetIsIllusion   bool    `logIndex:"6"`                            // false
+	IsDebuff           int     `logIndex:"7"`                            // 3  (seen values: 3)
+	Unknown8           int     `logIndex:"8"`                            // 0
+	Time               float32 `logIndex:"9"`                            // 1519.1506
+	TargetSource       string  `logIndex:"10" logTable:"CombatLogNames"` // 0
+	TimeRaw            float32 `logIndex:"11"`                           // 1638.1001
+	AttackerIsHero     bool    `logIndex:"12"`                           // true
+	TargetIsHero       bool    `logIndex:"13"`                           // true
+	Unknown14          bool    `logIndex:"14"`                           // false
+	Unknown15          bool    `logIndex:"15"`                           // false
+	Unknown16          int     `logIndex:"16"`                           // 4
+	Unknown17          int     `logIndex:"17"`                           // 0
+	Unknown18          int     `logIndex:"18"`                           // 0
+	Unknown19          int     `logIndex:"19"`                           // 0
 }
 
 func (c CombatLogAbilityTrigger) Type() dota.DOTA_COMBATLOG_TYPES {
@@ -240,19 +174,19 @@ func (c CombatLogAbilityTrigger) Timestamp() float32 {
 }
 
 type CombatLogDamage struct {
-	Source             string  `logIndex:"1" logTable:"CombatLogNames"`  // 1: val_short:3
-	Target             string  `logIndex:"2" logTable:"CombatLogNames"`  // 2: val_short:27
-	Attacker           string  `logIndex:"3" logTable:"CombatLogNames"`  // 3: val_short:3
-	Cause              string  `logIndex:"4" logTable:"CombatLogNames"`  // 4: val_short:0
-	AttackerIsIllusion bool    `logIndex:"5"`                            // 5: val_bool:false
-	TargetIsIllusion   bool    `logIndex:"6"`                            // 6: val_bool:false
-	Value              int     `logIndex:"7"`                            // 7: val_short:70
-	Health             int     `logIndex:"8"`                            // 8: val_short:429
-	Time               float32 `logIndex:"9"`                            // 9: val_float:229.45338
-	TargetSource       string  `logIndex:"10" logTable:"CombatLogNames"` // 10: val_short:27
-	TimeRaw            float32 `logIndex:"11"`                           // 11: val_float:238.43335
-	AttackerIsHero     bool    `logIndex:"12"`                           // 12: val_bool:true
-	TargetIsHero       bool    `logIndex:"13"`                           // 13: val_bool:false
+	Source             string  `logIndex:"1" logTable:"CombatLogNames"`  // 3
+	Target             string  `logIndex:"2" logTable:"CombatLogNames"`  // 27
+	Attacker           string  `logIndex:"3" logTable:"CombatLogNames"`  // 3
+	Cause              string  `logIndex:"4" logTable:"CombatLogNames"`  // 0
+	AttackerIsIllusion bool    `logIndex:"5"`                            // false
+	TargetIsIllusion   bool    `logIndex:"6"`                            // false
+	Value              int     `logIndex:"7"`                            // 70
+	Health             int     `logIndex:"8"`                            // 429
+	Time               float32 `logIndex:"9"`                            // 229.45338
+	TargetSource       string  `logIndex:"10" logTable:"CombatLogNames"` // 27
+	TimeRaw            float32 `logIndex:"11"`                           // 238.43335
+	AttackerIsHero     bool    `logIndex:"12"`                           // true
+	TargetIsHero       bool    `logIndex:"13"`                           // false
 }
 
 func (c CombatLogDamage) Type() dota.DOTA_COMBATLOG_TYPES {
@@ -400,9 +334,9 @@ func (c CombatLogGold) Timestamp() float32 {
 }
 
 type CombatLogGameState struct {
-	State   int     `logIndex:"7"`  //  7: val_short:5 (2,3,4,5,6)
-	Time    float32 `logIndex:"9"`  //  9: val_float:505.76474
-	TimeRaw float32 `logIndex:"11"` // 11: val_float:597.93335
+	State   int     `logIndex:"7"`  //  7: 5 (2,3,4,5,6)
+	Time    float32 `logIndex:"9"`  //  9: 505.76474
+	TimeRaw float32 `logIndex:"11"` // 11: 597.93335
 }
 
 func (c CombatLogGameState) Type() dota.DOTA_COMBATLOG_TYPES {
@@ -424,6 +358,122 @@ func (c CombatLogXP) Type() dota.DOTA_COMBATLOG_TYPES {
 	return dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_XP
 }
 func (c CombatLogXP) Timestamp() float32 {
+	return c.Time
+}
+
+type CombatLogPlayerstats struct {
+	Unknown0     int     `logIndex:"0"`                            // 14
+	Unknown1     int     `logIndex:"1"`                            // 0
+	Target       string  `logIndex:"2" logTable:"CombatLogNames"`  // val_shrt:9
+	Unknown3     int     `logIndex:"3"`                            // 11
+	Unknown4     int     `logIndex:"4"`                            // 0
+	Unknown5     bool    `logIndex:"5"`                            // false
+	Unknown6     bool    `logIndex:"6"`                            // false
+	Unknown7     int     `logIndex:"7"`                            // 22
+	Unknown8     int     `logIndex:"8"`                            // 0
+	Time         float32 `logIndex:"9"`                            // 2051.7341
+	TargetSource string  `logIndex:"10" logTable:"CombatLogNames"` // 3
+	TimeRaw      float32 `logIndex:"11"`                           // 2066.2668
+	Unknown12    bool    `logIndex:"12"`                           // false
+	Unknown13    bool    `logIndex:"13"`                           // false
+	Unknown14    bool    `logIndex:"14"`                           // false
+	Unknown15    bool    `logIndex:"15"`                           // false
+	Unknown16    int     `logIndex:"16"`                           // 0
+	Unknown17    int     `logIndex:"17"`                           // 0
+	Unknown18    int     `logIndex:"18"`                           // 0
+}
+
+func (c CombatLogPlayerstats) Type() dota.DOTA_COMBATLOG_TYPES {
+	return dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_PLAYERSTATS
+}
+func (c CombatLogPlayerstats) Timestamp() float32 {
+	return c.Time
+}
+
+type CombatLogTeamBuildingKill struct {
+	Unknown0  int     `logIndex:"0"`  //  17
+	Unknown1  int     `logIndex:"1"`  //  0
+	Unknown2  int     `logIndex:"2"`  //  0
+	Unknown3  int     `logIndex:"3"`  //  0
+	Unknown4  int     `logIndex:"4"`  //  0
+	Unknown5  bool    `logIndex:"5"`  //  false
+	Unknown6  bool    `logIndex:"6"`  //  false
+	Unknown7  int     `logIndex:"7"`  //  3
+	Unknown8  int     `logIndex:"8"`  //  0
+	Time      float32 `logIndex:"9"`  //  0
+	Unknown10 int     `logIndex:"10"` //  0
+	TimeRaw   float32 `logIndex:"11"` //  0
+	Unknown12 bool    `logIndex:"12"` //  false
+	Unknown13 bool    `logIndex:"13"` //  false
+	Unknown14 bool    `logIndex:"14"` //  false
+	Unknown15 bool    `logIndex:"15"` //  false
+	Unknown16 int     `logIndex:"16"` //  0
+	Unknown17 int     `logIndex:"17"` //  0
+	Unknown18 int     `logIndex:"18"` //  0
+}
+
+func (c CombatLogTeamBuildingKill) Type() dota.DOTA_COMBATLOG_TYPES {
+	return dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_TEAM_BUILDING_KILL
+}
+func (c CombatLogTeamBuildingKill) Timestamp() float32 {
+	return c.Time
+}
+
+type CombatLogKillStreak struct {
+	Unknown0  int     `logIndex:"0"`  // 16
+	Unknown1  int     `logIndex:"1"`  // 0
+	Unknown2  int     `logIndex:"2"`  // 6
+	Unknown3  int     `logIndex:"3"`  // 6
+	Unknown4  int     `logIndex:"4"`  // 0
+	Unknown5  bool    `logIndex:"5"`  // false
+	Unknown6  bool    `logIndex:"6"`  // false
+	Unknown7  int     `logIndex:"7"`  // 3
+	Unknown8  int     `logIndex:"8"`  // 0
+	Time      float32 `logIndex:"9"`  // 0
+	Unknown10 int     `logIndex:"10"` // 6
+	TimeRaw   float32 `logIndex:"11"` // 0
+	Unknown12 bool    `logIndex:"12"` // false
+	Unknown13 bool    `logIndex:"13"` // false
+	Unknown14 bool    `logIndex:"14"` // false
+	Unknown15 bool    `logIndex:"15"` // false
+	Unknown16 int     `logIndex:"16"` // 0
+	Unknown17 int     `logIndex:"17"` // 0
+	Unknown18 int     `logIndex:"18"` // 0
+}
+
+func (c CombatLogKillStreak) Type() dota.DOTA_COMBATLOG_TYPES {
+	return dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_KILLSTREAK
+}
+func (c CombatLogKillStreak) Timestamp() float32 {
+	return c.Time
+}
+
+type CombatLogMultikill struct {
+	Unknown0  int     `logIndex:"0"`  // 15
+	Unknown1  int     `logIndex:"1"`  // 0
+	Unknown2  int     `logIndex:"2"`  // 7
+	Unknown3  int     `logIndex:"3"`  // 7
+	Unknown4  int     `logIndex:"4"`  // 0
+	Unknown5  bool    `logIndex:"5"`  // false
+	Unknown6  bool    `logIndex:"6"`  // false
+	Unknown7  int     `logIndex:"7"`  // 3
+	Unknown8  int     `logIndex:"8"`  // 0
+	Time      float32 `logIndex:"9"`  // 0
+	Unknown10 int     `logIndex:"10"` // 2
+	TimeRaw   float32 `logIndex:"11"` // 0
+	Unknown12 bool    `logIndex:"12"` // false
+	Unknown13 bool    `logIndex:"13"` // false
+	Unknown14 bool    `logIndex:"14"` // false
+	Unknown15 bool    `logIndex:"15"` // false
+	Unknown16 int     `logIndex:"16"` // 0
+	Unknown17 int     `logIndex:"17"` // 0
+	Unknown18 int     `logIndex:"18"` // 0
+}
+
+func (c CombatLogMultikill) Type() dota.DOTA_COMBATLOG_TYPES {
+	return dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_MULTIKILL
+}
+func (c CombatLogMultikill) Timestamp() float32 {
 	return c.Time
 }
 
@@ -502,5 +552,79 @@ func (c combatLogParser) assign(v CombatLogEntry, keys []*dota.CSVCMsg_GameEvent
 		default:
 			panic("unknown GameEventKey Type" + spew.Sdump(key) + " in " + spew.Sdump(keys))
 		}
+	}
+}
+
+func printCombatLogKeys(v CombatLogEntry, keys []*dota.CSVCMsg_GameEventKeyT) {
+	out := []byte{}
+
+	typeString := v.Type().String()
+	parts := strings.Split(typeString, "_")
+	parts = parts[2:len(parts)]
+	for i, part := range parts {
+		parts[i] = strings.Title(strings.ToLower(part))
+	}
+	typeName := strings.Join(append([]string{"CombatLog"}, parts...), "")
+
+	out = append(out, spew.Sprintf("type %s struct {\n", typeName)...)
+
+	var key interface{}
+	var t string
+
+	for i, k := range keys {
+		switch k.GetType() {
+		case 2:
+			key = float64(k.GetValFloat())
+			t = "float64"
+		case 4:
+			key = int64(k.GetValShort())
+			t = "int64"
+		case 5:
+			key = int64(k.GetValByte())
+			t = "int64"
+		case 6:
+			key = k.GetValBool()
+			t = "bool"
+		}
+
+		name := fmt.Sprintf("Unknown%d", i)
+
+		switch i {
+		case 0:
+			continue
+		case 5:
+			name = "AttackerIsillusion"
+		case 6:
+			name = "TargetIsIllusion"
+		case 9:
+			name = "Time"
+		case 11:
+			name = "TimeRaw"
+		case 12:
+			name = "AttackerIsHero"
+		case 13:
+			name = "TargetIsHero"
+		case 14, 15:
+			if key.(bool) {
+				pp(v, keys)
+				panic("found one")
+			}
+		}
+
+		out = append(out, fmt.Sprintf("%s %s `logIndex:\"%d\"` // %v\n", name, t, i, key)...)
+	}
+
+	out = append(out, '}', '\n')
+	out = append(out, fmt.Sprintf(`func (c %s) Type() dota.DOTA_COMBATLOG_TYPES {`, typeName)...)
+	out = append(out, fmt.Sprintf(`return dota.DOTA_COMBATLOG_TYPES_%s`, typeString)...)
+	out = append(out, '}', '\n')
+	out = append(out, fmt.Sprintf(`func (c %s) Timestamp() float32 {`, typeName)...)
+	out = append(out, `return c.Time`...)
+	out = append(out, '}', '\n')
+
+	if formatted, err := format.Source(out); err == nil {
+		spew.Println(string(formatted))
+	} else {
+		panic(err)
 	}
 }
