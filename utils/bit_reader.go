@@ -40,7 +40,7 @@ func (br *BitReader) Length() int      { return len(br.buffer) }
 func (br *BitReader) CurrentBit() int  { return br.currentBit }
 func (br *BitReader) CurrentByte() int { return br.currentBit / 8 }
 func (br *BitReader) BitsLeft() int    { return (len(br.buffer) * 8) - br.currentBit }
-func (br *BitReader) BytesLeft() int   { return len(br.buffer) - (br.currentBit * 8) }
+func (br *BitReader) BytesLeft() int   { return len(br.buffer) - (br.currentBit / 8) }
 
 type Vector3 struct {
 	X, Y, Z float64
@@ -289,6 +289,7 @@ func (br *BitReader) ReadFloat(prop *send_tables.SendProp) float64 {
 
 func (br *BitReader) ReadLengthPrefixedString() string {
 	stringLength := uint(br.ReadUBits(9))
+
 	if stringLength > 0 {
 		return string(br.ReadBytes(int(stringLength)))
 	}
@@ -356,20 +357,55 @@ func (br *BitReader) ReadSpecialFloat(prop *send_tables.SendProp) (float32, bool
 	return 0, false
 }
 
-func (br *BitReader) ReadInt64(prop *send_tables.SendProp) uint64 {
-	var low, high uint
-	if prop.Flags&send_tables.SPROP_UNSIGNED != 0 {
-		low = br.ReadUBits(32)
-		high = br.ReadUBits(32)
-	} else {
-		br.SeekBits(1, Current)
-		low = br.ReadUBits(32)
-		high = br.ReadUBits(31)
+func (br *BitReader) nReadVarUnsignedInt64() uint64 {
+	var readCount, tmpBuf uint32
+	var value uint64
+
+	for {
+		if readCount == VarInt64Max {
+			return value
+		}
+
+		tmpBuf = uint32(br.ReadBits(8))
+		value |= uint64(tmpBuf&0x7F) << (7 * readCount)
+		readCount += 1
+		if tmpBuf&0x80 != 0x80 {
+			break
+		}
 	}
-	res := uint64(high)
-	res = (res << 32)
-	res = res | uint64(low)
-	return res
+	return value
+}
+
+func (br *BitReader) nReadVarSignedInt64() int64 {
+	value := br.nReadVarUnsignedInt64()
+	return int64(value>>1) ^ -int64(value&1)
+}
+
+func (br *BitReader) ReadInt64(prop *send_tables.SendProp) int64 {
+	if prop.Flags&send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT != 0 {
+		if prop.Flags&send_tables.SPROP_UNSIGNED != 0 {
+			return int64(br.nReadVarUnsignedInt64())
+		} else {
+			return br.nReadVarSignedInt64()
+		}
+	} else {
+		negate := false
+		sbits := prop.NumBits - 32
+
+		if prop.Flags&send_tables.SPROP_UNSIGNED == 0 {
+			sbits -= 1
+			negate = br.ReadBoolean()
+		}
+
+		a := int64(br.ReadUBits(32))
+		b := int64(br.ReadUBits(sbits))
+		val := (b << 32) | a
+		if negate {
+			return -val
+		} else {
+			return val
+		}
+	}
 }
 
 func (br *BitReader) ReadNextEntityIndex(oldEntity int) int {
@@ -428,36 +464,28 @@ func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multi
 			if elements > 1 {
 				key += "-" + strconv.Itoa(k)
 			}
+
+			var value interface{}
+
 			switch prop.Type {
 			case send_tables.DPT_Int:
-				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-					value := br.ReadVarInt()
-					// fmt.Printf("Int32 encoded against tickcount: '%s': %#v\n", key, value)
-					values[key] = value
-				} else {
-					values[key] = br.ReadInt(prop)
-				}
+				value = br.ReadInt(prop)
 			case send_tables.DPT_Int64:
-				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-					value := br.ReadVarInt()
-					// fmt.Printf("Int64 encoded against tickcount: '%s': %#v\n", key, value)
-					values[key] = value
-					// TODO: we still don't know how to _really_ parse it...
-					// panic("Int64 encoded against tickcount")
-				} else {
-					values[key] = br.ReadInt64(prop)
-				}
+				value = br.ReadInt64(prop)
 			case send_tables.DPT_Float:
-				values[key] = br.ReadFloat(prop)
+				value = br.ReadFloat(prop)
 			case send_tables.DPT_Vector:
-				values[key] = br.ReadVector(prop)
+				value = br.ReadVector(prop)
 			case send_tables.DPT_VectorXY:
-				values[key] = br.ReadVectorXY(prop)
+				value = br.ReadVectorXY(prop)
 			case send_tables.DPT_String:
-				values[key] = br.ReadLengthPrefixedString()
+				value = br.ReadLengthPrefixedString()
 			default:
 				panic("unknown type")
 			}
+
+			p(prop.Type, key, value)
+			values[key] = value
 		}
 	}
 
