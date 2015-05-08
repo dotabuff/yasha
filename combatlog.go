@@ -10,7 +10,6 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/dotabuff/yasha/dota"
-	"github.com/dotabuff/yasha/string_tables"
 )
 
 type CombatLogEntry interface {
@@ -19,8 +18,8 @@ type CombatLogEntry interface {
 }
 
 type combatLogParser struct {
-	stsh     *string_tables.StateHelper
-	distinct map[dota.DOTA_COMBATLOG_TYPES][]map[interface{}]bool
+	stringTables *StringTables
+	distinct     map[dota.DOTA_COMBATLOG_TYPES][]map[interface{}]bool
 }
 
 /*
@@ -482,8 +481,8 @@ func atoi(a string) int {
 	return i
 }
 
-func strtbl(table map[int]*string_tables.StringTableItem, keys []*dota.CSVCMsg_GameEventKeyT, index int) string {
-	return table[int(keys[index].GetValShort())].Str
+func strtbl(table map[int]*StringTableItem, keys []*dota.CSVCMsg_GameEventKeyT, index int) string {
+	return string(table[int(keys[index].GetValShort())].Value)
 }
 
 func (c combatLogParser) logDistinct(t dota.DOTA_COMBATLOG_TYPES, keys []*dota.CSVCMsg_GameEventKeyT) {
@@ -533,12 +532,12 @@ func (c combatLogParser) assign(v CombatLogEntry, keys []*dota.CSVCMsg_GameEvent
 		case 4:
 			valShort := key.GetValShort()
 			if logTable := fieldTag.Get("logTable"); logTable != "" {
-				table := c.stsh.GetTableNow(logTable).Items
+				table := c.stringTables.ByName(logTable).Items
 				entry := table[int(valShort)]
 				if entry == nil {
 					spew.Printf("no entry %d in %s for %v\n", valShort, logTable, v)
 				} else {
-					field.SetString(entry.Str)
+					field.SetString(string(entry.Value))
 				}
 			} else if field.Kind() == reflect.Bool {
 				field.SetBool(valShort == 1)

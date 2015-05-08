@@ -2,32 +2,30 @@ package yasha
 
 import (
 	"math"
-	"sort"
 	"strings"
 
 	"github.com/davecgh/go-spew/spew"
 
 	"github.com/dotabuff/yasha/dota"
 	"github.com/dotabuff/yasha/parser"
-	"github.com/dotabuff/yasha/send_tables"
-	"github.com/dotabuff/yasha/string_tables"
-	"github.com/dotabuff/yasha/utils"
 )
 
 type Parser struct {
-	Parser                *parser.Parser
-	combatLogParser       *combatLogParser
-	ClassIdNumBits        int
-	ClassInfosIdMapping   map[string]int
-	ClassInfosNameMapping map[int]string
-	FileHeader            *dota.CDemoFileHeader
-	GameEventMap          map[int32]*dota.CSVCMsg_GameEventListDescriptorT
-	Mapping               map[int][]*send_tables.SendProp
-	Multiples             map[int]map[string]int
-	ServerInfo            *dota.CSVCMsg_ServerInfo
-	Sth                   *send_tables.Helper
-	Stsh                  *string_tables.StateHelper
-	VoiceInit             *dota.CSVCMsg_VoiceInit
+	Parser          *parser.Parser
+	combatLogParser *combatLogParser
+
+	stringTableId  int
+	stringTables   *StringTables
+	sendTableId    int
+	sendTables     *SendTables
+	flatSendTables map[int]*FlatSendTable
+
+	classIdNumBits int
+	classInfos     *ClassInfos
+	FileHeader     *dota.CDemoFileHeader
+	GameEventMap   map[int32]*dota.CSVCMsg_GameEventListDescriptorT
+	ServerInfo     *dota.CSVCMsg_ServerInfo
+	VoiceInit      *dota.CSVCMsg_VoiceInit
 
 	ActiveModifiers map[int]*dota.CDOTAModifierBuffTableEntry
 	Entities        []*PacketEntity
@@ -37,7 +35,7 @@ type Parser struct {
 	OnEntityDeleted   func(*PacketEntity)
 	OnEntityPreserved func(*PacketEntity)
 
-	OnActiveModifierDelta func(map[int]*string_tables.StringTableItem, string_tables.ModifierBuffs)
+	// OnActiveModifierDelta func(map[int]*string_tables.StringTableItem, string_tables.ModifierBuffs)
 
 	OnAbilitySteal              func(tick int, obj *dota.CDOTAUserMsg_AbilitySteal)
 	OnBoosterState              func(tick int, obj *dota.CDOTAUserMsg_BoosterState)
@@ -109,18 +107,24 @@ func NewParser(data []byte) *Parser {
 }
 
 func (p *Parser) Parse() {
-	p.Sth = send_tables.NewHelper()
-	p.Stsh = string_tables.NewStateHelper()
+	// p.Sth = send_tables.NewHelper()
+	// p.Stsh = string_tables.NewStateHelper()
 	p.Entities = make([]*PacketEntity, 2048)
-	p.ClassInfosIdMapping = map[string]int{}
-	p.ClassInfosNameMapping = map[int]string{}
+	p.classInfos = NewClassInfos()
+
+	p.stringTableId = 0
+	p.stringTables = NewStringTables()
+	p.sendTableId = 0
+	p.sendTables = NewSendTables()
+	p.flatSendTables = map[int]*FlatSendTable{}
+
 	p.GameEventMap = map[int32]*dota.CSVCMsg_GameEventListDescriptorT{}
-	p.Mapping = map[int][]*send_tables.SendProp{}
-	p.Multiples = map[int]map[string]int{}
+	// p.Mapping = map[int][]*send_tables.SendProp{}
+	// p.Multiples = map[int]map[string]int{}
 	p.ByHandle = map[int]*PacketEntity{}
 	p.combatLogParser = &combatLogParser{
-		stsh:     p.Stsh,
-		distinct: map[dota.DOTA_COMBATLOG_TYPES][]map[interface{}]bool{},
+		stringTables: p.stringTables,
+		distinct:     map[dota.DOTA_COMBATLOG_TYPES][]map[interface{}]bool{},
 	}
 
 	// in order to successfully process data every tick, we need to maintain
@@ -165,8 +169,6 @@ func (p *Parser) PrintDistinctCombatLogTypes() {
 }
 
 func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
-	p.Stsh.ActiveModifierDelta = string_tables.ModifierBuffs{}
-
 	if p.BeforeTick != nil {
 		p.BeforeTick(tick)
 	}
@@ -174,10 +176,10 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 	for _, item := range items {
 		switch obj := item.Object.(type) {
 		case *dota.CSVCMsg_SendTable:
-			p.Sth.SetSendTable(obj.GetNetTableName(), obj)
+			p.handleSendTable(obj)
 		case *dota.CSVCMsg_ServerInfo:
 			p.ServerInfo = obj
-			p.ClassIdNumBits = int(math.Log(float64(obj.GetMaxClasses()))/math.Log(2)) + 1
+			p.classIdNumBits = int(math.Ceil(math.Log2(float64(obj.GetMaxClasses()))))
 		case *dota.CDemoClassInfo:
 			p.onCDemoClassInfo(obj)
 		}
@@ -185,8 +187,12 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 
 	for _, item := range items {
 		switch obj := item.Object.(type) {
-		case *dota.CSVCMsg_CreateStringTable, *dota.CSVCMsg_UpdateStringTable, *dota.CDemoStringTables:
-			p.Stsh.AppendPacket(item)
+		case *dota.CSVCMsg_CreateStringTable:
+			p.handleCreateStringTable(obj)
+		case *dota.CSVCMsg_UpdateStringTable:
+			p.handleUpdateStringTable(obj)
+		case *dota.CDemoStringTables:
+			// ignore
 		case *dota.CDemoFileHeader:
 			p.FileHeader = obj
 		case *dota.CSVCMsg_GameEventList:
@@ -330,7 +336,7 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 		case *dota.CSVCMsg_PacketEntities:
 			// to skip to a specific time, we have to handle more.
 			if item.From == dota.EDemoCommands_DEM_Packet {
-				p.ParsePacket(item.Tick, obj)
+				p.handleEntity(item.Tick, obj)
 			}
 		case *dota.CDemoFileInfo:
 			if p.OnFileInfo != nil {
@@ -411,13 +417,6 @@ func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
 		}
 	}
 
-	if p.OnActiveModifierDelta != nil {
-		if len(p.Stsh.ActiveModifierDelta) > 0 {
-			sort.Sort(p.Stsh.ActiveModifierDelta)
-			p.OnActiveModifierDelta(p.Stsh.GetTableNow("ModifierNames").Items, p.Stsh.ActiveModifierDelta)
-		}
-	}
-
 	if p.AfterTick != nil {
 		p.AfterTick(tick)
 	}
@@ -466,33 +465,17 @@ func (p *Parser) onGameEvent(tick int, obj *dota.CSVCMsg_GameEvent) {
 	}
 }
 
-func (p *Parser) onCDemoClassInfo(cdci *dota.CDemoClassInfo) {
-	for _, class := range cdci.GetClasses() {
-		id, name := int(class.GetClassId()), class.GetTableName()
-		p.ClassInfosIdMapping[name] = id
-		p.ClassInfosNameMapping[id] = name
-
-		props := p.Sth.LoadSendTable(name)
-		multiples := map[string]int{}
-		for _, prop := range props {
-			key := prop.DtName + "." + prop.VarName
-			multiples[key] += 1
-		}
-		p.Multiples[id] = multiples
-		p.Mapping[id] = props
-
-		if p.OnTablename != nil {
-			p.OnTablename(name)
-		}
+func (p *Parser) onCDemoClassInfo(ci *dota.CDemoClassInfo) {
+	for _, class := range ci.GetClasses() {
+		p.classInfos.Insert(NewClassInfo(class))
 	}
 
-	p.Stsh.ClassInfosNameMapping = p.ClassInfosNameMapping
-	p.Stsh.Mapping = p.Mapping
-	p.Stsh.Multiples = p.Multiples
+	p.flattenSendTables()
 }
 
+/*
 func (p *Parser) ParsePacket(tick int, pe *dota.CSVCMsg_PacketEntities) {
-	br := utils.NewBitReader(pe.GetEntityData())
+	br := bitstream.NewBitStream(pe.GetEntityData())
 	currentIndex := -1
 
 	createPackets := []*PacketEntity{}
@@ -536,11 +519,11 @@ func (p *Parser) ParsePacket(tick int, pe *dota.CSVCMsg_PacketEntities) {
 	}
 }
 
-func (p *Parser) entityCreate(br *utils.BitReader, currentIndex, tick int) *PacketEntity {
+func (p *Parser) entityCreate(bs *bitstream.BitStream, currentIndex, tick int) *PacketEntity {
 	pe := &PacketEntity{
 		Tick:      tick,
-		ClassId:   int(br.ReadUBits(p.ClassIdNumBits)),
-		SerialNum: int(br.ReadUBits(10)),
+		ClassId:   int(bs.ReadUBits(p.ClassIdNumBits)),
+		SerialNum: int(bs.ReadUBits(10)),
 		Index:     currentIndex,
 		Type:      Create,
 		Values:    map[string]interface{}{},
@@ -548,10 +531,10 @@ func (p *Parser) entityCreate(br *utils.BitReader, currentIndex, tick int) *Pack
 	pe.EntityHandle = pe.Handle()
 	pe.Name = p.ClassInfosNameMapping[pe.ClassId]
 
-	indices := br.ReadPropertiesIndex()
+	indices := bs.ReadPropertiesIndex()
 	pMapping := p.Mapping[pe.ClassId]
 	pMultiples := p.Multiples[pe.ClassId]
-	values := br.ReadPropertiesValues(pMapping, pMultiples, indices)
+	values := bs.ReadPropertiesValues(pMapping, pMultiples, indices)
 
 	baseline, foundBaseline := p.Stsh.Baseline[pe.ClassId]
 	if foundBaseline {
@@ -566,13 +549,13 @@ func (p *Parser) entityCreate(br *utils.BitReader, currentIndex, tick int) *Pack
 	return pe
 }
 
-func (p *Parser) entityPreserve(br *utils.BitReader, currentIndex, tick int) *PacketEntity {
+func (p *Parser) entityPreserve(bs *bitstream.BitStream, currentIndex, tick int) *PacketEntity {
 	pe := p.Entities[currentIndex]
 	pe.Tick = tick
 	pe.Type = Preserve
-	indices := br.ReadPropertiesIndex()
+	indices := bs.ReadPropertiesIndex()
 	classId := p.ClassInfosIdMapping[pe.Name]
-	pe.Delta = br.ReadPropertiesValues(p.Mapping[classId], p.Multiples[classId], indices)
+	pe.Delta = bs.ReadPropertiesValues(p.Mapping[classId], p.Multiples[classId], indices)
 	pe.OldDelta = map[string]interface{}{}
 
 	for key, value := range pe.Delta {
@@ -583,6 +566,7 @@ func (p *Parser) entityPreserve(br *utils.BitReader, currentIndex, tick int) *Pa
 	return pe
 }
 
-func (p *Parser) entityDelete(br *utils.BitReader, currentIndex, tick int) *PacketEntity {
+func (p *Parser) entityDelete(bs *bitstream.BitStream, currentIndex, tick int) *PacketEntity {
 	return p.Entities[currentIndex]
 }
+*/

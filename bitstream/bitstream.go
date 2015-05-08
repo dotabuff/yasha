@@ -21,44 +21,6 @@ func NewBitStream(data []byte) *BitStream {
 	}
 }
 
-var (
-	masks = [64]uint64{
-		0x0, 0x1, 0x3, 0x7,
-		0xf, 0x1f, 0x3f, 0x7f,
-		0xff, 0x1ff, 0x3ff, 0x7ff,
-		0xfff, 0x1fff, 0x3fff, 0x7fff,
-		0xffff, 0x1ffff, 0x3ffff, 0x7ffff,
-		0xfffff, 0x1fffff, 0x3fffff, 0x7fffff,
-		0xffffff, 0x1ffffff, 0x3ffffff, 0x7ffffff,
-		0xfffffff, 0x1fffffff, 0x3fffffff, 0x7fffffff,
-		0xffffffff, 0x1ffffffff, 0x3ffffffff, 0x7ffffffff,
-		0xfffffffff, 0x1fffffffff, 0x3fffffffff, 0x7fffffffff,
-		0xffffffffff, 0x1ffffffffff, 0x3ffffffffff, 0x7ffffffffff,
-		0xfffffffffff, 0x1fffffffffff, 0x3fffffffffff, 0x7fffffffffff,
-		0xffffffffffff, 0x1ffffffffffff, 0x3ffffffffffff, 0x7ffffffffffff,
-		0xfffffffffffff, 0x1fffffffffffff, 0x3fffffffffffff, 0x7fffffffffffff,
-	}
-
-	shift = [64]byte{
-		0x0, 0x1, 0x2, 0x3,
-		0x4, 0x5, 0x6, 0x7,
-		0x8, 0x9, 0xa, 0xb,
-		0xc, 0xd, 0xe, 0xf,
-		0x10, 0x11, 0x12, 0x13,
-		0x14, 0x15, 0x16, 0x17,
-		0x18, 0x19, 0x1a, 0x1b,
-		0x1c, 0x1d, 0x1e, 0x1f,
-		0x20, 0x21, 0x22, 0x23,
-		0x24, 0x25, 0x26, 0x27,
-		0x28, 0x29, 0x2a, 0x2b,
-		0x2c, 0x2d, 0x2e, 0x2f,
-		0x30, 0x31, 0x32, 0x33,
-		0x34, 0x35, 0x36, 0x37,
-		0x38, 0x39, 0x3a, 0x3b,
-		0x3c, 0x3d, 0x3e, 0x3f,
-	}
-)
-
 const (
 	// Number of fraction bits in a normalized float
 	NORMAL_FRACTION_BITS = 11
@@ -126,7 +88,7 @@ func (b *BitStream) seekBackward(n int) {
 // This function can read a maximum of 32 bits at once. If the amount of data requested
 // exceeds the remaining size of the current chunk it wraps around to the next one.
 func (b *BitStream) Read(n int) (ret uint) {
-	if n > b.size-b.pos {
+	if b.pos+n > b.size {
 		panic(fmt.Errorf(errBitStreamOverflow, n, b.size-b.pos))
 	}
 
@@ -134,17 +96,36 @@ func (b *BitStream) Read(n int) (ret uint) {
 		panic(fmt.Errorf(errBitStreamOverflow, n, 32))
 	}
 
-	start := b.pos / 8
-	end := (b.pos + n - 1) / 8
-	s := b.pos % 8
-	if start == end {
-		ret = uint(uint64(b.data[start]>>shift[s]) & masks[n])
-	} else { // wrap around
-		ret = uint(uint64(b.data[start]>>shift[s]) | uint64(b.data[end]<<(8-shift[s]))&masks[n])
+	// shortcut for aligned
+	if b.pos%8 == 0 && n%8 == 0 {
+		var result uint
+		for i := 0; i < n/8; i++ {
+			result += uint(b.data[b.pos/8] << (uint(i) * 8))
+			b.pos += 8
+		}
+		return result
 	}
 
+	bitOffset := b.pos % 8
+	nBitsToRead := bitOffset + n
+	nBytesToRead := nBitsToRead / 8
+	if nBitsToRead%8 != 0 {
+		nBytesToRead += 1
+	}
+
+	var currentValue uint64
+	for i := 0; i < nBytesToRead; i++ {
+		m := b.data[(b.pos/8)+i]
+		currentValue += (uint64(m) << (uint64(i) * 8))
+	}
+	currentValue >>= uint(bitOffset)
+	currentValue &= ((1 << uint64(n)) - 1)
 	b.pos += n
-	return ret
+	return uint(currentValue)
+}
+
+func (b *BitStream) ReadBool() bool {
+	return b.Read(1) == 1
 }
 
 func (b *BitStream) ReadUInt(n int) (ret uint) {
@@ -163,11 +144,11 @@ func (b *BitStream) ReadSInt(n int) (ret uint) {
 }
 
 func (b *BitStream) ReadNormal() (ret float32) {
-	sign := b.Read(1)
+	sign := b.ReadBool()
 	fraction := b.Read(NORMAL_FRACTION_BITS)
 	ret = float32(fraction) * NORMAL_RESOLUTION
 
-	if sign == 1 {
+	if sign {
 		return -ret
 	}
 	return ret
@@ -188,7 +169,7 @@ func (b *BitStream) ReadVarUInt32() (ret uint) {
 		tmpBuf = b.Read(8)
 		ret |= (tmpBuf & 0x7F) << (7 * readCount)
 		readCount += 1
-		if (tmpBuf & 0x80) != 0 {
+		if (tmpBuf & 0x80) == 0 {
 			break
 		}
 	}
@@ -211,8 +192,8 @@ func (b *BitStream) ReadVarUInt64() (ret uint64) {
 
 		tmpBuf = b.Read(8)
 		ret |= uint64(tmpBuf&0x7F) << (7 * readCount)
-		readCount += 1
-		if (tmpBuf & 0x80) != 0 {
+		readCount++
+		if (tmpBuf & 0x80) == 0 {
 			break
 		}
 	}
@@ -226,23 +207,20 @@ func (b *BitStream) ReadVarSInt64() (ret uint64) {
 }
 
 func (b *BitStream) ReadCoord() (ret float32) {
-	integer, fraction := b.Read(1), b.Read(1)
+	hasInteger, hasFraction := b.ReadBool(), b.ReadBool()
 
-	if integer != 0 || fraction != 0 {
-		signBit := b.Read(1)
+	if hasInteger || hasFraction {
+		signBit := b.ReadBool()
 
-		if integer != 0 {
-			integer = b.Read(COORD_INTEGER_BITS)
-			integer += 1
+		if hasInteger {
+			ret += float32(b.Read(COORD_INTEGER_BITS) + 1)
 		}
 
-		if fraction != 0 {
-			fraction = b.Read(COORD_FRACTION_BITS)
+		if hasFraction {
+			ret += float32(b.Read(COORD_FRACTION_BITS)) * COORD_RESOLUTION
 		}
 
-		ret = float32(integer) + float32(fraction)*COORD_RESOLUTION
-
-		if signBit != 0 {
+		if signBit {
 			return -ret
 		}
 		return ret
@@ -366,32 +344,49 @@ func (b *BitStream) ReadCellCoord(n int, integral, lowPrecision bool) (ret float
 }
 
 func (b *BitStream) ReadString(n int) string {
-	buffer := make([]byte, n)
+	buffer := []byte{}
 
-	for i := 0; i < n; i++ {
-		buffer[i] = byte(b.Read(8))
-		if buffer[i] == 0 {
+	for n > 0 {
+		got := byte(b.Read(8))
+		if got == 0 {
 			break
 		}
+		buffer = append(buffer, got)
+		n--
 	}
 
 	return string(buffer)
 }
 
 func (b *BitStream) ReadBits(n int) []byte {
-	buffer := make([]byte, n/8)
+	buffer := []byte{}
 	remaining := n
-	i := 0
 
 	for remaining >= 8 {
-		i++
-		buffer[i] = byte(b.Read(8))
+		buffer = append(buffer, byte(b.Read(8)))
 		remaining -= 8
 	}
 
-	if remaining > 8 {
+	if remaining > 0 {
+		buffer = append(buffer, byte(b.Read(remaining)))
+	}
+
+	return buffer
+}
+
+func (b *BitStream) ReadBitsAsBytes(n int) []byte {
+	buffer := make([]byte, (n+7)/8)
+
+	i := 0
+
+	for n > 7 {
+		n -= 8
+		buffer[i] = byte(b.Read(8))
 		i++
-		buffer[i] = byte(b.Read(remaining))
+	}
+
+	if n != 0 {
+		buffer[i] = byte(b.Read(n))
 	}
 
 	return buffer

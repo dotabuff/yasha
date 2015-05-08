@@ -1,4 +1,4 @@
-package send_tables
+package yasha
 
 import (
 	"bytes"
@@ -13,8 +13,8 @@ type SendPropFlag int
 type SendPropType int
 
 const (
-	SPROP_UNSIGNED SendPropFlag = 1 << 0
-	SPROP_COORD    SendPropFlag = 1 << iota
+	SPROP_UNSIGNED SendPropFlag = 1 << iota
+	SPROP_COORD
 	SPROP_NOSCALE
 	SPROP_ROUNDDOWN
 	SPROP_ROUNDUP
@@ -36,7 +36,7 @@ const (
 )
 
 const (
-	DPT_Int SendPropFlag = iota
+	DPT_Int SendPropType = iota + 1
 	DPT_Float
 	DPT_Vector
 	DPT_VectorXY
@@ -62,7 +62,9 @@ type SendProp struct {
 	LowValue  float32
 	HighValue float32
 	Bits      int
+	Type      SendPropType
 	ArrayType *SendProp
+	Value     interface{}
 }
 
 func NewSendProp(prop *dota.CSVCMsg_SendTableSendpropT, netName string) *SendProp {
@@ -76,7 +78,23 @@ func NewSendProp(prop *dota.CSVCMsg_SendTableSendpropT, netName string) *SendPro
 		LowValue:  prop.GetLowValue(),
 		HighValue: prop.GetHighValue(),
 		Bits:      int(prop.GetNumBits()),
+		Type:      SendPropType(prop.GetType()),
 	}
+}
+
+func SendPropFromStream(bs *bitstream.BitStream, prop *SendProp) *SendProp {
+	prop.update(bs)
+	return prop
+}
+
+func (s *SendProp) isExcluded(tableName string, excluded []*SendProp) bool {
+	name := tableName + s.Name
+	for _, ex := range excluded {
+		if ex.Name == name {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *SendProp) readInt(b *bitstream.BitStream) uint {
@@ -140,20 +158,20 @@ type Vector3 struct {
 	X, Y, Z float32
 }
 
-func (s *SendProp) ReadVector3(b *bitstream.BitStream) *Vector3 {
+func (s *SendProp) readVector3(b *bitstream.BitStream) *Vector3 {
 	vec := &Vector3{}
 	vec.X = s.readFloat(b)
 	vec.Y = s.readFloat(b)
 
 	if s.Flags&SPROP_NORMAL != 0 {
-		sign := b.Read(1)
+		sign := b.ReadBool()
 		f := vec.X*vec.X + vec.Y*vec.Y
 
 		if f >= 0 {
 			vec.Z = float32(math.Sqrt(1 - float64(f)))
 		}
 
-		if sign != 0 {
+		if sign {
 			vec.Z *= -1
 		}
 	} else {
@@ -167,14 +185,14 @@ type Vector2 struct {
 	X, Y float32
 }
 
-func (s *SendProp) ReadVector2(b *bitstream.BitStream) *Vector2 {
+func (s *SendProp) readVector2(b *bitstream.BitStream) *Vector2 {
 	vec := &Vector2{}
 	vec.X = s.readFloat(b)
 	vec.Y = s.readFloat(b)
 	return vec
 }
 
-func (s *SendProp) ReadString(b *bitstream.BitStream) string {
+func (s *SendProp) readString(b *bitstream.BitStream) string {
 	length := b.Read(9)
 
 	if length > PROPERTY_MAX_STRING_LENGTH {
@@ -184,7 +202,7 @@ func (s *SendProp) ReadString(b *bitstream.BitStream) string {
 	return string(b.ReadBits(int(8 * length)))
 }
 
-func (s *SendProp) ReadInt64(b *bitstream.BitStream) uint64 {
+func (s *SendProp) readInt64(b *bitstream.BitStream) uint64 {
 	flags := s.Flags
 
 	if flags&SPROP_ENCODED_AGAINST_TICKCOUNT != 0 {
@@ -199,7 +217,7 @@ func (s *SendProp) ReadInt64(b *bitstream.BitStream) uint64 {
 	sbits := s.Bits - 32
 	if flags&SPROP_UNSIGNED == 0 {
 		sbits--
-		negate = b.Read(1) == 1
+		negate = b.ReadBool()
 	}
 
 	x := b.Read(32)
@@ -213,19 +231,43 @@ func (s *SendProp) ReadInt64(b *bitstream.BitStream) uint64 {
 	return val
 }
 
-func (s *SendProp) ReadArray(b *bitstream.BitStream) []int {
+func (s *SendProp) readArray(b *bitstream.BitStream) []int {
 	elements := s.Elements
-	bits := int(math.Floor(math.Log2(float64(elements))))
+	bits := int(math.Floor(math.Log2(float64(elements)) + 1))
 	count := b.Read(bits)
 	if count > PROPERTY_MAX_ELEMENTS {
 		panic("too many elements in array")
 	}
 
-	aType := s.ArrayType
 	props := []int{}
-	for i := 0; i < count; i++ {
-		props = append(props, NewProperty(b, aType))
-	}
+	/*
+		for i := uint(0); i < count; i++ {
+			props = append(props, NewProperty(b, aType))
+		}
+	*/
+
+	panic("ReadArray")
 
 	return props
+}
+
+func (s *SendProp) update(bs *bitstream.BitStream) {
+	switch s.Type {
+	case DPT_Int:
+		s.Value = s.readInt(bs)
+	case DPT_Float:
+		s.Value = s.readFloat(bs)
+	case DPT_Vector:
+		s.Value = s.readVector3(bs)
+	case DPT_VectorXY:
+		s.Value = s.readVector2(bs)
+	case DPT_String:
+		s.Value = s.readString(bs)
+	case DPT_Array:
+		s.Value = s.readArray(bs)
+	case DPT_Int64:
+		s.Value = s.readInt64(bs)
+	default:
+		panic("unknown type")
+	}
 }
