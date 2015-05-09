@@ -561,6 +561,8 @@ const (
 	EDOTAGCMsg_k_EMsgGCToClientMergeGroupInviteReply                      EDOTAGCMsg = 8031
 	EDOTAGCMsg_k_EMsgClientToGCMergePartyResponse                         EDOTAGCMsg = 8032
 	EDOTAGCMsg_k_EMsgGCToClientMergePartyResponseReply                    EDOTAGCMsg = 8033
+	EDOTAGCMsg_k_EMsgClientToGCTopLeagueMatchesRequest                    EDOTAGCMsg = 8036
+	EDOTAGCMsg_k_EMsgClientToGCTopLeagueMatchesResponse                   EDOTAGCMsg = 8037
 )
 
 var EDOTAGCMsg_name = map[int32]string{
@@ -1111,6 +1113,8 @@ var EDOTAGCMsg_name = map[int32]string{
 	8031: "k_EMsgGCToClientMergeGroupInviteReply",
 	8032: "k_EMsgClientToGCMergePartyResponse",
 	8033: "k_EMsgGCToClientMergePartyResponseReply",
+	8036: "k_EMsgClientToGCTopLeagueMatchesRequest",
+	8037: "k_EMsgClientToGCTopLeagueMatchesResponse",
 }
 var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgGCDOTABase":                                           7000,
@@ -1660,6 +1664,8 @@ var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgGCToClientMergeGroupInviteReply":                      8031,
 	"k_EMsgClientToGCMergePartyResponse":                         8032,
 	"k_EMsgGCToClientMergePartyResponseReply":                    8033,
+	"k_EMsgClientToGCTopLeagueMatchesRequest":                    8036,
+	"k_EMsgClientToGCTopLeagueMatchesResponse":                   8037,
 }
 
 func (x EDOTAGCMsg) Enum() *EDOTAGCMsg {
@@ -3678,7 +3684,6 @@ type CSODOTAParty struct {
 	LeaderId                        *uint64               `protobuf:"fixed64,2,opt,name=leader_id" json:"leader_id,omitempty"`
 	MemberIds                       []uint64              `protobuf:"fixed64,3,rep,name=member_ids" json:"member_ids,omitempty"`
 	GameModes                       *uint32               `protobuf:"varint,4,opt,name=game_modes" json:"game_modes,omitempty"`
-	LegacyPendingInvites            []uint64              `protobuf:"fixed64,5,rep,name=legacy_pending_invites" json:"legacy_pending_invites,omitempty"`
 	State                           *CSODOTAParty_State   `protobuf:"varint,6,opt,name=state,enum=dota.CSODOTAParty_State,def=0" json:"state,omitempty"`
 	EffectiveStartedMatchmakingTime *uint32               `protobuf:"varint,7,opt,name=effective_started_matchmaking_time" json:"effective_started_matchmaking_time,omitempty"`
 	RawStartedMatchmakingTime       *uint32               `protobuf:"varint,32,opt,name=raw_started_matchmaking_time" json:"raw_started_matchmaking_time,omitempty"`
@@ -3741,13 +3746,6 @@ func (m *CSODOTAParty) GetGameModes() uint32 {
 		return *m.GameModes
 	}
 	return 0
-}
-
-func (m *CSODOTAParty) GetLegacyPendingInvites() []uint64 {
-	if m != nil {
-		return m.LegacyPendingInvites
-	}
-	return nil
 }
 
 func (m *CSODOTAParty) GetState() CSODOTAParty_State {
@@ -6662,6 +6660,7 @@ type CMsgDOTACombatLogEntry struct {
 	LastHits           *uint32               `protobuf:"varint,27,opt,name=last_hits" json:"last_hits,omitempty"`
 	AttackerTeam       *uint32               `protobuf:"varint,28,opt,name=attacker_team" json:"attacker_team,omitempty"`
 	TargetTeam         *uint32               `protobuf:"varint,29,opt,name=target_team" json:"target_team,omitempty"`
+	ObsWardsPlaced     *uint32               `protobuf:"varint,30,opt,name=obs_wards_placed" json:"obs_wards_placed,omitempty"`
 	XXX_unrecognized   []byte                `json:"-"`
 }
 
@@ -6870,6 +6869,13 @@ func (m *CMsgDOTACombatLogEntry) GetAttackerTeam() uint32 {
 func (m *CMsgDOTACombatLogEntry) GetTargetTeam() uint32 {
 	if m != nil && m.TargetTeam != nil {
 		return *m.TargetTeam
+	}
+	return 0
+}
+
+func (m *CMsgDOTACombatLogEntry) GetObsWardsPlaced() uint32 {
+	if m != nil && m.ObsWardsPlaced != nil {
+		return *m.ObsWardsPlaced
 	}
 	return 0
 }
