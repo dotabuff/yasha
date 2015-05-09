@@ -1,7 +1,6 @@
 package yasha
 
 import (
-	"compress/bzip2"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -22,7 +21,7 @@ type testCase struct {
 func TestEsportsPatch683b(t *testing.T) {
 	c := &testCase{
 		matchId: 1405240741,
-		url:     "http://replay135.valve.net/570/1405240741_220241732.dem.bz2",
+		url:     "http://s.tsai.co/replays/1405240741.dem",
 		expectLastChatMessage: "Gg",
 	}
 
@@ -33,7 +32,7 @@ func TestEsportsPatch683b(t *testing.T) {
 func TestEsportsPatch684p0(t *testing.T) {
 	c := &testCase{
 		matchId: 1450235906,
-		url:     "http://replay136.valve.net/570/1450235906_1463120933.dem.bz2",
+                url:     "http://s.tsai.co/replays/1450235906.dem",
 		expectLastChatMessage: "gg",
 	}
 
@@ -44,11 +43,47 @@ func TestEsportsPatch684p0(t *testing.T) {
 func TestEsportsPatch684p1(t *testing.T) {
 	c := &testCase{
 		matchId: 1458895412,
-		url:     "http://replay123.valve.net/570/1458895412_140022944.dem.bz2",
+                url:     "http://s.tsai.co/replays/1458895412.dem",
 		expectLastChatMessage: "gg",
 	}
 
 	testReplayCase(t, c)
+}
+
+// Manually scrutinised match, played on patch 6.84p1
+func TestPublicMatchPatch684p1(t *testing.T) {
+        assert := assert.New(t)
+
+        data, err := getReplayData(1456774107, "http://s.tsai.co/replays/1456774107.dem")
+	if err != nil {
+		t.Fatalf("unable to get replay: %s", err)
+	}
+
+        parser := NewParser(data)
+        parser.OnSayText2 = func(n int, o *dota.CUserMsg_SayText2) {
+            //t.Logf("OnSayText2: %+v", o)
+        }
+
+        earthshakerDeaths := 0
+        spiritBreakerDeaths := 0
+        parser.OnCombatLog = func(entry CombatLogEntry) {
+            // t.Logf("OnCombatLog: %s: %+v", reflect.TypeOf(entry), entry)
+            switch log := entry.(type) {
+            case *CombatLogDeath:
+                if log.Target == "npc_dota_hero_earthshaker" {
+                    earthshakerDeaths++
+                }
+                if log.Target == "npc_dota_hero_spirit_breaker" {
+                    t.Logf("OnCombatLog: %+v", log)
+                    spiritBreakerDeaths++
+                }
+            }
+        }
+
+        parser.Parse()
+
+        assert.Equal(8, earthshakerDeaths)
+        assert.Equal(11, spiritBreakerDeaths) // not actually right but verified in replay
 }
 
 func testReplayCase(t *testing.T, c *testCase) {
@@ -95,8 +130,7 @@ func getReplayData(matchId int64, url string) ([]byte, error) {
 		return nil, fmt.Errorf("invalid status %d", resp.StatusCode)
 	}
 
-	reader := bzip2.NewReader(resp.Body)
-	data, err := ioutil.ReadAll(reader)
+	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
