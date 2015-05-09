@@ -1,0 +1,11 @@
+language: go
+
+go:
+  - 1.4
+
+install:
+  - export PATH=$PATH:$HOME/gopath/bin
+  - go get golang.org/x/tools/cmd/cover
+
+script:
+  - make test
