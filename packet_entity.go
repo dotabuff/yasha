@@ -1,6 +1,7 @@
 package yasha
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/davecgh/go-spew/spew"
@@ -147,7 +148,6 @@ func (p *Parser) handleEntity(tick int, pes *dota.CSVCMsg_PacketEntities) {
 		switch updateType {
 		case Create:
 			pp("create", id)
-
 			classId := int(bs.Read(p.classIdNumBits))
 			serialNum := int(bs.Read(10))
 			eClass := p.classInfos.byId[classId]
@@ -182,8 +182,10 @@ func (p *Parser) handleEntity(tick int, pes *dota.CSVCMsg_PacketEntities) {
 			}
 
 			baseStream := bitstream.NewBitStream(base.Value)
+			fmt.Println("first call to updateFromBitStream")
 			ent.updateFromBitStream(baseStream, nil)
 			delta := &EntityDelta{}
+			fmt.Println("second call to updateFromBitStream")
 			ent.updateFromBitStream(bs, delta)
 		case Preserve:
 		case Delete:
@@ -199,6 +201,12 @@ func (e *PacketEntity) updateFromBitStream(bs *bitstream.BitStream, delta *Entit
 		e.properties = map[int]*SendProp{}
 	}
 
+	fmt.Printf("updateFromBitStream flat: name=%d fields=%v\n", e.flat.Name, len(fields))
+
+	for i, v := range e.flat.Properties {
+		fmt.Printf("updateFromBitStream flat prop %d: %v\n", i, v)
+	}
+
 	for _, field := range fields {
 		// if field >= len(e.properties) {
 		// 	panic(spew.Sprintf("unknown sendprop: %d > %d", field, len(e.properties)))
@@ -206,9 +214,6 @@ func (e *PacketEntity) updateFromBitStream(bs *bitstream.BitStream, delta *Entit
 
 		property := e.properties[field]
 		if property == nil {
-			// pp("field:", field)
-			// pp("property:", e.flat.Properties)
-			// pp(e)
 			e.properties[field] = SendPropFromStream(bs, e.flat.Properties[field].Prop)
 			e.properties[field].Name = e.flat.Properties[field].Prop.Name
 		} else {

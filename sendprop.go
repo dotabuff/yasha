@@ -3,6 +3,7 @@ package yasha
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"math"
 
 	"github.com/dotabuff/yasha/bitstream"
@@ -36,7 +37,7 @@ const (
 )
 
 const (
-	DPT_Int SendPropType = iota + 1
+	DPT_Int SendPropType = iota
 	DPT_Float
 	DPT_Vector
 	DPT_VectorXY
@@ -116,19 +117,24 @@ func (s *SendProp) readInt(b *bitstream.BitStream) uint {
 func (s *SendProp) readFloat(b *bitstream.BitStream) float32 {
 	flags := s.Flags
 
+	fmt.Println("readfloat")
+
 	if flags&SPROP_COORD != 0 {
+		fmt.Println("readfloat->readcoord")
 		return b.ReadCoord()
 	}
 
 	if flags&SPROP_COORD_MP != 0 {
+		fmt.Println("readfloat->readcoordmp")
 		integral := int(flags & SPROP_COORD_MP_INTEGRAL)
 		lowPrecision := int(flags & SPROP_COORD_MP_LOWPRECISION)
 		return b.ReadCoordMp(integral, lowPrecision)
 	}
 
 	if flags&SPROP_NOSCALE != 0 {
+		fmt.Println("readfloat->noscale??")
 		var f float32
-		buf := bytes.NewReader(b.ReadBits(32 * 8))
+		buf := bytes.NewReader(b.ReadBits(32))
 		err := binary.Read(buf, binary.LittleEndian, &f) // FIXME: let's hope it's LE
 		if err != nil {
 			panic(err)
@@ -147,11 +153,9 @@ func (s *SendProp) readFloat(b *bitstream.BitStream) float32 {
 		return b.ReadCellCoord(s.Bits, integral, lowPrecision)
 	}
 
-	dividend := float32(b.Read(s.Bits))
-	divisor := float32(b.Read(int(1<<uint(s.Bits) - 1)))
-
-	low, high := float32(s.LowValue), float32(s.HighValue)
-	return (dividend/divisor)*high - low + low
+	val := b.Read(s.Bits)
+	fval := float32(val / (1<<uint(s.Bits) - 1))
+	return fval*(s.HighValue-s.LowValue) + s.LowValue
 }
 
 type Vector3 struct {
@@ -160,10 +164,13 @@ type Vector3 struct {
 
 func (s *SendProp) readVector3(b *bitstream.BitStream) *Vector3 {
 	vec := &Vector3{}
+	fmt.Println("first float")
 	vec.X = s.readFloat(b)
+	fmt.Println("second float")
 	vec.Y = s.readFloat(b)
 
 	if s.Flags&SPROP_NORMAL != 0 {
+		fmt.Println("normal bool")
 		sign := b.ReadBool()
 		f := vec.X*vec.X + vec.Y*vec.Y
 
@@ -175,6 +182,7 @@ func (s *SendProp) readVector3(b *bitstream.BitStream) *Vector3 {
 			vec.Z *= -1
 		}
 	} else {
+		fmt.Println("non-normal float")
 		vec.Z = s.readFloat(b)
 	}
 
@@ -252,6 +260,7 @@ func (s *SendProp) readArray(b *bitstream.BitStream) []int {
 }
 
 func (s *SendProp) update(bs *bitstream.BitStream) {
+	fmt.Printf("sendprop %+v updating\n", s)
 	switch s.Type {
 	case DPT_Int:
 		s.Value = s.readInt(bs)
@@ -268,6 +277,8 @@ func (s *SendProp) update(bs *bitstream.BitStream) {
 	case DPT_Int64:
 		s.Value = s.readInt64(bs)
 	default:
-		panic("unknown type")
+		panic(fmt.Errorf("unknown type: %d", s.Type))
 	}
+
+	fmt.Printf("sendprop %s: %+v\n", s.Name, s.Value)
 }

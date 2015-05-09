@@ -1,6 +1,8 @@
 package yasha
 
 import (
+	"sort"
+
 	"github.com/davecgh/go-spew/spew"
 	"github.com/dotabuff/yasha/dota"
 )
@@ -77,13 +79,20 @@ func (p *Parser) flattenSendTables() {
 		p.buildHierarchy(table, excludes, &props, table.Name)
 
 		// set of all possible priorities
+		prioIndex := make([]int, 0)
 		priorities := make(map[int]bool, 64)
 		for _, prop := range props {
+
 			priorities[prop.Prop.Priority] = true
 		}
 
-		offset := 0
 		for priority, _ := range priorities {
+			prioIndex = append(prioIndex, priority)
+		}
+		sort.Ints(prioIndex)
+
+		offset := 0
+		for _, priority := range prioIndex {
 			cursor := offset
 
 			for cursor < len(props) {
@@ -96,7 +105,6 @@ func (p *Parser) flattenSendTables() {
 			}
 		}
 
-		pp(props)
 		p.flatSendTables[tableId] = NewFlatSendTable(table.Name, props)
 	}
 }
@@ -104,7 +112,6 @@ func (p *Parser) flattenSendTables() {
 func (p *Parser) handleSendTable(st *dota.CSVCMsg_SendTable) {
 	sendTableId := p.sendTableId
 	p.sendTableId++
-	sendTableId++
 
 	table := NewSendTable(st.GetNetTableName(), st.GetNeedsDecoder(), sendTableId)
 	for _, prop := range st.GetProps() {
@@ -166,7 +173,7 @@ func (p *Parser) buildHierarchy(table *SendTable, excludes []*SendProp, props *[
 }
 
 func (p *Parser) gatherProperties(table *SendTable, dtProp *[]*DtHierarchy, excludes []*SendProp, props *[]*DtHierarchy, base string) {
-	for _, prop := range table.propsById {
+	for _, prop := range table.props {
 		if (SPROP_EXCLUDE|SPROP_INSIDEARRAY)&prop.Flags != 0 {
 			continue
 		} else if prop.isExcluded(table.Name, excludes) {

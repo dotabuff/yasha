@@ -144,6 +144,8 @@ func (b *BitStream) ReadSInt(n int) (ret uint) {
 }
 
 func (b *BitStream) ReadNormal() (ret float32) {
+	fmt.Println("readnormal")
+
 	sign := b.ReadBool()
 	fraction := b.Read(NORMAL_FRACTION_BITS)
 	ret = float32(fraction) * NORMAL_RESOLUTION
@@ -207,6 +209,7 @@ func (b *BitStream) ReadVarSInt64() (ret uint64) {
 }
 
 func (b *BitStream) ReadCoord() (ret float32) {
+	fmt.Println("readcoord")
 	hasInteger, hasFraction := b.ReadBool(), b.ReadBool()
 
 	if hasInteger || hasFraction {
@@ -226,7 +229,7 @@ func (b *BitStream) ReadCoord() (ret float32) {
 		return ret
 	}
 
-	panic("Returning default coord")
+	return 0 // XXX this may need more work
 }
 
 var (
@@ -250,6 +253,8 @@ var (
 )
 
 func (b *BitStream) ReadCoordMp(integral, lowPrecision int) float32 {
+	fmt.Println("readcoordmp")
+
 	var flags uint
 	if integral != 0 {
 		flags = b.Read(3)
@@ -326,6 +331,8 @@ func (b *BitStream) ReadCoordMp(integral, lowPrecision int) float32 {
 }
 
 func (b *BitStream) ReadCellCoord(n int, integral, lowPrecision bool) (ret float32) {
+	fmt.Println("readcellcoord")
+
 	val := b.Read(n)
 
 	if integral {
