@@ -1,6 +1,6 @@
 SteamKit := $(wildcard ~/github/SteamRE/SteamKit/Resources/Protobufs)
 
-default : proto
+default : test 
 
 test:
 	go test -cover -v
