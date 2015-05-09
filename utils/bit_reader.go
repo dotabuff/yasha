@@ -427,37 +427,46 @@ func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multi
 	return values
 }
 
-func (br *BitReader) decodeInt(prop *send_tables.SendProp) uint {
+func (br *BitReader) decodeInt(prop *send_tables.SendProp) interface{} {
 	if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
 		val := br.decodeVarInt()
+		// unsigned
 		if (prop.Flags & send_tables.SPROP_UNSIGNED) != 0 {
-			return val
+			return uint(val)
 		}
-		return (val >> 1) ^ -(val & 1)
+
+		// signed returned as uint
+		return uint((val >> 1) ^ -(val & 1))
 	}
 
 	val := br.read(prop.NumBits)
+	// unsigned returned as int
 	if (prop.Flags & send_tables.SPROP_UNSIGNED) != 0 {
-		var sign uint = 1 << uint(prop.NumBits-1)
-		if val >= sign {
-			val = val - sign - sign
-		}
+		return int(val)
 	}
 
-	return val
+	// signed
+	var sign uint = 1 << uint(prop.NumBits-1)
+	if val >= sign {
+		val = val - sign - sign
+	}
+	return int(val)
 }
 
 func (br *BitReader) decodeInt64(prop *send_tables.SendProp) uint64 {
 	if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
 		val := br.decodeVarInt()
+		// unsigned
 		if (prop.Flags & send_tables.SPROP_UNSIGNED) != 0 {
 			return uint64(val)
 		}
+		// signed returned as uint64
 		return uint64((val >> 1) ^ -(val & 1))
 	}
 
 	negate := false
 	remainderBits := prop.NumBits - 32
+	// unsigned
 	if (prop.Flags & send_tables.SPROP_UNSIGNED) == 0 {
 		remainderBits -= 1
 		negate = (br.read(1) == 1)
@@ -467,10 +476,17 @@ func (br *BitReader) decodeInt64(prop *send_tables.SendProp) uint64 {
 	r := br.read(remainderBits)
 	val := (r << 32) | l
 
+	// signed returned as uint64
 	if negate {
 		return uint64(-val)
 	}
 
+	// signed uint64
+	if (prop.Flags & send_tables.SPROP_UNSIGNED) == 0 {
+		return uint64(val)
+	}
+
+	// unsigned
 	return uint64(val)
 }
 
