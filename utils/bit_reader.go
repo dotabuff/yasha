@@ -25,22 +25,26 @@ const (
 )
 
 type BitReader struct {
-	buffer     []byte
-	currentBit int
+	buffer []byte
+	size   int
+	pos    int
 }
 
 func NewBitReader(buffer []byte) *BitReader {
 	if len(buffer) == 0 {
 		panic("empty buffer?")
 	}
-	return &BitReader{buffer: buffer}
+	return &BitReader{
+		buffer: buffer,
+		size:   len(buffer) * 8,
+	}
 }
 
 func (br *BitReader) Length() int      { return len(br.buffer) }
-func (br *BitReader) CurrentBit() int  { return br.currentBit }
-func (br *BitReader) CurrentByte() int { return br.currentBit / 8 }
-func (br *BitReader) BitsLeft() int    { return (len(br.buffer) * 8) - br.currentBit }
-func (br *BitReader) BytesLeft() int   { return len(br.buffer) - (br.currentBit * 8) }
+func (br *BitReader) CurrentBit() int  { return br.pos }
+func (br *BitReader) CurrentByte() int { return br.pos / 8 }
+func (br *BitReader) BitsLeft() int    { return (len(br.buffer) * 8) - br.pos }
+func (br *BitReader) BytesLeft() int   { return len(br.buffer) - (br.pos * 8) }
 
 type Vector3 struct {
 	X, Y, Z float64
@@ -68,13 +72,13 @@ const (
 
 func (br *BitReader) SeekBits(offset int, origin SeekOrigin) {
 	if origin == Current {
-		br.currentBit += offset
+		br.pos += offset
 	} else if origin == Begin {
-		br.currentBit = offset
+		br.pos = offset
 	} else if origin == End {
-		br.currentBit = (len(br.buffer) * 8) - offset
+		br.pos = (len(br.buffer) * 8) - offset
 	}
-	if br.currentBit < 0 || br.currentBit > (len(br.buffer)*8) {
+	if br.pos < 0 || br.pos > (len(br.buffer)*8) {
 		panic("out of range")
 	}
 }
@@ -84,20 +88,20 @@ func (br *BitReader) ReadUBitsByteAligned(nBits int) uint {
 		panic("Must be multple of 8")
 	}
 
-	if br.currentBit%8 != 0 {
+	if br.pos%8 != 0 {
 		panic("Current bit is not byte-aligned")
 	}
 
 	var result uint
 	for i := 0; i < nBits/8; i++ {
 		result += uint(br.buffer[br.CurrentByte()] << (uint(i) * 8))
-		br.currentBit += 8
+		br.pos += 8
 	}
 	return result
 }
 
 func (br *BitReader) ReadUBitsNotByteAligned(nBits int) uint {
-	bitOffset := br.currentBit % 8
+	bitOffset := br.pos % 8
 	nBitsToRead := bitOffset + nBits
 	nBytesToRead := nBitsToRead / 8
 	if nBitsToRead%8 != 0 {
@@ -111,7 +115,7 @@ func (br *BitReader) ReadUBitsNotByteAligned(nBits int) uint {
 	}
 	currentValue >>= uint(bitOffset)
 	currentValue &= ((1 << uint64(nBits)) - 1)
-	br.currentBit += nBits
+	br.pos += nBits
 	return uint(currentValue)
 }
 
@@ -142,10 +146,10 @@ func (br *BitReader) ReadUBits(nBits int) uint {
 	if nBits <= 0 || nBits > 32 {
 		panic("Value must be a positive integer between 1 and 32 inclusive.")
 	}
-	if (br.currentBit + nBits) > (len(br.buffer) * 8) {
+	if (br.pos + nBits) > (len(br.buffer) * 8) {
 		panic("Out of range")
 	}
-	if br.currentBit%8 == 0 && nBits%8 == 0 {
+	if br.pos%8 == 0 && nBits%8 == 0 {
 		return br.ReadUBitsByteAligned(nBits)
 	}
 	return br.ReadUBitsNotByteAligned(nBits)
@@ -178,15 +182,15 @@ func (br *BitReader) ReadBoolean() bool {
 	if br.CurrentBit()+1 > br.Length()*8 {
 		panic("Out of range")
 	}
-	currentByte := br.currentBit / 8
-	bitOffset := br.currentBit % 8
+	currentByte := br.pos / 8
+	bitOffset := br.pos % 8
 	result := br.buffer[currentByte]&(1<<uint(bitOffset)) != 0
-	br.currentBit++
+	br.pos++
 	return result
 }
 
 func (br *BitReader) ReadByte() byte {
-	return byte(br.ReadUBits(8))
+	return byte(br.read(8))
 }
 
 func (br *BitReader) ReadBytes(nBytes int) []byte {
@@ -252,25 +256,29 @@ func (br *BitReader) ReadBitCoord() (value float32) {
 }
 
 func (br *BitReader) ReadString() string {
-	bs := []byte{}
+	buf := []byte{}
 	for {
-		b := br.ReadByte()
+		b := br.readByte()
 		if b == 0 {
 			break
 		}
-		bs = append(bs, b)
+		buf = append(buf, b)
 	}
-	return string(bs)
+	return string(buf)
 }
 
 func (br *BitReader) ReadStringN(n int) string {
+	if n == 0 {
+		return ""
+	}
+
 	buf := []byte{}
 	for n > 0 {
-		c := br.ReadByte()
-		if c == 0 {
+		b := br.readByte()
+		if b == 0 {
 			break
 		}
-		buf = append(buf, c)
+		buf = append(buf, b)
 		n--
 	}
 	return string(buf)
@@ -285,14 +293,6 @@ func (br *BitReader) ReadFloat(prop *send_tables.SendProp) float64 {
 	f := dividend / float64(divisor)
 	r := prop.HighValue - prop.LowValue
 	return f*r + prop.LowValue
-}
-
-func (br *BitReader) ReadLengthPrefixedString() string {
-	stringLength := uint(br.ReadUBits(9))
-	if stringLength > 0 {
-		return string(br.ReadBytes(int(stringLength)))
-	}
-	return ""
 }
 
 func (br *BitReader) ReadVector(prop *send_tables.SendProp) *Vector3 {
@@ -326,13 +326,6 @@ func (br *BitReader) ReadVectorXY(prop *send_tables.SendProp) *Vector2 {
 	}
 }
 
-func (br *BitReader) ReadInt(prop *send_tables.SendProp) int {
-	if prop.Flags&send_tables.SPROP_UNSIGNED != 0 {
-		return int(br.ReadUBits(prop.NumBits))
-	}
-	return br.ReadBits(prop.NumBits)
-}
-
 func (br *BitReader) ReadSpecialFloat(prop *send_tables.SendProp) (float32, bool) {
 	if prop.Flags&send_tables.SPROP_COORD != 0 {
 		return br.ReadBitCoord(), true
@@ -354,22 +347,6 @@ func (br *BitReader) ReadSpecialFloat(prop *send_tables.SendProp) (float32, bool
 		return br.ReadBitNormal(), true
 	}
 	return 0, false
-}
-
-func (br *BitReader) ReadInt64(prop *send_tables.SendProp) uint64 {
-	var low, high uint
-	if prop.Flags&send_tables.SPROP_UNSIGNED != 0 {
-		low = br.ReadUBits(32)
-		high = br.ReadUBits(32)
-	} else {
-		br.SeekBits(1, Current)
-		low = br.ReadUBits(32)
-		high = br.ReadUBits(31)
-	}
-	res := uint64(high)
-	res = (res << 32)
-	res = res | uint64(low)
-	return res
 }
 
 func (br *BitReader) ReadNextEntityIndex(oldEntity int) int {
@@ -430,23 +407,9 @@ func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multi
 			}
 			switch prop.Type {
 			case send_tables.DPT_Int:
-				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-					value := br.ReadVarInt()
-					// fmt.Printf("Int32 encoded against tickcount: '%s': %#v\n", key, value)
-					values[key] = value
-				} else {
-					values[key] = br.ReadInt(prop)
-				}
+				values[key] = br.decodeInt(prop)
 			case send_tables.DPT_Int64:
-				if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
-					value := br.ReadVarInt()
-					// fmt.Printf("Int64 encoded against tickcount: '%s': %#v\n", key, value)
-					values[key] = value
-					// TODO: we still don't know how to _really_ parse it...
-					// panic("Int64 encoded against tickcount")
-				} else {
-					values[key] = br.ReadInt64(prop)
-				}
+				values[key] = br.decodeInt64(prop)
 			case send_tables.DPT_Float:
 				values[key] = br.ReadFloat(prop)
 			case send_tables.DPT_Vector:
@@ -454,7 +417,7 @@ func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multi
 			case send_tables.DPT_VectorXY:
 				values[key] = br.ReadVectorXY(prop)
 			case send_tables.DPT_String:
-				values[key] = br.ReadLengthPrefixedString()
+				values[key] = br.decodeString()
 			default:
 				panic("unknown type")
 			}
@@ -462,4 +425,117 @@ func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multi
 	}
 
 	return values
+}
+
+func (br *BitReader) decodeInt(prop *send_tables.SendProp) interface{} {
+	if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+		val := br.decodeVarInt()
+		// unsigned
+		if (prop.Flags & send_tables.SPROP_UNSIGNED) != 0 {
+			return uint(val)
+		}
+
+		// signed returned as uint
+		return uint((val >> 1) ^ -(val & 1))
+	}
+
+	val := br.read(prop.NumBits)
+	// unsigned returned as int
+	if (prop.Flags & send_tables.SPROP_UNSIGNED) != 0 {
+		return int(val)
+	}
+
+	// signed
+	var sign uint = 1 << uint(prop.NumBits-1)
+	if val >= sign {
+		val = val - sign - sign
+	}
+	return int(val)
+}
+
+func (br *BitReader) decodeInt64(prop *send_tables.SendProp) uint64 {
+	if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+		val := br.decodeVarInt()
+		// unsigned
+		if (prop.Flags & send_tables.SPROP_UNSIGNED) != 0 {
+			return uint64(val)
+		}
+		// signed returned as uint64
+		return uint64((val >> 1) ^ -(val & 1))
+	}
+
+	negate := false
+	remainderBits := prop.NumBits - 32
+	// unsigned
+	if (prop.Flags & send_tables.SPROP_UNSIGNED) == 0 {
+		remainderBits -= 1
+		negate = (br.read(1) == 1)
+	}
+
+	l := br.read(32)
+	r := br.read(remainderBits)
+	val := (r << 32) | l
+
+	// signed returned as uint64
+	if negate {
+		return uint64(-val)
+	}
+
+	// signed uint64
+	if (prop.Flags & send_tables.SPROP_UNSIGNED) == 0 {
+		return uint64(val)
+	}
+
+	// unsigned
+	return uint64(val)
+}
+
+func (br *BitReader) decodeVarInt() uint {
+	var value, shift, bits uint
+	for {
+		bits = br.read(8)
+		value |= (bits & 0x7F) << shift
+		shift += 7
+		if ((bits & 0x80) == 0) || (shift == 35) {
+			break
+		}
+	}
+
+	return value
+}
+
+func (br *BitReader) decodeString() string {
+	n := int(br.read(9))
+	return br.ReadStringN(n)
+}
+
+func (br *BitReader) readByte() byte {
+	return byte(br.read(8))
+}
+
+func (br *BitReader) read(n int) uint {
+	if n > br.size-br.pos {
+		panic(fmt.Errorf("read overflow: %d+%d=%d > %d", br.pos, n, br.pos+n, br.size))
+	}
+
+	if n > 32 {
+		panic(fmt.Errorf("read overflow: %d > 32", n))
+	}
+
+	bitOffset := br.pos % 8
+	nBitsToRead := bitOffset + n
+	nBytesToRead := nBitsToRead / 8
+	if nBitsToRead%8 != 0 {
+		nBytesToRead += 1
+	}
+
+	var val uint64
+	for i := 0; i < nBytesToRead; i++ {
+		m := br.buffer[(br.pos/8)+i]
+		val += (uint64(m) << (uint64(i) * 8))
+	}
+	val >>= uint(bitOffset)
+	val &= ((1 << uint64(n)) - 1)
+	br.pos += n
+	return uint(val)
 }

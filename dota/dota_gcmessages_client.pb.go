@@ -2832,6 +2832,140 @@ func (m *CMsgGCToClientFindTopSourceTVGamesResponse) GetSpecificGames() bool {
 	return false
 }
 
+type CMsgClientToGCTopLeagueMatchesRequest struct {
+	XXX_unrecognized []byte `json:"-"`
+}
+
+func (m *CMsgClientToGCTopLeagueMatchesRequest) Reset()         { *m = CMsgClientToGCTopLeagueMatchesRequest{} }
+func (m *CMsgClientToGCTopLeagueMatchesRequest) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCTopLeagueMatchesRequest) ProtoMessage()    {}
+
+type CMsgClientToGCTopLeagueMatchesResponse struct {
+	Matches          []*CMsgDOTAMatch `protobuf:"bytes,5,rep,name=matches" json:"matches,omitempty"`
+	XXX_unrecognized []byte           `json:"-"`
+}
+
+func (m *CMsgClientToGCTopLeagueMatchesResponse) Reset() {
+	*m = CMsgClientToGCTopLeagueMatchesResponse{}
+}
+func (m *CMsgClientToGCTopLeagueMatchesResponse) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCTopLeagueMatchesResponse) ProtoMessage()    {}
+
+func (m *CMsgClientToGCTopLeagueMatchesResponse) GetMatches() []*CMsgDOTAMatch {
+	if m != nil {
+		return m.Matches
+	}
+	return nil
+}
+
+type CMsgClientToGCFindTopMatches struct {
+	StartGame        *uint32 `protobuf:"varint,1,opt,name=start_game" json:"start_game,omitempty"`
+	LeagueId         *uint32 `protobuf:"varint,2,opt,name=league_id" json:"league_id,omitempty"`
+	HeroId           *uint32 `protobuf:"varint,3,opt,name=hero_id" json:"hero_id,omitempty"`
+	FriendId         *uint32 `protobuf:"varint,4,opt,name=friend_id" json:"friend_id,omitempty"`
+	FriendList       *bool   `protobuf:"varint,5,opt,name=friend_list" json:"friend_list,omitempty"`
+	LeagueList       *bool   `protobuf:"varint,6,opt,name=league_list" json:"league_list,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgClientToGCFindTopMatches) Reset()         { *m = CMsgClientToGCFindTopMatches{} }
+func (m *CMsgClientToGCFindTopMatches) String() string { return proto.CompactTextString(m) }
+func (*CMsgClientToGCFindTopMatches) ProtoMessage()    {}
+
+func (m *CMsgClientToGCFindTopMatches) GetStartGame() uint32 {
+	if m != nil && m.StartGame != nil {
+		return *m.StartGame
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCFindTopMatches) GetLeagueId() uint32 {
+	if m != nil && m.LeagueId != nil {
+		return *m.LeagueId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCFindTopMatches) GetHeroId() uint32 {
+	if m != nil && m.HeroId != nil {
+		return *m.HeroId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCFindTopMatches) GetFriendId() uint32 {
+	if m != nil && m.FriendId != nil {
+		return *m.FriendId
+	}
+	return 0
+}
+
+func (m *CMsgClientToGCFindTopMatches) GetFriendList() bool {
+	if m != nil && m.FriendList != nil {
+		return *m.FriendList
+	}
+	return false
+}
+
+func (m *CMsgClientToGCFindTopMatches) GetLeagueList() bool {
+	if m != nil && m.LeagueList != nil {
+		return *m.LeagueList
+	}
+	return false
+}
+
+type CMsgGCToClientFindTopLeagueMatchesResponse struct {
+	StartGame        *uint32          `protobuf:"varint,1,opt,name=start_game" json:"start_game,omitempty"`
+	LeagueId         *uint32          `protobuf:"varint,2,opt,name=league_id" json:"league_id,omitempty"`
+	HeroId           *uint32          `protobuf:"varint,3,opt,name=hero_id" json:"hero_id,omitempty"`
+	MatchIds         []uint32         `protobuf:"varint,4,rep,name=match_ids" json:"match_ids,omitempty"`
+	Matches          []*CMsgDOTAMatch `protobuf:"bytes,5,rep,name=matches" json:"matches,omitempty"`
+	XXX_unrecognized []byte           `json:"-"`
+}
+
+func (m *CMsgGCToClientFindTopLeagueMatchesResponse) Reset() {
+	*m = CMsgGCToClientFindTopLeagueMatchesResponse{}
+}
+func (m *CMsgGCToClientFindTopLeagueMatchesResponse) String() string {
+	return proto.CompactTextString(m)
+}
+func (*CMsgGCToClientFindTopLeagueMatchesResponse) ProtoMessage() {}
+
+func (m *CMsgGCToClientFindTopLeagueMatchesResponse) GetStartGame() uint32 {
+	if m != nil && m.StartGame != nil {
+		return *m.StartGame
+	}
+	return 0
+}
+
+func (m *CMsgGCToClientFindTopLeagueMatchesResponse) GetLeagueId() uint32 {
+	if m != nil && m.LeagueId != nil {
+		return *m.LeagueId
+	}
+	return 0
+}
+
+func (m *CMsgGCToClientFindTopLeagueMatchesResponse) GetHeroId() uint32 {
+	if m != nil && m.HeroId != nil {
+		return *m.HeroId
+	}
+	return 0
+}
+
+func (m *CMsgGCToClientFindTopLeagueMatchesResponse) GetMatchIds() []uint32 {
+	if m != nil {
+		return m.MatchIds
+	}
+	return nil
+}
+
+func (m *CMsgGCToClientFindTopLeagueMatchesResponse) GetMatches() []*CMsgDOTAMatch {
+	if m != nil {
+		return m.Matches
+	}
+	return nil
+}
+
 type CMsgSpectateFriendGame struct {
 	SteamId          *uint64 `protobuf:"fixed64,1,opt,name=steam_id" json:"steam_id,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
@@ -13651,6 +13785,7 @@ func (m *CMsgGCToClientEventStatusChanged) GetActiveEvents() []EIngameEvent {
 
 type CMsgClientToGCExchangeItemsForOffering struct {
 	ItemIds          []uint64 `protobuf:"varint,1,rep,name=item_ids" json:"item_ids,omitempty"`
+	RecycleId        *uint32  `protobuf:"varint,2,opt,name=recycle_id" json:"recycle_id,omitempty"`
 	XXX_unrecognized []byte   `json:"-"`
 }
 
@@ -13665,6 +13800,13 @@ func (m *CMsgClientToGCExchangeItemsForOffering) GetItemIds() []uint64 {
 		return m.ItemIds
 	}
 	return nil
+}
+
+func (m *CMsgClientToGCExchangeItemsForOffering) GetRecycleId() uint32 {
+	if m != nil && m.RecycleId != nil {
+		return *m.RecycleId
+	}
+	return 0
 }
 
 type CMsgClientToGCExchangeItemsForOfferingResponse struct {
