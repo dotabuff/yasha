@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/dotabuff/yasha/dota"
 	"github.com/stretchr/testify/assert"
@@ -61,7 +62,6 @@ func TestPublicMatchPatch684p1(t *testing.T) {
 
 	parser := NewParser(data)
 	parser.OnSayText2 = func(n int, o *dota.CUserMsg_SayText2) {
-		//t.Logf("OnSayText2: %+v", o)
 	}
 
 	earthshakerDeaths := 0
@@ -74,16 +74,49 @@ func TestPublicMatchPatch684p1(t *testing.T) {
 				earthshakerDeaths++
 			}
 			if log.Target == "npc_dota_hero_spirit_breaker" {
-				t.Logf("OnCombatLog: %+v", log)
 				spiritBreakerDeaths++
 			}
 		}
 	}
 
+	var now time.Duration
+	var gameTime, preGameStarttime float64
+	parser.OnEntityPreserved = func(pe *PacketEntity) {
+		if pe.Name == "DT_DOTAGamerulesProxy" {
+			gameTime = pe.Values["DT_DOTAGamerules.m_fGameTime"].(float64)
+			preGameStarttime = pe.Values["DT_DOTAGamerules.m_flPreGameStartTime"].(float64)
+			now = time.Duration(gameTime-preGameStarttime) * time.Second
+		}
+	}
+
+	// entindex:3 order_type:1 units:349 position:<x:6953.3125 y:6920.8438 z:384 > queue:false
+	unitOrderCount := 0
+	unitOrderQueuedCount := 0
+	specificUnitOrder := false
+	parser.OnSpectatorPlayerUnitOrders = func(n int, o *dota.CDOTAUserMsg_SpectatorPlayerUnitOrders) {
+		unitOrderCount++
+		if *o.Queue == true {
+			unitOrderQueuedCount++
+		}
+		if *o.Entindex == 3 && *o.OrderType == 1 && o.Units[0] == 349 && *o.Queue == false &&
+			*o.Position.X == 6953.3125 && *o.Position.Y == 6920.8438 && *o.Position.Y == 384.0 {
+			specificUnitOrder = true
+		}
+	}
+
+	chatWheelMessagesCount := 0
+	parser.OnChatWheel = func(n int, o *dota.CDOTAUserMsg_ChatWheel) {
+		chatWheelMessagesCount++
+	}
+
 	parser.Parse()
 
 	assert.Equal(8, earthshakerDeaths)
-	assert.Equal(11, spiritBreakerDeaths) // not actually right but verified in replay
+	assert.Equal(11, spiritBreakerDeaths)          // not actually right but verified in replay
+	assert.Equal(55316, unitOrderCount)            // regression test
+	assert.Equal(102, unitOrderQueuedCount)        // regression test
+	assert.Equal(int64(2585000000000), int64(now)) // regression test
+	assert.Equal(0, chatWheelMessagesCount)        // regression test
 }
 
 func testReplayCase(t *testing.T, c *testCase) {
@@ -98,12 +131,12 @@ func testReplayCase(t *testing.T, c *testCase) {
 
 	parser := NewParser(data)
 	parser.OnSayText2 = func(n int, o *dota.CUserMsg_SayText2) {
-		t.Logf("OnSayText2: %+v", o)
+		//t.Logf("OnSayText2: %+v", o)
 		lastChatMessage = o.GetText()
 	}
 
 	parser.OnChatEvent = func(n int, o *dota.CDOTAUserMsg_ChatEvent) {
-		t.Logf("OnChatEvent: %+v", o)
+		//t.Logf("OnChatEvent: %+v", o)
 	}
 	parser.Parse()
 
