@@ -2,6 +2,9 @@ SteamKit := $(wildcard ~/github/SteamRE/SteamKit/Resources/Protobufs)
 
 default : proto
 
+test:
+	go test -cover -v
+
 proto:
 	git -C game-tracking pull
 	rm -rf dota
