@@ -1,6 +1,7 @@
 package yasha
 
 import (
+	"compress/bzip2"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -22,7 +23,7 @@ type testCase struct {
 func TestEsportsPatch683b(t *testing.T) {
 	c := &testCase{
 		matchId: 1405240741,
-		url:     "http://s.tsai.co/replays/1405240741.dem",
+		url:     "http://replay135.valve.net/570/1405240741_220241732.dem.bz2",
 		expectLastChatMessage: "Gg",
 	}
 
@@ -33,7 +34,7 @@ func TestEsportsPatch683b(t *testing.T) {
 func TestEsportsPatch684p0(t *testing.T) {
 	c := &testCase{
 		matchId: 1450235906,
-		url:     "http://s.tsai.co/replays/1450235906.dem",
+		url:     "http://replay136.valve.net/570/1450235906_1463120933.dem.bz2",
 		expectLastChatMessage: "gg",
 	}
 
@@ -44,7 +45,7 @@ func TestEsportsPatch684p0(t *testing.T) {
 func TestEsportsPatch684p1(t *testing.T) {
 	c := &testCase{
 		matchId: 1458895412,
-		url:     "http://s.tsai.co/replays/1458895412.dem",
+		url:     "http://replay123.valve.net/570/1458895412_140022944.dem.bz2",
 		expectLastChatMessage: "gg",
 	}
 
@@ -163,7 +164,13 @@ func getReplayData(matchId int64, url string) ([]byte, error) {
 		return nil, fmt.Errorf("invalid status %d", resp.StatusCode)
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
+	var data []byte
+	if url[len(url)-3:] == "bz2" {
+		data, err = ioutil.ReadAll(bzip2.NewReader(resp.Body))
+	} else {
+		data, err = ioutil.ReadAll(resp.Body)
+	}
+
 	if err != nil {
 		return nil, err
 	}
