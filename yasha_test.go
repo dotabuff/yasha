@@ -32,7 +32,7 @@ func TestEsportsPatch683b(t *testing.T) {
 func TestEsportsPatch684p0(t *testing.T) {
 	c := &testCase{
 		matchId: 1450235906,
-                url:     "http://s.tsai.co/replays/1450235906.dem",
+		url:     "http://s.tsai.co/replays/1450235906.dem",
 		expectLastChatMessage: "gg",
 	}
 
@@ -43,7 +43,7 @@ func TestEsportsPatch684p0(t *testing.T) {
 func TestEsportsPatch684p1(t *testing.T) {
 	c := &testCase{
 		matchId: 1458895412,
-                url:     "http://s.tsai.co/replays/1458895412.dem",
+		url:     "http://s.tsai.co/replays/1458895412.dem",
 		expectLastChatMessage: "gg",
 	}
 
@@ -52,38 +52,38 @@ func TestEsportsPatch684p1(t *testing.T) {
 
 // Manually scrutinised match, played on patch 6.84p1
 func TestPublicMatchPatch684p1(t *testing.T) {
-        assert := assert.New(t)
+	assert := assert.New(t)
 
-        data, err := getReplayData(1456774107, "http://s.tsai.co/replays/1456774107.dem")
+	data, err := getReplayData(1456774107, "http://s.tsai.co/replays/1456774107.dem")
 	if err != nil {
 		t.Fatalf("unable to get replay: %s", err)
 	}
 
-        parser := NewParser(data)
-        parser.OnSayText2 = func(n int, o *dota.CUserMsg_SayText2) {
-            //t.Logf("OnSayText2: %+v", o)
-        }
+	parser := NewParser(data)
+	parser.OnSayText2 = func(n int, o *dota.CUserMsg_SayText2) {
+		//t.Logf("OnSayText2: %+v", o)
+	}
 
-        earthshakerDeaths := 0
-        spiritBreakerDeaths := 0
-        parser.OnCombatLog = func(entry CombatLogEntry) {
-            // t.Logf("OnCombatLog: %s: %+v", reflect.TypeOf(entry), entry)
-            switch log := entry.(type) {
-            case *CombatLogDeath:
-                if log.Target == "npc_dota_hero_earthshaker" {
-                    earthshakerDeaths++
-                }
-                if log.Target == "npc_dota_hero_spirit_breaker" {
-                    t.Logf("OnCombatLog: %+v", log)
-                    spiritBreakerDeaths++
-                }
-            }
-        }
+	earthshakerDeaths := 0
+	spiritBreakerDeaths := 0
+	parser.OnCombatLog = func(entry CombatLogEntry) {
+		// t.Logf("OnCombatLog: %s: %+v", reflect.TypeOf(entry), entry)
+		switch log := entry.(type) {
+		case *CombatLogDeath:
+			if log.Target == "npc_dota_hero_earthshaker" {
+				earthshakerDeaths++
+			}
+			if log.Target == "npc_dota_hero_spirit_breaker" {
+				t.Logf("OnCombatLog: %+v", log)
+				spiritBreakerDeaths++
+			}
+		}
+	}
 
-        parser.Parse()
+	parser.Parse()
 
-        assert.Equal(8, earthshakerDeaths)
-        assert.Equal(11, spiritBreakerDeaths) // not actually right but verified in replay
+	assert.Equal(8, earthshakerDeaths)
+	assert.Equal(11, spiritBreakerDeaths) // not actually right but verified in replay
 }
 
 func testReplayCase(t *testing.T, c *testCase) {
