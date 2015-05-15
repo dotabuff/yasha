@@ -2028,6 +2028,13 @@ type CMsgSignOutPlayerStats struct {
 	FarmScore         *float32 `protobuf:"fixed32,14,opt,name=farm_score" json:"farm_score,omitempty"`
 	SupportScore      *float32 `protobuf:"fixed32,15,opt,name=support_score" json:"support_score,omitempty"`
 	PushScore         *float32 `protobuf:"fixed32,16,opt,name=push_score" json:"push_score,omitempty"`
+	Kills             *uint32  `protobuf:"varint,17,opt,name=kills" json:"kills,omitempty"`
+	Deaths            *uint32  `protobuf:"varint,18,opt,name=deaths" json:"deaths,omitempty"`
+	Assists           *uint32  `protobuf:"varint,19,opt,name=assists" json:"assists,omitempty"`
+	LastHits          *uint32  `protobuf:"varint,20,opt,name=last_hits" json:"last_hits,omitempty"`
+	Denies            *uint32  `protobuf:"varint,21,opt,name=denies" json:"denies,omitempty"`
+	Gpm               *float32 `protobuf:"fixed32,22,opt,name=gpm" json:"gpm,omitempty"`
+	Xppm              *float32 `protobuf:"fixed32,23,opt,name=xppm" json:"xppm,omitempty"`
 	XXX_unrecognized  []byte   `json:"-"`
 }
 
@@ -2143,6 +2150,55 @@ func (m *CMsgSignOutPlayerStats) GetSupportScore() float32 {
 func (m *CMsgSignOutPlayerStats) GetPushScore() float32 {
 	if m != nil && m.PushScore != nil {
 		return *m.PushScore
+	}
+	return 0
+}
+
+func (m *CMsgSignOutPlayerStats) GetKills() uint32 {
+	if m != nil && m.Kills != nil {
+		return *m.Kills
+	}
+	return 0
+}
+
+func (m *CMsgSignOutPlayerStats) GetDeaths() uint32 {
+	if m != nil && m.Deaths != nil {
+		return *m.Deaths
+	}
+	return 0
+}
+
+func (m *CMsgSignOutPlayerStats) GetAssists() uint32 {
+	if m != nil && m.Assists != nil {
+		return *m.Assists
+	}
+	return 0
+}
+
+func (m *CMsgSignOutPlayerStats) GetLastHits() uint32 {
+	if m != nil && m.LastHits != nil {
+		return *m.LastHits
+	}
+	return 0
+}
+
+func (m *CMsgSignOutPlayerStats) GetDenies() uint32 {
+	if m != nil && m.Denies != nil {
+		return *m.Denies
+	}
+	return 0
+}
+
+func (m *CMsgSignOutPlayerStats) GetGpm() float32 {
+	if m != nil && m.Gpm != nil {
+		return *m.Gpm
+	}
+	return 0
+}
+
+func (m *CMsgSignOutPlayerStats) GetXppm() float32 {
+	if m != nil && m.Xppm != nil {
+		return *m.Xppm
 	}
 	return 0
 }

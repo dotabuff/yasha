@@ -669,6 +669,7 @@ const (
 	Activity_ACT_DOTA_CAST_BURROW_END                        Activity = 623
 	Activity_ACT_DOTA_LIFESTEALER_ASSIMILATE                 Activity = 624
 	Activity_ACT_DOTA_LIFESTEALER_EJECT                      Activity = 625
+	Activity_ACT_DOTA_ATTACK_EVENT_BASH                      Activity = 626
 )
 
 var Activity_name = map[int32]string{
@@ -1297,6 +1298,7 @@ var Activity_name = map[int32]string{
 	623: "ACT_DOTA_CAST_BURROW_END",
 	624: "ACT_DOTA_LIFESTEALER_ASSIMILATE",
 	625: "ACT_DOTA_LIFESTEALER_EJECT",
+	626: "ACT_DOTA_ATTACK_EVENT_BASH",
 }
 var Activity_value = map[string]int32{
 	"ACT_INVALID":                                     -1,
@@ -1924,6 +1926,7 @@ var Activity_value = map[string]int32{
 	"ACT_DOTA_CAST_BURROW_END":                        623,
 	"ACT_DOTA_LIFESTEALER_ASSIMILATE":                 624,
 	"ACT_DOTA_LIFESTEALER_EJECT":                      625,
+	"ACT_DOTA_ATTACK_EVENT_BASH":                      626,
 }
 
 func (x Activity) Enum() *Activity {

@@ -476,7 +476,7 @@ const (
 	EDOTAGCMsg_k_EMsgClientToGCGetProfileCardResponse                     EDOTAGCMsg = 7535
 	EDOTAGCMsg_k_EMsgServerToGCGetProfileCard                             EDOTAGCMsg = 7536
 	EDOTAGCMsg_k_EMsgServerToGCGetProfileCardResponse                     EDOTAGCMsg = 7537
-	EDOTAGCMsg_k_EMsgClientToGCSetProfileCardSlot                         EDOTAGCMsg = 7538
+	EDOTAGCMsg_k_EMsgClientToGCSetProfileCardSlots                        EDOTAGCMsg = 7538
 	EDOTAGCMsg_k_EMsgGCToClientProfileCardUpdated                         EDOTAGCMsg = 7539
 	EDOTAGCMsg_k_EMsgServerToGCVictoryPredictions                         EDOTAGCMsg = 7540
 	EDOTAGCMsg_k_EMsgClientToGCMarkNotificationListRead                   EDOTAGCMsg = 7542
@@ -561,8 +561,12 @@ const (
 	EDOTAGCMsg_k_EMsgGCToClientMergeGroupInviteReply                      EDOTAGCMsg = 8031
 	EDOTAGCMsg_k_EMsgClientToGCMergePartyResponse                         EDOTAGCMsg = 8032
 	EDOTAGCMsg_k_EMsgGCToClientMergePartyResponseReply                    EDOTAGCMsg = 8033
+	EDOTAGCMsg_k_EMsgClientToGCGetProfileCardStats                        EDOTAGCMsg = 8034
+	EDOTAGCMsg_k_EMsgClientToGCGetProfileCardStatsResponse                EDOTAGCMsg = 8035
 	EDOTAGCMsg_k_EMsgClientToGCTopLeagueMatchesRequest                    EDOTAGCMsg = 8036
-	EDOTAGCMsg_k_EMsgClientToGCTopLeagueMatchesResponse                   EDOTAGCMsg = 8037
+	EDOTAGCMsg_k_EMsgClientToGCTopFriendMatchesRequest                    EDOTAGCMsg = 8037
+	EDOTAGCMsg_k_EMsgGCToClientTopMatchesResponse                         EDOTAGCMsg = 8038
+	EDOTAGCMsg_k_EMsgClientToGCTopPubMatchesRequest                       EDOTAGCMsg = 8039
 )
 
 var EDOTAGCMsg_name = map[int32]string{
@@ -1028,7 +1032,7 @@ var EDOTAGCMsg_name = map[int32]string{
 	7535: "k_EMsgClientToGCGetProfileCardResponse",
 	7536: "k_EMsgServerToGCGetProfileCard",
 	7537: "k_EMsgServerToGCGetProfileCardResponse",
-	7538: "k_EMsgClientToGCSetProfileCardSlot",
+	7538: "k_EMsgClientToGCSetProfileCardSlots",
 	7539: "k_EMsgGCToClientProfileCardUpdated",
 	7540: "k_EMsgServerToGCVictoryPredictions",
 	7542: "k_EMsgClientToGCMarkNotificationListRead",
@@ -1113,8 +1117,12 @@ var EDOTAGCMsg_name = map[int32]string{
 	8031: "k_EMsgGCToClientMergeGroupInviteReply",
 	8032: "k_EMsgClientToGCMergePartyResponse",
 	8033: "k_EMsgGCToClientMergePartyResponseReply",
+	8034: "k_EMsgClientToGCGetProfileCardStats",
+	8035: "k_EMsgClientToGCGetProfileCardStatsResponse",
 	8036: "k_EMsgClientToGCTopLeagueMatchesRequest",
-	8037: "k_EMsgClientToGCTopLeagueMatchesResponse",
+	8037: "k_EMsgClientToGCTopFriendMatchesRequest",
+	8038: "k_EMsgGCToClientTopMatchesResponse",
+	8039: "k_EMsgClientToGCTopPubMatchesRequest",
 }
 var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgGCDOTABase":                                           7000,
@@ -1579,7 +1587,7 @@ var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgClientToGCGetProfileCardResponse":                     7535,
 	"k_EMsgServerToGCGetProfileCard":                             7536,
 	"k_EMsgServerToGCGetProfileCardResponse":                     7537,
-	"k_EMsgClientToGCSetProfileCardSlot":                         7538,
+	"k_EMsgClientToGCSetProfileCardSlots":                        7538,
 	"k_EMsgGCToClientProfileCardUpdated":                         7539,
 	"k_EMsgServerToGCVictoryPredictions":                         7540,
 	"k_EMsgClientToGCMarkNotificationListRead":                   7542,
@@ -1664,8 +1672,12 @@ var EDOTAGCMsg_value = map[string]int32{
 	"k_EMsgGCToClientMergeGroupInviteReply":                      8031,
 	"k_EMsgClientToGCMergePartyResponse":                         8032,
 	"k_EMsgGCToClientMergePartyResponseReply":                    8033,
+	"k_EMsgClientToGCGetProfileCardStats":                        8034,
+	"k_EMsgClientToGCGetProfileCardStatsResponse":                8035,
 	"k_EMsgClientToGCTopLeagueMatchesRequest":                    8036,
-	"k_EMsgClientToGCTopLeagueMatchesResponse":                   8037,
+	"k_EMsgClientToGCTopFriendMatchesRequest":                    8037,
+	"k_EMsgGCToClientTopMatchesResponse":                         8038,
+	"k_EMsgClientToGCTopPubMatchesRequest":                       8039,
 }
 
 func (x EDOTAGCMsg) Enum() *EDOTAGCMsg {
@@ -2933,6 +2945,8 @@ const (
 	DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_MULTIKILL          DOTA_COMBATLOG_TYPES = 15
 	DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_KILLSTREAK         DOTA_COMBATLOG_TYPES = 16
 	DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_TEAM_BUILDING_KILL DOTA_COMBATLOG_TYPES = 17
+	DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_FIRST_BLOOD        DOTA_COMBATLOG_TYPES = 18
+	DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_MODIFIER_REFRESH   DOTA_COMBATLOG_TYPES = 19
 )
 
 var DOTA_COMBATLOG_TYPES_name = map[int32]string{
@@ -2954,6 +2968,8 @@ var DOTA_COMBATLOG_TYPES_name = map[int32]string{
 	15: "DOTA_COMBATLOG_MULTIKILL",
 	16: "DOTA_COMBATLOG_KILLSTREAK",
 	17: "DOTA_COMBATLOG_TEAM_BUILDING_KILL",
+	18: "DOTA_COMBATLOG_FIRST_BLOOD",
+	19: "DOTA_COMBATLOG_MODIFIER_REFRESH",
 }
 var DOTA_COMBATLOG_TYPES_value = map[string]int32{
 	"DOTA_COMBATLOG_DAMAGE":             0,
@@ -2974,6 +2990,8 @@ var DOTA_COMBATLOG_TYPES_value = map[string]int32{
 	"DOTA_COMBATLOG_MULTIKILL":          15,
 	"DOTA_COMBATLOG_KILLSTREAK":         16,
 	"DOTA_COMBATLOG_TEAM_BUILDING_KILL": 17,
+	"DOTA_COMBATLOG_FIRST_BLOOD":        18,
+	"DOTA_COMBATLOG_MODIFIER_REFRESH":   19,
 }
 
 func (x DOTA_COMBATLOG_TYPES) Enum() *DOTA_COMBATLOG_TYPES {
@@ -3186,28 +3204,25 @@ const (
 	CMsgDOTAProfileCard_k_eStat_PartyRank      CMsgDOTAProfileCard_EStatID = 2
 	CMsgDOTAProfileCard_k_eStat_Wins           CMsgDOTAProfileCard_EStatID = 3
 	CMsgDOTAProfileCard_k_eStat_Commends       CMsgDOTAProfileCard_EStatID = 4
-	CMsgDOTAProfileCard_k_eStat_Level          CMsgDOTAProfileCard_EStatID = 5
-	CMsgDOTAProfileCard_k_eStat_HeroWins_Start CMsgDOTAProfileCard_EStatID = 100
-	CMsgDOTAProfileCard_k_eStat_HeroWins_End   CMsgDOTAProfileCard_EStatID = 399
+	CMsgDOTAProfileCard_k_eStat_GamesPlayed    CMsgDOTAProfileCard_EStatID = 5
+	CMsgDOTAProfileCard_k_eStat_FirstMatchDate CMsgDOTAProfileCard_EStatID = 6
 )
 
 var CMsgDOTAProfileCard_EStatID_name = map[int32]string{
-	1:   "k_eStat_SoloRank",
-	2:   "k_eStat_PartyRank",
-	3:   "k_eStat_Wins",
-	4:   "k_eStat_Commends",
-	5:   "k_eStat_Level",
-	100: "k_eStat_HeroWins_Start",
-	399: "k_eStat_HeroWins_End",
+	1: "k_eStat_SoloRank",
+	2: "k_eStat_PartyRank",
+	3: "k_eStat_Wins",
+	4: "k_eStat_Commends",
+	5: "k_eStat_GamesPlayed",
+	6: "k_eStat_FirstMatchDate",
 }
 var CMsgDOTAProfileCard_EStatID_value = map[string]int32{
 	"k_eStat_SoloRank":       1,
 	"k_eStat_PartyRank":      2,
 	"k_eStat_Wins":           3,
 	"k_eStat_Commends":       4,
-	"k_eStat_Level":          5,
-	"k_eStat_HeroWins_Start": 100,
-	"k_eStat_HeroWins_End":   399,
+	"k_eStat_GamesPlayed":    5,
+	"k_eStat_FirstMatchDate": 6,
 }
 
 func (x CMsgDOTAProfileCard_EStatID) Enum() *CMsgDOTAProfileCard_EStatID {
@@ -3931,6 +3946,7 @@ type CSODOTAPartyInvite struct {
 	TeamId            *uint32                           `protobuf:"varint,5,opt,name=team_id" json:"team_id,omitempty"`
 	LowPriorityStatus *bool                             `protobuf:"varint,6,opt,name=low_priority_status" json:"low_priority_status,omitempty"`
 	AsCoach           *bool                             `protobuf:"varint,7,opt,name=as_coach" json:"as_coach,omitempty"`
+	InviteGid         *uint64                           `protobuf:"fixed64,8,opt,name=invite_gid" json:"invite_gid,omitempty"`
 	XXX_unrecognized  []byte                            `json:"-"`
 }
 
@@ -3987,9 +4003,17 @@ func (m *CSODOTAPartyInvite) GetAsCoach() bool {
 	return false
 }
 
+func (m *CSODOTAPartyInvite) GetInviteGid() uint64 {
+	if m != nil && m.InviteGid != nil {
+		return *m.InviteGid
+	}
+	return 0
+}
+
 type CSODOTAPartyInvite_PartyMember struct {
 	Name             *string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 	SteamId          *uint64 `protobuf:"fixed64,2,opt,name=steam_id" json:"steam_id,omitempty"`
+	IsCoach          *bool   `protobuf:"varint,4,opt,name=is_coach" json:"is_coach,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
@@ -4011,12 +4035,20 @@ func (m *CSODOTAPartyInvite_PartyMember) GetSteamId() uint64 {
 	return 0
 }
 
+func (m *CSODOTAPartyInvite_PartyMember) GetIsCoach() bool {
+	if m != nil && m.IsCoach != nil {
+		return *m.IsCoach
+	}
+	return false
+}
+
 type CSODOTALobbyInvite struct {
 	GroupId          *uint64                           `protobuf:"varint,1,opt,name=group_id" json:"group_id,omitempty"`
 	SenderId         *uint64                           `protobuf:"fixed64,2,opt,name=sender_id" json:"sender_id,omitempty"`
 	SenderName       *string                           `protobuf:"bytes,3,opt,name=sender_name" json:"sender_name,omitempty"`
 	Members          []*CSODOTALobbyInvite_LobbyMember `protobuf:"bytes,4,rep,name=members" json:"members,omitempty"`
 	CustomGameId     *uint64                           `protobuf:"varint,5,opt,name=custom_game_id" json:"custom_game_id,omitempty"`
+	InviteGid        *uint64                           `protobuf:"fixed64,6,opt,name=invite_gid" json:"invite_gid,omitempty"`
 	XXX_unrecognized []byte                            `json:"-"`
 }
 
@@ -4055,6 +4087,13 @@ func (m *CSODOTALobbyInvite) GetMembers() []*CSODOTALobbyInvite_LobbyMember {
 func (m *CSODOTALobbyInvite) GetCustomGameId() uint64 {
 	if m != nil && m.CustomGameId != nil {
 		return *m.CustomGameId
+	}
+	return 0
+}
+
+func (m *CSODOTALobbyInvite) GetInviteGid() uint64 {
+	if m != nil && m.InviteGid != nil {
+		return *m.InviteGid
 	}
 	return 0
 }
@@ -6661,6 +6700,12 @@ type CMsgDOTACombatLogEntry struct {
 	AttackerTeam       *uint32               `protobuf:"varint,28,opt,name=attacker_team" json:"attacker_team,omitempty"`
 	TargetTeam         *uint32               `protobuf:"varint,29,opt,name=target_team" json:"target_team,omitempty"`
 	ObsWardsPlaced     *uint32               `protobuf:"varint,30,opt,name=obs_wards_placed" json:"obs_wards_placed,omitempty"`
+	AssistPlayer0      *uint32               `protobuf:"varint,31,opt,name=assist_player0" json:"assist_player0,omitempty"`
+	AssistPlayer1      *uint32               `protobuf:"varint,32,opt,name=assist_player1" json:"assist_player1,omitempty"`
+	AssistPlayer2      *uint32               `protobuf:"varint,33,opt,name=assist_player2" json:"assist_player2,omitempty"`
+	AssistPlayer3      *uint32               `protobuf:"varint,34,opt,name=assist_player3" json:"assist_player3,omitempty"`
+	StackCount         *uint32               `protobuf:"varint,35,opt,name=stack_count" json:"stack_count,omitempty"`
+	HiddenModifier     *bool                 `protobuf:"varint,36,opt,name=hidden_modifier" json:"hidden_modifier,omitempty"`
 	XXX_unrecognized   []byte                `json:"-"`
 }
 
@@ -6880,6 +6925,48 @@ func (m *CMsgDOTACombatLogEntry) GetObsWardsPlaced() uint32 {
 	return 0
 }
 
+func (m *CMsgDOTACombatLogEntry) GetAssistPlayer0() uint32 {
+	if m != nil && m.AssistPlayer0 != nil {
+		return *m.AssistPlayer0
+	}
+	return 0
+}
+
+func (m *CMsgDOTACombatLogEntry) GetAssistPlayer1() uint32 {
+	if m != nil && m.AssistPlayer1 != nil {
+		return *m.AssistPlayer1
+	}
+	return 0
+}
+
+func (m *CMsgDOTACombatLogEntry) GetAssistPlayer2() uint32 {
+	if m != nil && m.AssistPlayer2 != nil {
+		return *m.AssistPlayer2
+	}
+	return 0
+}
+
+func (m *CMsgDOTACombatLogEntry) GetAssistPlayer3() uint32 {
+	if m != nil && m.AssistPlayer3 != nil {
+		return *m.AssistPlayer3
+	}
+	return 0
+}
+
+func (m *CMsgDOTACombatLogEntry) GetStackCount() uint32 {
+	if m != nil && m.StackCount != nil {
+		return *m.StackCount
+	}
+	return 0
+}
+
+func (m *CMsgDOTACombatLogEntry) GetHiddenModifier() bool {
+	if m != nil && m.HiddenModifier != nil {
+		return *m.HiddenModifier
+	}
+	return false
+}
+
 type CMsgDOTAProfileCard struct {
 	AccountId          *uint32                     `protobuf:"varint,1,opt,name=account_id" json:"account_id,omitempty"`
 	BackgroundDefIndex *uint32                     `protobuf:"varint,2,opt,name=background_def_index" json:"background_def_index,omitempty"`
@@ -6913,11 +7000,13 @@ func (m *CMsgDOTAProfileCard) GetSlots() []*CMsgDOTAProfileCard_Slot {
 }
 
 type CMsgDOTAProfileCard_Slot struct {
-	SlotId           *uint32                          `protobuf:"varint,1,opt,name=slot_id" json:"slot_id,omitempty"`
-	Trophy           *CMsgDOTAProfileCard_Slot_Trophy `protobuf:"bytes,2,opt,name=trophy" json:"trophy,omitempty"`
-	Stat             *CMsgDOTAProfileCard_Slot_Stat   `protobuf:"bytes,3,opt,name=stat" json:"stat,omitempty"`
-	Item             *CMsgDOTAProfileCard_Slot_Item   `protobuf:"bytes,4,opt,name=item" json:"item,omitempty"`
-	XXX_unrecognized []byte                           `json:"-"`
+	SlotId           *uint32                            `protobuf:"varint,1,opt,name=slot_id" json:"slot_id,omitempty"`
+	Trophy           *CMsgDOTAProfileCard_Slot_Trophy   `protobuf:"bytes,2,opt,name=trophy" json:"trophy,omitempty"`
+	Stat             *CMsgDOTAProfileCard_Slot_Stat     `protobuf:"bytes,3,opt,name=stat" json:"stat,omitempty"`
+	Item             *CMsgDOTAProfileCard_Slot_Item     `protobuf:"bytes,4,opt,name=item" json:"item,omitempty"`
+	Hero             *CMsgDOTAProfileCard_Slot_Hero     `protobuf:"bytes,5,opt,name=hero" json:"hero,omitempty"`
+	Emoticon         *CMsgDOTAProfileCard_Slot_Emoticon `protobuf:"bytes,6,opt,name=emoticon" json:"emoticon,omitempty"`
+	XXX_unrecognized []byte                             `json:"-"`
 }
 
 func (m *CMsgDOTAProfileCard_Slot) Reset()         { *m = CMsgDOTAProfileCard_Slot{} }
@@ -6948,6 +7037,20 @@ func (m *CMsgDOTAProfileCard_Slot) GetStat() *CMsgDOTAProfileCard_Slot_Stat {
 func (m *CMsgDOTAProfileCard_Slot) GetItem() *CMsgDOTAProfileCard_Slot_Item {
 	if m != nil {
 		return m.Item
+	}
+	return nil
+}
+
+func (m *CMsgDOTAProfileCard_Slot) GetHero() *CMsgDOTAProfileCard_Slot_Hero {
+	if m != nil {
+		return m.Hero
+	}
+	return nil
+}
+
+func (m *CMsgDOTAProfileCard_Slot) GetEmoticon() *CMsgDOTAProfileCard_Slot_Emoticon {
+	if m != nil {
+		return m.Emoticon
 	}
 	return nil
 }
@@ -7016,6 +7119,54 @@ func (m *CMsgDOTAProfileCard_Slot_Item) GetSerializedItem() string {
 		return *m.SerializedItem
 	}
 	return ""
+}
+
+type CMsgDOTAProfileCard_Slot_Hero struct {
+	HeroId           *uint32 `protobuf:"varint,1,opt,name=hero_id" json:"hero_id,omitempty"`
+	HeroWins         *uint32 `protobuf:"varint,2,opt,name=hero_wins" json:"hero_wins,omitempty"`
+	HeroLosses       *uint32 `protobuf:"varint,3,opt,name=hero_losses" json:"hero_losses,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgDOTAProfileCard_Slot_Hero) Reset()         { *m = CMsgDOTAProfileCard_Slot_Hero{} }
+func (m *CMsgDOTAProfileCard_Slot_Hero) String() string { return proto.CompactTextString(m) }
+func (*CMsgDOTAProfileCard_Slot_Hero) ProtoMessage()    {}
+
+func (m *CMsgDOTAProfileCard_Slot_Hero) GetHeroId() uint32 {
+	if m != nil && m.HeroId != nil {
+		return *m.HeroId
+	}
+	return 0
+}
+
+func (m *CMsgDOTAProfileCard_Slot_Hero) GetHeroWins() uint32 {
+	if m != nil && m.HeroWins != nil {
+		return *m.HeroWins
+	}
+	return 0
+}
+
+func (m *CMsgDOTAProfileCard_Slot_Hero) GetHeroLosses() uint32 {
+	if m != nil && m.HeroLosses != nil {
+		return *m.HeroLosses
+	}
+	return 0
+}
+
+type CMsgDOTAProfileCard_Slot_Emoticon struct {
+	EmoticonId       *uint32 `protobuf:"varint,1,opt,name=emoticon_id" json:"emoticon_id,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
+}
+
+func (m *CMsgDOTAProfileCard_Slot_Emoticon) Reset()         { *m = CMsgDOTAProfileCard_Slot_Emoticon{} }
+func (m *CMsgDOTAProfileCard_Slot_Emoticon) String() string { return proto.CompactTextString(m) }
+func (*CMsgDOTAProfileCard_Slot_Emoticon) ProtoMessage()    {}
+
+func (m *CMsgDOTAProfileCard_Slot_Emoticon) GetEmoticonId() uint32 {
+	if m != nil && m.EmoticonId != nil {
+		return *m.EmoticonId
+	}
+	return 0
 }
 
 type CMsgGCToClientNewBloomTimingUpdated struct {

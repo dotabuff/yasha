@@ -1202,6 +1202,8 @@ type CDOTAUserMsg_ChatEvent struct {
 	Playerid_4       *int32             `protobuf:"zigzag32,6,opt,name=playerid_4,def=-1" json:"playerid_4,omitempty"`
 	Playerid_5       *int32             `protobuf:"zigzag32,7,opt,name=playerid_5,def=-1" json:"playerid_5,omitempty"`
 	Playerid_6       *int32             `protobuf:"zigzag32,8,opt,name=playerid_6,def=-1" json:"playerid_6,omitempty"`
+	Value2           *uint32            `protobuf:"varint,9,opt,name=value2" json:"value2,omitempty"`
+	Value3           *uint32            `protobuf:"varint,10,opt,name=value3" json:"value3,omitempty"`
 	XXX_unrecognized []byte             `json:"-"`
 }
 
@@ -1271,6 +1273,20 @@ func (m *CDOTAUserMsg_ChatEvent) GetPlayerid_6() int32 {
 		return *m.Playerid_6
 	}
 	return Default_CDOTAUserMsg_ChatEvent_Playerid_6
+}
+
+func (m *CDOTAUserMsg_ChatEvent) GetValue2() uint32 {
+	if m != nil && m.Value2 != nil {
+		return *m.Value2
+	}
+	return 0
+}
+
+func (m *CDOTAUserMsg_ChatEvent) GetValue3() uint32 {
+	if m != nil && m.Value3 != nil {
+		return *m.Value3
+	}
+	return 0
 }
 
 type CDOTAUserMsg_CombatLogShowDeath struct {
