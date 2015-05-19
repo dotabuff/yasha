@@ -1,32 +1,30 @@
-package parser
+package yasha
 
 import (
+	"bytes"
 	"strings"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/dotabuff/yasha/dota"
-	"github.com/dotabuff/yasha/utils"
 )
 
-var p = spew.Dump
-
-type Parser struct {
-	reader   *utils.BytesReader
+type OuterParser struct {
+	reader   *BytesReader
 	Sequence int64
-	Items    map[int64]*ParserItem
+	Items    map[int64]*OuterParserItem
 }
 
-func ParserFromFile(path string) *Parser {
+func OuterParserFromFile(path string) *OuterParser {
 	if strings.HasSuffix(path, ".dem.bz2") {
-		return NewParser(ReadBz2File(path))
+		return NewOuterParser(ReadBz2File(path))
 	} else if strings.HasSuffix(path, ".dem") {
-		return NewParser(ReadFile(path))
+		return NewOuterParser(ReadFile(path))
 	} else {
 		panic("expected path to .dem or .dem.bz2 instead of " + path)
 	}
 }
 
-func NewParser(data []byte) *Parser {
+func NewOuterParser(data []byte) *OuterParser {
 	if len(data) < headerLength {
 		panic("File too small.")
 	}
@@ -42,17 +40,17 @@ func NewParser(data []byte) *Parser {
 	}
 
 	buffer := data[headerLength:(headerLength + totalLength)]
-	return &Parser{reader: utils.NewBytesReader(buffer)}
+	return &OuterParser{reader: NewBytesReader(buffer)}
 }
 
-func (p *Parser) readEDemoCommands() (dota.EDemoCommands, bool) {
+func (p *OuterParser) readEDemoCommands() (dota.EDemoCommands, bool) {
 	command := dota.EDemoCommands(p.reader.ReadVarInt32())
 	compressed := (command & dota.EDemoCommands_DEM_IsCompressed) == dota.EDemoCommands_DEM_IsCompressed
 	command = command & ^dota.EDemoCommands_DEM_IsCompressed
 	return command, compressed
 }
 
-func (p *Parser) Analyze(callback func(*ParserBaseItem)) {
+func (p *OuterParser) Analyze(callback func(*OuterParserBaseItem)) {
 	p.Sequence = 1
 	command, compressed := p.readEDemoCommands()
 	if command == dota.EDemoCommands_DEM_Error {
@@ -63,7 +61,7 @@ func (p *Parser) Analyze(callback func(*ParserBaseItem)) {
 		length := int(p.reader.ReadVarInt32())
 		obj, err := p.AsBaseEvent(command.String())
 		if err == nil {
-			item := &ParserItem{
+			item := &OuterParserItem{
 				Sequence: p.Sequence,
 				Object:   obj,
 				Tick:     tick,
@@ -105,8 +103,8 @@ func (p *Parser) Analyze(callback func(*ParserBaseItem)) {
 	}
 }
 
-func (p *Parser) AnalyzePacket(callback func(*ParserBaseItem), fromEvent dota.EDemoCommands, tick int, data []byte) {
-	reader := utils.NewBytesReader(data)
+func (p *OuterParser) AnalyzePacket(callback func(*OuterParserBaseItem), fromEvent dota.EDemoCommands, tick int, data []byte) {
+	reader := NewBytesReader(data)
 	for reader.CanRead() {
 		iType := int(reader.ReadVarInt32())
 		length := int(reader.ReadVarInt32())
@@ -115,7 +113,7 @@ func (p *Parser) AnalyzePacket(callback func(*ParserBaseItem), fromEvent dota.ED
 			spew.Println(err)
 			reader.Skip(length)
 		} else {
-			item := &ParserItem{
+			item := &OuterParserItem{
 				Sequence: p.Sequence,
 				From:     fromEvent,
 				Object:   obj,
@@ -140,19 +138,27 @@ func (p *Parser) AnalyzePacket(callback func(*ParserBaseItem), fromEvent dota.ED
 	}
 }
 
-func parseOne(item *ParserItem) *ParserBaseItem {
+func parseOne(item *OuterParserItem) *OuterParserBaseItem {
 	err := ProtoUnmarshal(item.Data, item.Object)
 	if err != nil {
 		spew.Println("parseOne()")
 		spew.Dump(item)
 		panic(err)
-		return &ParserBaseItem{}
+		return &OuterParserBaseItem{}
 	}
 	item.Data = nil
-	return &ParserBaseItem{
+	return &OuterParserBaseItem{
 		Sequence: item.Sequence,
 		Tick:     item.Tick,
 		From:     item.From,
 		Object:   item.Object,
 	}
+}
+
+func ReadStringZ(datas []byte, offset int) string {
+	idx := bytes.IndexByte(datas[offset:], '\000')
+	if idx < 0 {
+		return ""
+	}
+	return string(datas[offset:idx])
 }

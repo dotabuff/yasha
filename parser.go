@@ -8,25 +8,21 @@ import (
 	"github.com/davecgh/go-spew/spew"
 
 	"github.com/dotabuff/yasha/dota"
-	"github.com/dotabuff/yasha/parser"
-	"github.com/dotabuff/yasha/send_tables"
-	"github.com/dotabuff/yasha/string_tables"
-	"github.com/dotabuff/yasha/utils"
 )
 
 type Parser struct {
-	Parser                *parser.Parser
+	Parser                *OuterParser
 	combatLogParser       *combatLogParser
 	ClassIdNumBits        int
 	ClassInfosIdMapping   map[string]int
 	ClassInfosNameMapping map[int]string
 	FileHeader            *dota.CDemoFileHeader
 	GameEventMap          map[int32]*dota.CSVCMsg_GameEventListDescriptorT
-	Mapping               map[int][]*send_tables.SendProp
+	Mapping               map[int][]*SendProp
 	Multiples             map[int]map[string]int
 	ServerInfo            *dota.CSVCMsg_ServerInfo
-	Sth                   *send_tables.Helper
-	Stsh                  *string_tables.StateHelper
+	Sth                   *Helper
+	Stsh                  *StateHelper
 	VoiceInit             *dota.CSVCMsg_VoiceInit
 
 	ActiveModifiers map[int]*dota.CDOTAModifierBuffTableEntry
@@ -37,7 +33,7 @@ type Parser struct {
 	OnEntityDeleted   func(*PacketEntity)
 	OnEntityPreserved func(*PacketEntity)
 
-	OnActiveModifierDelta func(map[int]*string_tables.StringTableItem, string_tables.ModifierBuffs)
+	OnActiveModifierDelta func(map[int]*StringTableItem, ModifierBuffs)
 
 	OnAbilitySteal              func(tick int, obj *dota.CDOTAUserMsg_AbilitySteal)
 	OnBoosterState              func(tick int, obj *dota.CDOTAUserMsg_BoosterState)
@@ -96,26 +92,26 @@ type Parser struct {
 
 func ParserFromFile(path string) *Parser {
 	if strings.HasSuffix(path, ".dem.bz2") {
-		return NewParser(parser.ReadBz2File(path))
+		return NewParser(ReadBz2File(path))
 	} else if strings.HasSuffix(path, ".dem") {
-		return NewParser(parser.ReadFile(path))
+		return NewParser(ReadFile(path))
 	} else {
 		panic("expected path to .dem or .dem.bz2 instead of " + path)
 	}
 }
 
 func NewParser(data []byte) *Parser {
-	return &Parser{Parser: parser.NewParser(data)}
+	return &Parser{Parser: NewOuterParser(data)}
 }
 
 func (p *Parser) Parse() {
-	p.Sth = send_tables.NewHelper()
-	p.Stsh = string_tables.NewStateHelper()
+	p.Sth = NewSendTablesHelper()
+	p.Stsh = NewStateHelper()
 	p.Entities = make([]*PacketEntity, 2048)
 	p.ClassInfosIdMapping = map[string]int{}
 	p.ClassInfosNameMapping = map[int]string{}
 	p.GameEventMap = map[int32]*dota.CSVCMsg_GameEventListDescriptorT{}
-	p.Mapping = map[int][]*send_tables.SendProp{}
+	p.Mapping = map[int][]*SendProp{}
 	p.Multiples = map[int]map[string]int{}
 	p.ByHandle = map[int]*PacketEntity{}
 	p.combatLogParser = &combatLogParser{
@@ -132,13 +128,13 @@ func (p *Parser) Parse() {
 	// switch, but less overhead than doing a sort instead.
 
 	currentTick := 0
-	buffer := []*parser.ParserBaseItem{}
+	buffer := []*OuterParserBaseItem{}
 
-	p.Parser.Analyze(func(item *parser.ParserBaseItem) {
+	p.Parser.Analyze(func(item *OuterParserBaseItem) {
 		// we got a new tick, process the previous items
 		if item.Tick > currentTick {
 			p.processTick(currentTick, buffer)
-			buffer = make([]*parser.ParserBaseItem, 1, len(buffer))
+			buffer = make([]*OuterParserBaseItem, 1, len(buffer))
 			buffer[0] = item
 			currentTick = item.Tick
 		} else {
@@ -164,8 +160,8 @@ func (p *Parser) PrintDistinctCombatLogTypes() {
 	}
 }
 
-func (p *Parser) processTick(tick int, items []*parser.ParserBaseItem) {
-	p.Stsh.ActiveModifierDelta = string_tables.ModifierBuffs{}
+func (p *Parser) processTick(tick int, items []*OuterParserBaseItem) {
+	p.Stsh.ActiveModifierDelta = ModifierBuffs{}
 
 	if p.BeforeTick != nil {
 		p.BeforeTick(tick)
@@ -492,7 +488,7 @@ func (p *Parser) onCDemoClassInfo(cdci *dota.CDemoClassInfo) {
 }
 
 func (p *Parser) ParsePacket(tick int, pe *dota.CSVCMsg_PacketEntities) {
-	br := utils.NewBitReader(pe.GetEntityData())
+	br := NewBitReader(pe.GetEntityData())
 	currentIndex := -1
 
 	createPackets := []*PacketEntity{}
@@ -536,7 +532,7 @@ func (p *Parser) ParsePacket(tick int, pe *dota.CSVCMsg_PacketEntities) {
 	}
 }
 
-func (p *Parser) entityCreate(br *utils.BitReader, currentIndex, tick int) *PacketEntity {
+func (p *Parser) entityCreate(br *BitReader, currentIndex, tick int) *PacketEntity {
 	pe := &PacketEntity{
 		Tick:      tick,
 		ClassId:   int(br.ReadUBits(p.ClassIdNumBits)),
@@ -566,7 +562,7 @@ func (p *Parser) entityCreate(br *utils.BitReader, currentIndex, tick int) *Pack
 	return pe
 }
 
-func (p *Parser) entityPreserve(br *utils.BitReader, currentIndex, tick int) *PacketEntity {
+func (p *Parser) entityPreserve(br *BitReader, currentIndex, tick int) *PacketEntity {
 	pe := p.Entities[currentIndex]
 	pe.Tick = tick
 	pe.Type = Preserve
@@ -583,6 +579,6 @@ func (p *Parser) entityPreserve(br *utils.BitReader, currentIndex, tick int) *Pa
 	return pe
 }
 
-func (p *Parser) entityDelete(br *utils.BitReader, currentIndex, tick int) *PacketEntity {
+func (p *Parser) entityDelete(br *BitReader, currentIndex, tick int) *PacketEntity {
 	return p.Entities[currentIndex]
 }

@@ -10,7 +10,6 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/dotabuff/yasha/dota"
-	"github.com/dotabuff/yasha/string_tables"
 )
 
 type CombatLogEntry interface {
@@ -19,7 +18,7 @@ type CombatLogEntry interface {
 }
 
 type combatLogParser struct {
-	stsh     *string_tables.StateHelper
+	stsh     *StateHelper
 	distinct map[dota.DOTA_COMBATLOG_TYPES][]map[interface{}]bool
 }
 
@@ -482,7 +481,7 @@ func atoi(a string) int {
 	return i
 }
 
-func strtbl(table map[int]*string_tables.StringTableItem, keys []*dota.CSVCMsg_GameEventKeyT, index int) string {
+func strtbl(table map[int]*StringTableItem, keys []*dota.CSVCMsg_GameEventKeyT, index int) string {
 	return table[int(keys[index].GetValShort())].Str
 }
 

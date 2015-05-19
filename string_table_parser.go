@@ -1,10 +1,9 @@
-package string_tables
+package yasha
 
 import (
 	"math"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/dotabuff/yasha/utils"
 )
 
 const (
@@ -46,7 +45,7 @@ func ParseUST(obj USTObject, meta *CacheItem) map[int]*StringTableItem {
 }
 
 func Parse(data []byte, numEntries, maxEntries, dataSizeBits int, dataFixedSize bool) map[int]*StringTableItem {
-	br := utils.NewBitReader(data)
+	br := NewBitReader(data)
 
 	bitsPerIndex := int(math.Log(float64(maxEntries)) / math.Log(2))
 	keyHistory := make([]string, 0, KeyHistorySize)

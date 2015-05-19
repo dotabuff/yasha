@@ -1,7 +1,5 @@
 package yasha
 
-import "github.com/dotabuff/yasha/utils"
-
 type UpdateType int
 
 const (
@@ -47,7 +45,7 @@ func (pe *PacketEntity) Clone() *PacketEntity {
 	}
 }
 
-func ReadUpdateType(br *utils.BitReader) UpdateType {
+func ReadUpdateType(br *BitReader) UpdateType {
 	result := Preserve
 	if !br.ReadBoolean() {
 		if br.ReadBoolean() {
