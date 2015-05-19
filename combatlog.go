@@ -83,8 +83,10 @@ func (c combatLogParser) parse(obj *dota.CSVCMsg_GameEvent) CombatLogEntry {
 	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_MULTIKILL:
 		v = &CombatLogMultikill{}
 	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_FIRST_BLOOD:
+		// TODO: map DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_FIRST_BLOOD
 		return nil
 	case dota.DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_MODIFIER_REFRESH:
+		// TODO: map DOTA_COMBATLOG_TYPES_DOTA_COMBATLOG_MODIFIER_REFRESH
 		return nil
 	default:
 		pp(t, keys)
