@@ -1,5 +1,7 @@
 # Yasha
 
+[![Build Status](https://travis-ci.org/dotabuff/yasha.svg?branch=master)](https://travis-ci.org/dotabuff/yasha)
+
 Dota 2 (Source 1) replay parser written in Go, extracted from [Dotabuff TrueSight](https://secure.dotabuff.com/truesight).
 
 We're working on both maintaining the parser for replays of both Source 1 and Source 2 Engines.
