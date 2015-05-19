@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/dotabuff/yasha"
-	"github.com/dotabuff/yasha/utils"
 )
 
 const MAX_COORDINATE float64 = 16384
@@ -45,12 +44,12 @@ func coordFromCell(pe *yasha.PacketEntity) Coordinate {
 
 	var cX, cY, vX, vY float64
 
-	if vO2, ok := pe.Values["DT_DOTA_BaseNPC.m_vecOrigin"].(*utils.Vector2); ok {
+	if vO2, ok := pe.Values["DT_DOTA_BaseNPC.m_vecOrigin"].(*yasha.Vector2); ok {
 		cX = float64(pe.Values["DT_DOTA_BaseNPC.m_cellX"].(int))
 		cY = float64(pe.Values["DT_DOTA_BaseNPC.m_cellY"].(int))
 		vX, vY = vO2.X, vO2.Y
 	} else {
-		vO3 := pe.Values["DT_BaseEntity.m_vecOrigin"].(*utils.Vector3)
+		vO3 := pe.Values["DT_BaseEntity.m_vecOrigin"].(*yasha.Vector3)
 		cX = float64(pe.Values["DT_BaseEntity.m_cellX"].(int))
 		cY = float64(pe.Values["DT_BaseEntity.m_cellY"].(int))
 		vX, vY = vO3.X, vO3.Y
