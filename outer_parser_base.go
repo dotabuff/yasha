@@ -1,4 +1,4 @@
-package parser
+package yasha
 
 import (
 	"io/ioutil"
@@ -51,30 +51,30 @@ const (
 )
 
 const (
-	DEM ParserBaseEventMapType = iota
+	DEM OuterParserBaseEventMapType = iota
 	NET
 	SVC
 	BUM
 	DUM
 )
 
-type ParserBaseEvent int
-type ParserBaseEventMapType int
+type OuterParserBaseEvent int
+type OuterParserBaseEventMapType int
 type ItemType int
 
-type ParserBaseItem struct {
+type OuterParserBaseItem struct {
 	Sequence int64
 	Tick     int
 	From     dota.EDemoCommands
 	Object   proto.Message
 }
 
-// ParserBaseItems attaches the methods of Interface to []*ParserBaseItem, sorting in increasing order by Sequence.
-type ParserBaseItems []*ParserBaseItem
+// OuterParserBaseItems attaches the methods of Interface to []*OuterParserBaseItem, sorting in increasing order by Sequence.
+type OuterParserBaseItems []*OuterParserBaseItem
 
-func (p ParserBaseItems) Len() int           { return len(p) }
-func (p ParserBaseItems) Less(i, j int) bool { return p[i].Sequence < p[j].Sequence }
-func (p ParserBaseItems) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+func (p OuterParserBaseItems) Len() int           { return len(p) }
+func (p OuterParserBaseItems) Less(i, j int) bool { return p[i].Sequence < p[j].Sequence }
+func (p OuterParserBaseItems) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 type Error string
 

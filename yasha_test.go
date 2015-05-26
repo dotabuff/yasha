@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -17,36 +18,79 @@ type testCase struct {
 	url     string
 
 	expectLastChatMessage string
+	expectHeroKillCount   map[string]int
+	expectHeroDeathCount  map[string]int
 }
 
-// Secret vs Cloud 9 played on patch 6.83c
+// Esports match, played on patch 6.83c
 func TestEsportsPatch683b(t *testing.T) {
 	c := &testCase{
 		matchId: 1405240741,
 		url:     "http://replay135.valve.net/570/1405240741_220241732.dem.bz2",
 		expectLastChatMessage: "Gg",
+		expectHeroKillCount: map[string]int{
+			"npc_dota_hero_ember_spirit": 0,
+			"npc_dota_hero_broodmother":  5,
+		},
+		expectHeroDeathCount: map[string]int{
+			"npc_dota_hero_chen":        2,
+			"npc_dota_hero_broodmother": 0,
+			"npc_dota_hero_sniper":      2,
+			"npc_dota_hero_phoenix":     2,
+		},
 	}
 
 	testReplayCase(t, c)
 }
 
-// Navi vs Basically Unknown, played on patch 6.84p0
+// Esports match, played on patch 6.84p0
 func TestEsportsPatch684p0(t *testing.T) {
 	c := &testCase{
 		matchId: 1450235906,
 		url:     "http://replay136.valve.net/570/1450235906_1463120933.dem.bz2",
 		expectLastChatMessage: "gg",
+		expectHeroKillCount: map[string]int{
+			"npc_dota_hero_broodmother": 3,
+		},
+		expectHeroDeathCount: map[string]int{
+			"npc_dota_hero_broodmother": 7,
+		},
 	}
 
 	testReplayCase(t, c)
 }
 
-// No Respeta Funadores vs Who Needs Skill, played on patch 6.84p1
+// Esports match, played on patch 6.84p1
 func TestEsportsPatch684p1(t *testing.T) {
 	c := &testCase{
 		matchId: 1458895412,
 		url:     "http://replay123.valve.net/570/1458895412_140022944.dem.bz2",
 		expectLastChatMessage: "gg",
+		expectHeroKillCount: map[string]int{
+			"npc_dota_hero_faceless_void": 3,
+		},
+		expectHeroDeathCount: map[string]int{
+			"npc_dota_hero_faceless_void": 2,
+		},
+	}
+
+	testReplayCase(t, c)
+}
+
+// Esports match, played on patch 6.84c
+func TestEsportsPatch684c(t *testing.T) {
+	c := &testCase{
+		matchId: 1483980562,
+		url:     "http://replay133.valve.net/570/1483980562_1668922202.dem.bz2",
+		expectLastChatMessage: "gg wp",
+		expectHeroKillCount: map[string]int{
+			"npc_dota_hero_dragon_knight": 5,
+			"npc_dota_hero_bristleback":   1,
+		},
+		expectHeroDeathCount: map[string]int{
+			"npc_dota_hero_earthshaker": 6,
+			"npc_dota_hero_bristleback": 3,
+		},
 	}
 
 	testReplayCase(t, c)
@@ -128,19 +172,66 @@ func testReplayCase(t *testing.T, c *testCase) {
 		t.Fatalf("unable to get replay: %s", err)
 	}
 
+	worldMins := &Vector3{}
+	worldMaxes := &Vector3{}
 	lastChatMessage := ""
+	heroKillCount := make(map[string]int)
+	heroDeathCount := make(map[string]int)
 
 	parser := NewParser(data)
 	parser.OnSayText2 = func(n int, o *dota.CUserMsg_SayText2) {
-		//t.Logf("OnSayText2: %+v", o)
 		lastChatMessage = o.GetText()
 	}
 
 	parser.OnChatEvent = func(n int, o *dota.CDOTAUserMsg_ChatEvent) {
-		//t.Logf("OnChatEvent: %+v", o)
 	}
+
+	parser.OnCombatLog = func(entry CombatLogEntry) {
+		switch log := entry.(type) {
+		case *CombatLogDeath:
+			if strings.HasPrefix(log.Target, "npc_dota_hero_") {
+				if _, ok := heroKillCount[log.Source]; !ok {
+					heroKillCount[log.Source] = 0
+				}
+				heroKillCount[log.Source] += 1
+			}
+
+			if _, ok := heroDeathCount[log.Target]; !ok {
+				heroDeathCount[log.Target] = 0
+			}
+			heroDeathCount[log.Target] += 1
+		}
+	}
+
+	parser.OnEntityCreated = func(ent *PacketEntity) {
+		if ent.Tick == 0 && ent.Name == "DT_WORLD" {
+			worldMins = ent.Values["DT_WORLD.m_WorldMins"].(*Vector3)
+			worldMaxes = ent.Values["DT_WORLD.m_WorldMaxs"].(*Vector3)
+		}
+	}
+
 	parser.Parse()
 
+	// Make sure we have found the death counts for specified heroes
+	if c.expectHeroDeathCount != nil {
+		for hero, count := range c.expectHeroDeathCount {
+			assert.Equal(count, heroDeathCount[hero], "expected hero %s to have death count %d", hero, count)
+		}
+	}
+
+	// Make sure we have found the kill counts for specified heroes.
+	if c.expectHeroKillCount != nil {
+		for hero, count := range c.expectHeroKillCount {
+			assert.Equal(count, heroKillCount[hero], "expected hero %s to have kill count %d", hero, count)
+		}
+	}
+
+	// Make sure we find the DT_WORLD entity and it has the correct min and max dimensions.
+	// This serves to help ensure our Float and Vector3 parsing is correct.
+	assert.Equal(&Vector3{X: -8576.0, Y: -7680.0, Z: -1536.0}, worldMins)
+	assert.Equal(&Vector3{X: 9216.0, Y: 8192.0, Z: 256.0}, worldMaxes)
+
+	// Make sure we found the chat messages and have properly found the last one
 	assert.Equal(c.expectLastChatMessage, lastChatMessage)
 }
 

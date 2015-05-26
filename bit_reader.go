@@ -1,4 +1,4 @@
-package utils
+package yasha
 
 import (
 	"bytes"
@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/dotabuff/yasha/send_tables"
 )
 
 var p = spew.Dump
@@ -284,7 +283,7 @@ func (br *BitReader) ReadStringN(n int) string {
 	return string(buf)
 }
 
-func (br *BitReader) ReadFloat(prop *send_tables.SendProp) float64 {
+func (br *BitReader) ReadFloat(prop *SendProp) float64 {
 	if result, ok := br.ReadSpecialFloat(prop); ok {
 		return float64(result)
 	}
@@ -295,12 +294,12 @@ func (br *BitReader) ReadFloat(prop *send_tables.SendProp) float64 {
 	return f*r + prop.LowValue
 }
 
-func (br *BitReader) ReadVector(prop *send_tables.SendProp) *Vector3 {
+func (br *BitReader) ReadVector(prop *SendProp) *Vector3 {
 	var x, y, z float64
 	x = br.ReadFloat(prop)
 	y = br.ReadFloat(prop)
 
-	if prop.Flags&send_tables.SPROP_NORMAL == 0 {
+	if prop.Flags&SPROP_NORMAL == 0 {
 		z = br.ReadFloat(prop)
 	} else {
 		f := float64(x*x + y*y)
@@ -319,31 +318,31 @@ func (br *BitReader) ReadVector(prop *send_tables.SendProp) *Vector3 {
 	}
 }
 
-func (br *BitReader) ReadVectorXY(prop *send_tables.SendProp) *Vector2 {
+func (br *BitReader) ReadVectorXY(prop *SendProp) *Vector2 {
 	return &Vector2{
 		X: br.ReadFloat(prop),
 		Y: br.ReadFloat(prop),
 	}
 }
 
-func (br *BitReader) ReadSpecialFloat(prop *send_tables.SendProp) (float32, bool) {
-	if prop.Flags&send_tables.SPROP_COORD != 0 {
+func (br *BitReader) ReadSpecialFloat(prop *SendProp) (float32, bool) {
+	if prop.Flags&SPROP_COORD != 0 {
 		return br.ReadBitCoord(), true
-	} else if prop.Flags&send_tables.SPROP_COORD_MP != 0 {
+	} else if prop.Flags&SPROP_COORD_MP != 0 {
 		panic("wtf")
-	} else if prop.Flags&send_tables.SPROP_COORD_MP_INTEGRAL != 0 {
+	} else if prop.Flags&SPROP_COORD_MP_INTEGRAL != 0 {
 		panic("wtf")
-	} else if prop.Flags&send_tables.SPROP_COORD_MP_LOWPRECISION != 0 {
+	} else if prop.Flags&SPROP_COORD_MP_LOWPRECISION != 0 {
 		panic("wtf")
-	} else if prop.Flags&send_tables.SPROP_CELL_COORD != 0 {
+	} else if prop.Flags&SPROP_CELL_COORD != 0 {
 		return br.ReadBitCellCoord(prop.NumBits, false, false), true
-	} else if prop.Flags&send_tables.SPROP_CELL_COORD_INTEGRAL != 0 {
+	} else if prop.Flags&SPROP_CELL_COORD_INTEGRAL != 0 {
 		return br.ReadBitCellCoord(prop.NumBits, true, false), true
-	} else if prop.Flags&send_tables.SPROP_CELL_COORD_LOWPRECISION != 0 {
+	} else if prop.Flags&SPROP_CELL_COORD_LOWPRECISION != 0 {
 		return br.ReadBitCellCoord(prop.NumBits, false, true), true
-	} else if prop.Flags&send_tables.SPROP_NOSCALE != 0 {
+	} else if prop.Flags&SPROP_NOSCALE != 0 {
 		return br.ReadBitFloat(), true
-	} else if prop.Flags&send_tables.SPROP_NORMAL != 0 {
+	} else if prop.Flags&SPROP_NORMAL != 0 {
 		return br.ReadBitNormal(), true
 	}
 	return 0, false
@@ -386,7 +385,7 @@ func (br *BitReader) ReadPropertiesIndex() []int {
 // Rememver that our PE decoder is wrong, it needs to construct key names recursively.
 // https://github.com/spheenik/clarity/tree/master/src/main/java/clarity/decoder/SendTableFlattener.java
 // https://gist.githubusercontent.com/onethirtyfive/07899a78622dc18679c3/raw/19d411910016170e4c4ee2782fd4a987e9ce2afc/gistfile1.txt
-func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multiples map[string]int, indices []int) map[string]interface{} {
+func (br *BitReader) ReadPropertiesValues(mapping []*SendProp, multiples map[string]int, indices []int) map[string]interface{} {
 	values := map[string]interface{}{}
 
 	for _, index := range indices {
@@ -394,7 +393,7 @@ func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multi
 		name := prop.DtName + "." + prop.VarName
 		multiple := multiples[name] > 1
 		elements := 1
-		if prop.Flags&send_tables.SPROP_INSIDEARRAY != 0 {
+		if prop.Flags&SPROP_INSIDEARRAY != 0 {
 			elements = int(br.ReadUBits(6))
 		}
 		for k := 0; k < elements; k++ {
@@ -406,17 +405,17 @@ func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multi
 				key += "-" + strconv.Itoa(k)
 			}
 			switch prop.Type {
-			case send_tables.DPT_Int:
+			case DPT_Int:
 				values[key] = br.decodeInt(prop)
-			case send_tables.DPT_Int64:
+			case DPT_Int64:
 				values[key] = br.decodeInt64(prop)
-			case send_tables.DPT_Float:
+			case DPT_Float:
 				values[key] = br.ReadFloat(prop)
-			case send_tables.DPT_Vector:
+			case DPT_Vector:
 				values[key] = br.ReadVector(prop)
-			case send_tables.DPT_VectorXY:
+			case DPT_VectorXY:
 				values[key] = br.ReadVectorXY(prop)
-			case send_tables.DPT_String:
+			case DPT_String:
 				values[key] = br.decodeString()
 			default:
 				panic("unknown type")
@@ -427,11 +426,11 @@ func (br *BitReader) ReadPropertiesValues(mapping []*send_tables.SendProp, multi
 	return values
 }
 
-func (br *BitReader) decodeInt(prop *send_tables.SendProp) interface{} {
-	if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+func (br *BitReader) decodeInt(prop *SendProp) interface{} {
+	if (prop.Flags & SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
 		val := br.decodeVarInt()
 		// unsigned
-		if (prop.Flags & send_tables.SPROP_UNSIGNED) != 0 {
+		if (prop.Flags & SPROP_UNSIGNED) != 0 {
 			return uint(val)
 		}
 
@@ -441,7 +440,7 @@ func (br *BitReader) decodeInt(prop *send_tables.SendProp) interface{} {
 
 	val := br.read(prop.NumBits)
 	// unsigned returned as int
-	if (prop.Flags & send_tables.SPROP_UNSIGNED) != 0 {
+	if (prop.Flags & SPROP_UNSIGNED) != 0 {
 		return int(val)
 	}
 
@@ -453,11 +452,11 @@ func (br *BitReader) decodeInt(prop *send_tables.SendProp) interface{} {
 	return int(val)
 }
 
-func (br *BitReader) decodeInt64(prop *send_tables.SendProp) uint64 {
-	if (prop.Flags & send_tables.SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
+func (br *BitReader) decodeInt64(prop *SendProp) uint64 {
+	if (prop.Flags & SPROP_ENCODED_AGAINST_TICKCOUNT) != 0 {
 		val := br.decodeVarInt()
 		// unsigned
-		if (prop.Flags & send_tables.SPROP_UNSIGNED) != 0 {
+		if (prop.Flags & SPROP_UNSIGNED) != 0 {
 			return uint64(val)
 		}
 		// signed returned as uint64
@@ -467,7 +466,7 @@ func (br *BitReader) decodeInt64(prop *send_tables.SendProp) uint64 {
 	negate := false
 	remainderBits := prop.NumBits - 32
 	// unsigned
-	if (prop.Flags & send_tables.SPROP_UNSIGNED) == 0 {
+	if (prop.Flags & SPROP_UNSIGNED) == 0 {
 		remainderBits -= 1
 		negate = (br.read(1) == 1)
 	}
@@ -482,7 +481,7 @@ func (br *BitReader) decodeInt64(prop *send_tables.SendProp) uint64 {
 	}
 
 	// signed uint64
-	if (prop.Flags & send_tables.SPROP_UNSIGNED) == 0 {
+	if (prop.Flags & SPROP_UNSIGNED) == 0 {
 		return uint64(val)
 	}
 

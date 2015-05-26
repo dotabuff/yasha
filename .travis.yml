@@ -10,3 +10,7 @@ install:
 
 script:
   - make test
+
+cache:
+  directories:
+    - $HOME/gopath/src/github.com/dotabuff/yasha/replays

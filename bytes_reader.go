@@ -1,4 +1,4 @@
-package utils
+package yasha
 
 type BytesReader struct {
 	data     []byte

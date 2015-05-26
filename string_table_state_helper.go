@@ -1,4 +1,4 @@
-package string_tables
+package yasha
 
 import (
 	"bytes"
@@ -10,9 +10,6 @@ import (
 	"strconv"
 
 	"github.com/dotabuff/yasha/dota"
-	"github.com/dotabuff/yasha/parser"
-	"github.com/dotabuff/yasha/send_tables"
-	"github.com/dotabuff/yasha/utils"
 	"github.com/golang/protobuf/proto"
 )
 
@@ -30,7 +27,7 @@ func (m ModifierBuffs) Less(i, j int) bool { return m[i].GetSerialNum() < m[j].G
 func (m ModifierBuffs) Swap(i, j int)      { m[i], m[j] = m[j], m[i] }
 
 type StateHelper struct {
-	packets parser.ParserBaseItems
+	packets OuterParserBaseItems
 
 	lastCreateIndex int
 	// contains meta information for parsing the table
@@ -44,7 +41,7 @@ type StateHelper struct {
 
 	ClassInfosNameMapping map[int]string
 	ActiveModifierDelta   ModifierBuffs
-	Mapping               map[int][]*send_tables.SendProp
+	Mapping               map[int][]*SendProp
 	Multiples             map[int]map[string]int
 	Baseline              map[int]map[string]interface{}
 	pendingBaseline       []*StringTableItem
@@ -52,7 +49,7 @@ type StateHelper struct {
 
 func NewStateHelper() *StateHelper {
 	return &StateHelper{
-		packets:         parser.ParserBaseItems{},
+		packets:         OuterParserBaseItems{},
 		metaTables:      map[int]*CacheItem{},
 		baseTables:      map[int]*StringTable{},
 		evolution:       map[int][]*StringTable{},
@@ -74,7 +71,7 @@ func writeStringTables(directory string, tick int, t string) {
 	}
 }
 
-func (helper *StateHelper) AppendPacket(packet *parser.ParserBaseItem) {
+func (helper *StateHelper) AppendPacket(packet *OuterParserBaseItem) {
 	switch obj := packet.Object.(type) {
 	case *dota.CDemoStringTables:
 		// looks like we don't need them, they are just like CST
@@ -213,7 +210,7 @@ func (helper *StateHelper) updateInstanceBaselineItem(item *StringTableItem) {
 	}
 
 	if len(item.Data) > 0 {
-		br := utils.NewBitReader(item.Data)
+		br := NewBitReader(item.Data)
 		indices := br.ReadPropertiesIndex()
 		baseValues := br.ReadPropertiesValues(mapping, multiples, indices)
 		for key, value := range baseValues {

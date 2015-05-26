@@ -1,4 +1,4 @@
-package string_tables
+package yasha
 
 import (
 	"github.com/dotabuff/yasha/dota"

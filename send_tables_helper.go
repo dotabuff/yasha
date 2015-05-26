@@ -1,4 +1,4 @@
-package send_tables
+package yasha
 
 import (
 	"sort"
@@ -62,7 +62,7 @@ type Helper struct {
 	excludedSendProp []*SendProp
 }
 
-func NewHelper() *Helper {
+func NewSendTablesHelper() *Helper {
 	return &Helper{
 		sendTables:       map[string]*dota.CSVCMsg_SendTable{},
 		flatSendTable:    []*SendProp{},
