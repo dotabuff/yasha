@@ -26,7 +26,7 @@ type testCase struct {
 func TestEsportsPatch683b(t *testing.T) {
 	c := &testCase{
 		matchId: 1405240741,
-		url:     "http://replay135.valve.net/570/1405240741_220241732.dem.bz2",
+		url:     "https://s3-us-west-2.amazonaws.com/yasha.dotabuff/1405240741.dem",
 		expectLastChatMessage: "Gg",
 		expectHeroKillCount: map[string]int{
 			"npc_dota_hero_ember_spirit": 0,
@@ -47,7 +47,7 @@ func TestEsportsPatch683b(t *testing.T) {
 func TestEsportsPatch684p0(t *testing.T) {
 	c := &testCase{
 		matchId: 1450235906,
-		url:     "http://replay136.valve.net/570/1450235906_1463120933.dem.bz2",
+		url:     "https://s3-us-west-2.amazonaws.com/yasha.dotabuff/1450235906.dem",
 		expectLastChatMessage: "gg",
 		expectHeroKillCount: map[string]int{
 			"npc_dota_hero_broodmother": 3,
@@ -64,7 +64,7 @@ func TestEsportsPatch684p0(t *testing.T) {
 func TestEsportsPatch684p1(t *testing.T) {
 	c := &testCase{
 		matchId: 1458895412,
-		url:     "http://replay123.valve.net/570/1458895412_140022944.dem.bz2",
+		url:     "https://s3-us-west-2.amazonaws.com/yasha.dotabuff/1458895412.dem",
 		expectLastChatMessage: "gg",
 		expectHeroKillCount: map[string]int{
 			"npc_dota_hero_faceless_void": 3,
@@ -81,7 +81,7 @@ func TestEsportsPatch684p1(t *testing.T) {
 func TestEsportsPatch684c(t *testing.T) {
 	c := &testCase{
 		matchId: 1483980562,
-		url:     "http://replay133.valve.net/570/1483980562_1668922202.dem.bz2",
+		url:     "https://s3-us-west-2.amazonaws.com/yasha.dotabuff/1483980562.dem",
 		expectLastChatMessage: "gg wp",
 		expectHeroKillCount: map[string]int{
 			"npc_dota_hero_dragon_knight": 5,
@@ -100,7 +100,7 @@ func TestEsportsPatch684c(t *testing.T) {
 func TestPublicMatchPatch684p1(t *testing.T) {
 	assert := assert.New(t)
 
-	data, err := getReplayData(1456774107, "http://s.tsai.co/replays/1456774107.dem")
+	data, err := getReplayData(1456774107, "https://s3-us-west-2.amazonaws.com/yasha.dotabuff/1456774107.dem")
 	if err != nil {
 		t.Fatalf("unable to get replay: %s", err)
 	}

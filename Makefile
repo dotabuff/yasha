@@ -21,3 +21,6 @@ dota: dota/google/protobuf/descriptor.pb.go
 dota/google/protobuf/descriptor.pb.go : google/protobuf/descriptor.proto
 	mkdir -p dota/google/protobuf
 	protoc -I. --go_out=dota $<
+
+sync-replays:
+	s3cmd --region=us-west-2 sync ./replays/*.dem s3://yasha.dotabuff/
