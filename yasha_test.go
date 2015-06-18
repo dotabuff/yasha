@@ -13,6 +13,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func init() {
+	debugMode = true
+}
+
 type testCase struct {
 	matchId int64
 	url     string
@@ -211,6 +215,18 @@ func testReplayCase(t *testing.T, c *testCase) {
 	}
 
 	parser.Parse()
+
+	/*
+		for _, table := range parser.Stsh.current {
+			if table.Name == "instancebaseline" {
+				for _, i := range table.Items {
+					classId := atoi(i.Str)
+					className := parser.ClassInfosNameMapping[classId]
+					_dump_fixture(_sprintf("instancebaseline/%d_%s", c.matchId, className), i.Data)
+				}
+			}
+		}
+	*/
 
 	// Make sure we have found the death counts for specified heroes
 	if c.expectHeroDeathCount != nil {

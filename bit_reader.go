@@ -407,15 +407,21 @@ func (br *BitReader) ReadPropertiesValues(mapping []*SendProp, multiples map[str
 			switch prop.Type {
 			case DPT_Int:
 				values[key] = br.decodeInt(prop)
+				//_debugf("reading %s as a DPT_Int = %v", key, values[key])
 			case DPT_Int64:
+				//_debugf("reading %s as a DPT_Int64 = %v", key, values[key])
 				values[key] = br.decodeInt64(prop)
 			case DPT_Float:
+				//_debugf("reading %s as a DPT_Float = %v", key, values[key])
 				values[key] = br.ReadFloat(prop)
 			case DPT_Vector:
+				//_debugf("reading %s as a DPT_Vector = %v", key, values[key])
 				values[key] = br.ReadVector(prop)
 			case DPT_VectorXY:
+				//_debugf("reading %s as a DPT_VectorXY = %v", key, values[key])
 				values[key] = br.ReadVectorXY(prop)
 			case DPT_String:
+				//_debugf("reading %s as a DPT_String = %v", key, values[key])
 				values[key] = br.decodeString()
 			default:
 				panic("unknown type")

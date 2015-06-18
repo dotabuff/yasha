@@ -477,6 +477,13 @@ func (p *Parser) onCDemoClassInfo(cdci *dota.CDemoClassInfo) {
 		p.Multiples[id] = multiples
 		p.Mapping[id] = props
 
+		/*
+			_debugf("class %d: %s", id, name)
+			for _, prop := range props {
+				_debugf("  -> %+v", prop)
+			}
+		*/
+
 		if p.OnTablename != nil {
 			p.OnTablename(name)
 		}
@@ -487,7 +494,16 @@ func (p *Parser) onCDemoClassInfo(cdci *dota.CDemoClassInfo) {
 	p.Stsh.Multiples = p.Multiples
 }
 
+var __pe int
+
 func (p *Parser) ParsePacket(tick int, pe *dota.CSVCMsg_PacketEntities) {
+	/*
+		if !pe.GetIsDelta() {
+			__pe++
+			_dump_fixture(_sprintf("packet_entities/pe_%04d_%detntries_%dmax.rawbuf", __pe, pe.GetUpdatedEntries(), pe.GetMaxEntries()), pe.GetEntityData())
+		}
+	*/
+
 	br := NewBitReader(pe.GetEntityData())
 	currentIndex := -1
 
@@ -543,6 +559,11 @@ func (p *Parser) entityCreate(br *BitReader, currentIndex, tick int) *PacketEnti
 	}
 	pe.EntityHandle = pe.Handle()
 	pe.Name = p.ClassInfosNameMapping[pe.ClassId]
+	/*
+		_debugf("creating pe: tick+%d classId=%d serial=%d index=%d handle=%d name=%s",
+			pe.Tick, pe.ClassId, pe.SerialNum, pe.Index, pe.EntityHandle, pe.Name,
+		)
+	*/
 
 	indices := br.ReadPropertiesIndex()
 	pMapping := p.Mapping[pe.ClassId]
