@@ -111,7 +111,7 @@ func TestPublicMatchPatch684p1(t *testing.T) {
 
 	earthshakerDeaths := 0
 	spiritBreakerDeaths := 0
-	parser.OnCombatLog = func(entry CombatLogEntry) {
+	parser.OnCombatLog = func(tick int, entry CombatLogEntry) {
 		// t.Logf("OnCombatLog: %s: %+v", reflect.TypeOf(entry), entry)
 		switch log := entry.(type) {
 		case *CombatLogDeath:
@@ -186,7 +186,7 @@ func testReplayCase(t *testing.T, c *testCase) {
 	parser.OnChatEvent = func(n int, o *dota.CDOTAUserMsg_ChatEvent) {
 	}
 
-	parser.OnCombatLog = func(entry CombatLogEntry) {
+	parser.OnCombatLog = func(tick int, entry CombatLogEntry) {
 		switch log := entry.(type) {
 		case *CombatLogDeath:
 			if strings.HasPrefix(log.Target, "npc_dota_hero_") {
