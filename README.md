@@ -14,7 +14,7 @@ This parser is able to parse replays recorded since about 2012.
 
 The upcoming Source 2 Engine requires several incompatible changes, so we work on it in a separate repository.
 
-See also [Sange, the Dota 2 (Source 2) parser](http://github.com/dotabuff/sange)
+See also [Manta, the Dota 2 (Source 2) parser](http://github.com/dotabuff/manta)
 
 ## Installation
 
