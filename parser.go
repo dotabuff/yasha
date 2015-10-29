@@ -82,7 +82,7 @@ type Parser struct {
 	OnSetConVar func(obj *dota.CNETMsg_SetConVar)
 	OnVoiceData func(obj *dota.CSVCMsg_VoiceData)
 
-	OnCombatLog func(log CombatLogEntry)
+	OnCombatLog func(tick int, log CombatLogEntry)
 
 	OnTablename func(name string)
 
@@ -436,7 +436,7 @@ func (p *Parser) onGameEvent(tick int, obj *dota.CSVCMsg_GameEvent) {
 	case "dota_combatlog":
 		if p.OnCombatLog != nil {
 			if log := p.combatLogParser.parse(obj); log != nil {
-				p.OnCombatLog(log)
+				p.OnCombatLog(tick, log)
 			}
 		}
 	case "dota_chase_hero":
